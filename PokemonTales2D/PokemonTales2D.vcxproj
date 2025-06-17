@@ -18,6 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\EventManager.h" />
+    <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\SharedTypes.h" />
+    <ClInclude Include="include\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\EventManager.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Window.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -105,7 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Program Files\SFML\SFML-3.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\enjal\Documents\JVDev\PokeTales\PokemonTales2D\PokemonTales2D\include;C:\Program Files\SFML\SFML-3.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,9 +146,6 @@
       <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
