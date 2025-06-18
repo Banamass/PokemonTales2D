@@ -33,8 +33,9 @@ void Window::SetCallbacks() {
 	eventManager.AddCallback("LCtrlFKey", &Window::ToggleFullscreen, this);
 }
 
-Window::Window(const std::string& l_title, const sf::Vector2u l_size) {
+Window::Window(const std::string& l_title, const sf::Vector2u l_size, SharedContext* context) {
 	Setup(l_title, l_size);
+	context->eventManager = &eventManager;
 }
 Window::~Window() {
 	Destroy();

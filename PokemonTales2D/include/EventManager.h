@@ -32,7 +32,7 @@ private:
 
 class WindowEvent : public ASfmlEvent {
 public:
-    enum EType { Closed };
+    enum EType { Closed, MouseMove };
 
     WindowEvent(EType l_type);
     bool match();

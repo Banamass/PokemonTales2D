@@ -5,7 +5,7 @@
 class Window
 {
 public:
-	Window(const std::string& l_title, const sf::Vector2u l_size);
+	Window(const std::string& l_title, const sf::Vector2u l_size, SharedContext* context);
 	virtual ~Window();
 
 	void BeginDraw();

@@ -2,9 +2,7 @@
 
 /*------------------------Box------------------------*/
 
-Box::Box(sf::Vector2f l_pos, float l_size): pos(l_pos), size(l_size){
-	defaultColor = sf::Color::White;
-	selectedColor = sf::Color::Red;
+Box::Box(sf::Vector2f l_pos, float l_size, sf::Color color): pos(l_pos), size(l_size), defaultColor(color){
 
 	sprite.setPosition(pos);
 	sprite.setSize(sf::Vector2f(size, size));
@@ -18,8 +16,11 @@ void Box::Render(Window* win){
 	win->Draw(sprite);
 }
 
-void Box::setIsSelected(bool isSelected) {
-	sprite.setFillColor(isSelected ? selectedColor : defaultColor);
+void Box::SetColor(sf::Color color) {
+	sprite.setFillColor(color);
+}
+void Box::ResetColor() {
+	sprite.setFillColor(defaultColor);
 }
 
 /*------------------------SelectedBoxArea------------------------*/
@@ -41,13 +42,14 @@ void SelectedBoxArea::Update(Board* board, sf::Vector2i centerCoord) {
 
 void SelectedBoxArea::Clear() {
 	for (Box* box : boxes) {
-		box->setIsSelected(false);
+		box->ResetColor();
 	}
 	boxes.clear();
 }
 
 void SelectedBoxArea::SetSize(int l_size) { size = l_size; }
 void SelectedBoxArea::SetShape(Shape l_shape) { shape = l_shape; }
+void SelectedBoxArea::SetSelectedColor(sf::Color color) { selectedColor = color; }
 
 void SelectedBoxArea::UpdateSquare(Board* board, sf::Vector2i centerCoord) {
 	for (int i = centerCoord.x - size + 1; i <= centerCoord.x + size - 1; i++) {
@@ -78,7 +80,7 @@ void SelectedBoxArea::Add(Box* box) {
 	if (box == nullptr)
 		return;
 	boxes.push_back(box);
-	box->setIsSelected(true);
+	box->SetColor(selectedColor);
 }
 
 /*------------------------Board------------------------*/
@@ -89,6 +91,9 @@ Board::Board(SharedContext* l_context): context(l_context){
 	CreateBoxes();
 	cursor.SetSize(5);
 	cursor.SetShape(SelectedBoxArea::Shape::Diamant);
+	cursor.SetSelectedColor(sf::Color::Blue);
+
+	SetCallbacks();
 }
 Board::~Board(){}
 
@@ -97,8 +102,6 @@ void Board::Update(){
 	viewSpace.position.x = size.x * boxSize / 2 - viewSpace.size.x / 2;
 	viewSpace.position.y = size.y * boxSize / 2 - viewSpace.size.y / 2;
 	context->window->GetRenderWindow()->setView(sf::View(viewSpace));
-
-	UpdateCursor();
 }
 
 void Board::Render(){
@@ -111,6 +114,14 @@ void Board::Render(){
 
 Box* Board::GetBox(sf::Vector2i boxCoord) {
 	return isBoxInBoard(boxCoord) ? &boxes[boxCoord.x][boxCoord.y] : nullptr;
+}
+
+void Board::SetCallbacks() {
+	Binding* b = new Binding("MouseMove");
+	b->BindEvent(new WindowEvent(WindowEvent::EType::MouseMove));
+	context->eventManager->AddBinding(b);
+
+	context->eventManager->AddCallback("MouseMove", &Board::UpdateCursor, this);
 }
 
 void Board::CreateBoxes() {
@@ -128,6 +139,7 @@ bool Board::isBoxInBoard(sf::Vector2i boxCoord) {
 }
 
 void Board::UpdateCursor() {
+	std::cout << "Update Cursor" << std::endl;
 	sf::Vector2i pix_mousepos = context->window->GetMousePos();
 	sf::Vector2f world_mousePos = context->window->GetRenderWindow()->mapPixelToCoords(pix_mousepos);
 

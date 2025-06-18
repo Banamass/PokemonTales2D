@@ -21,8 +21,8 @@ protected:
 	sf::Time elapsed;
 	float frametime;
 
-	Board board;
 	Window window;
+	Board board;
 
 	SharedContext context;
 };

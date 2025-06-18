@@ -14,6 +14,8 @@ WindowEvent::WindowEvent(EType l_type) : type(l_type){}
 bool WindowEvent::match(const sf::Event& event) {
 	if (type == EType::Closed)
 		return event.is<sf::Event::Closed>();
+	if (type == EType::MouseMove)
+		return event.is<sf::Event::MouseMoved>();
 	return false;
 }
 bool WindowEvent::match() {

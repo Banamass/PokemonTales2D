@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : window("PokeTales2D", sf::Vector2u(1920/1.5, 1080/1.5)), board(&context) {
+Game::Game() : window("PokeTales2D", sf::Vector2u(1920/1.5, 1080/1.5), &context), board(&context) {
 	frametime = 1.0f / 60.0f;
 
 	context.window = &window;
