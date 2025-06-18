@@ -19,17 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\APlayer.h" />
     <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\EventManager.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\GameSystem.h" />
+    <ClInclude Include="include\Pokemon.h" />
     <ClInclude Include="include\SharedTypes.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\APlayer.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Pokemon.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

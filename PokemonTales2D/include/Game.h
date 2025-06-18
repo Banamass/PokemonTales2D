@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Board.h"
+#include "GameSystem.h"
 
 class Game
 {
@@ -22,7 +22,7 @@ protected:
 	float frametime;
 
 	Window window;
-	Board board;
+	GameSystem gameSystem;
 
 	SharedContext context;
 };

@@ -1,17 +1,16 @@
 #include "Game.h"
 
-Game::Game() : window("PokeTales2D", sf::Vector2u(1920/1.5, 1080/1.5), &context), board(&context) {
+Game::Game() : window("PokeTales2D", sf::Vector2u(1920/1.5, 1080/1.5), &context), gameSystem(&context) {
 	frametime = 1.0f / 60.0f;
 
 	context.window = &window;
-	context.board = &board;
 }
 Game::~Game(){}
 
 void Game::Update(){
 	while (elapsed.asSeconds() >= frametime) {
 		window.Update();
-		board.Update();
+		gameSystem.Update();
 		elapsed -= sf::seconds(frametime);
 	}
 }
@@ -21,7 +20,7 @@ void Game::LateUpdate(){
 void Game::Render(){
 	window.BeginDraw();
 	
-	board.Render();
+	gameSystem.Render();
 
 	window.EndDraw();
 }
