@@ -5,12 +5,13 @@
 
 class Box {
 public:
-	Box(sf::Vector2f l_pos, float l_size);
+	Box(sf::Vector2f l_pos, float l_size, sf::Color l_color = sf::Color::White);
 	~Box();
 
 	void Render(Window* win);
 
-	void setIsSelected(bool isSelected);
+	void SetColor(sf::Color l_color);
+	void ResetColor();
 
 private:
 	sf::Vector2f pos;
@@ -18,7 +19,6 @@ private:
 	sf::RectangleShape sprite;
 
 	sf::Color defaultColor;
-	sf::Color selectedColor;
 };
 
 class SelectedBoxArea {
@@ -34,6 +34,7 @@ public:
 
 	void SetSize(int l_size);
 	void SetShape(Shape l_shape);
+	void SetSelectedColor(sf::Color l_color);
 
 private:
 	void UpdateSquare(Board* board, sf::Vector2i centerCoord);
@@ -45,6 +46,7 @@ private:
 	sf::Vector2i center;
 	Shape shape;
 	int size;
+	sf::Color selectedColor;
 };
 
 class Board {
@@ -58,6 +60,7 @@ public:
 	Box* GetBox(sf::Vector2i);
 
 private:
+	void SetCallbacks();
 	void CreateBoxes();
 	bool isBoxInBoard(sf::Vector2i boxCoord);
 

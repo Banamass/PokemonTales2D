@@ -139,7 +139,6 @@ bool Board::isBoxInBoard(sf::Vector2i boxCoord) {
 }
 
 void Board::UpdateCursor() {
-	std::cout << "Update Cursor" << std::endl;
 	sf::Vector2i pix_mousepos = context->window->GetMousePos();
 	sf::Vector2f world_mousePos = context->window->GetRenderWindow()->mapPixelToCoords(pix_mousepos);
 
