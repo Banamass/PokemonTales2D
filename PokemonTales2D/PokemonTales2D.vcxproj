@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\EventManager.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\SharedTypes.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />

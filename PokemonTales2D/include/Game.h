@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Window.h"
+#include "Board.h"
 
 class Game
 {
@@ -21,6 +21,7 @@ protected:
 	sf::Time elapsed;
 	float frametime;
 
+	Board board;
 	Window window;
 
 	SharedContext context;
