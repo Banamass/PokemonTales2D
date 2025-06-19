@@ -14,11 +14,25 @@ WindowEvent::WindowEvent(EType l_type) : type(l_type){}
 bool WindowEvent::match(const sf::Event& event) {
 	if (type == EType::Closed)
 		return event.is<sf::Event::Closed>();
-	if (type == EType::MouseMove)
-		return event.is<sf::Event::MouseMoved>();
 	return false;
 }
 bool WindowEvent::match() {
+	return false;
+}
+
+MouseEvent::MouseEvent(EType l_type) : type(l_type) {}
+bool MouseEvent::match(const sf::Event& event) {
+	if (type == EType::Moved)
+		return event.is<sf::Event::MouseMoved>();
+	if (event.is<sf::Event::MouseButtonReleased>()) {
+		if(type == EType::LClick)
+			return event.getIf<sf::Event::MouseButtonReleased>()->button == sf::Mouse::Button::Left;
+		if (type == EType::RClick)
+			return event.getIf<sf::Event::MouseButtonReleased>()->button == sf::Mouse::Button::Right;
+	}
+	return false;
+}
+bool MouseEvent::match() {
 	return false;
 }
 

@@ -24,6 +24,7 @@
     <ClInclude Include="include\EventManager.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GameSystem.h" />
+    <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Pokemon.h" />
     <ClInclude Include="include\SharedTypes.h" />
     <ClInclude Include="include\Window.h" />
@@ -35,6 +36,7 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>

@@ -3,11 +3,12 @@
 /*------------------------Box------------------------*/
 
 Box::Box(sf::Vector2f l_pos, float l_size, sf::Color color): pos(l_pos), size(l_size), defaultColor(color){
+	float oulineThickness = Constants::GAP_SIZE;
 
-	sprite.setPosition(pos);
-	sprite.setSize(sf::Vector2f(size, size));
+	sprite.setPosition({ pos.x + oulineThickness, pos.y + oulineThickness });
+	sprite.setSize(sf::Vector2f(size-oulineThickness, size-oulineThickness));
 	sprite.setFillColor(defaultColor);
-	sprite.setOutlineThickness(2.0f);
+	sprite.setOutlineThickness(oulineThickness);
 	sprite.setOutlineColor(sf::Color::Blue);
 }
 Box::~Box(){}
@@ -23,75 +24,16 @@ void Box::ResetColor() {
 	sprite.setFillColor(defaultColor);
 }
 
-/*------------------------SelectedBoxArea------------------------*/
-
-void SelectedBoxArea::Update(Board* board, sf::Vector2i centerCoord) {
-	if (center == centerCoord)
-		return;
-	Clear();
-	if (shape == Shape::Square) {
-		UpdateSquare(board, centerCoord);
-	}
-	else if (shape == Shape::Cross) {
-		UpdateCross(board, centerCoord);
-	}
-	else if (shape == Shape::Diamant) {
-		UpdateDiamant(board, centerCoord);
-	}
-}
-
-void SelectedBoxArea::Clear() {
-	for (Box* box : boxes) {
-		box->ResetColor();
-	}
-	boxes.clear();
-}
-
-void SelectedBoxArea::SetSize(int l_size) { size = l_size; }
-void SelectedBoxArea::SetShape(Shape l_shape) { shape = l_shape; }
-void SelectedBoxArea::SetSelectedColor(sf::Color color) { selectedColor = color; }
-
-void SelectedBoxArea::UpdateSquare(Board* board, sf::Vector2i centerCoord) {
-	for (int i = centerCoord.x - size + 1; i <= centerCoord.x + size - 1; i++) {
-		for (int j = centerCoord.y - size + 1; j <= centerCoord.y + size - 1; j++) {
-			Add(board->GetBox(sf::Vector2i(i, j)));
-		}
-	}
-}
-void SelectedBoxArea::UpdateCross(Board* board, sf::Vector2i centerCoord) {
-	Add(board->GetBox(sf::Vector2i(centerCoord.x, centerCoord.y)));
-	for (int i = 1; i < size; i++) {
-		Add(board->GetBox(sf::Vector2i(centerCoord.x-i, centerCoord.y)));
-		Add(board->GetBox(sf::Vector2i(centerCoord.x+i, centerCoord.y)));
-		Add(board->GetBox(sf::Vector2i(centerCoord.x, centerCoord.y-i)));
-		Add(board->GetBox(sf::Vector2i(centerCoord.x, centerCoord.y+i)));
-	}
-}
-void SelectedBoxArea::UpdateDiamant(Board* board, sf::Vector2i centerCoord) {
-	for (int i = (-size + 1); i <= (size - 1); i++) {
-		for (int j = (-size + 1) + std::abs(i); j <= (size - 1)-std::abs(i); j++) {
-			Add(board->GetBox(sf::Vector2i(centerCoord.x +i, centerCoord.y + j)));
-		}
-	}
-}
-
-// Add box to boxes if it's not null, otherwise do nothing
-void SelectedBoxArea::Add(Box* box) {
-	if (box == nullptr)
-		return;
-	boxes.push_back(box);
-	box->SetColor(selectedColor);
+sf::Vector2f Box::GetPos() {
+	return pos;
 }
 
 /*------------------------Board------------------------*/
 
 Board::Board(SharedContext* l_context): context(l_context){
-	boxSize = 50;
+	boxSize = Constants::BOX_SIZE;
 	size = { 22,13 };
 	CreateBoxes();
-	cursor.SetSize(5);
-	cursor.SetShape(SelectedBoxArea::Shape::Diamant);
-	cursor.SetSelectedColor(sf::Color::Blue);
 
 	SetCallbacks();
 }
@@ -110,18 +52,86 @@ void Board::Render(){
 			boxes[i][j].Render(context->window);
 		}
 	}
+	for (auto& itr : pokemonsPos) {
+		itr.first->Render(context->window, GetBoxMiddle(itr.second));
+	}
+}
+
+sf::Vector2i Board::GetMousePosition(){
+	sf::Vector2i pix_mousepos = context->window->GetMousePos();
+	sf::Vector2f world_mousePos = context->window->GetRenderWindow()->mapPixelToCoords(pix_mousepos);
+
+	sf::Vector2i hoverBox((int)std::floor(world_mousePos.x / boxSize), (int)std::floor(world_mousePos.y / boxSize));
+	return hoverBox;
+}
+
+sf::Vector2f Board::GetBoxMiddle(sf::Vector2i boxCoord) {
+	sf::Vector2f boxPos = boxes[boxCoord.x][boxCoord.y].GetPos();
+	return sf::Vector2f(boxPos.x + boxSize / 2, boxPos.y + boxSize / 2);
 }
 
 Box* Board::GetBox(sf::Vector2i boxCoord) {
 	return isBoxInBoard(boxCoord) ? &boxes[boxCoord.x][boxCoord.y] : nullptr;
 }
 
-void Board::SetCallbacks() {
-	Binding* b = new Binding("MouseMove");
-	b->BindEvent(new WindowEvent(WindowEvent::EType::MouseMove));
-	context->eventManager->AddBinding(b);
+bool Board::SetPokemonPos(Pokemon* poke, sf::Vector2i pos) {
+	if (poke == nullptr)
+		return false;
+	if (!CheckMove(poke, pos))
+		return false;
+	auto itr = pokemonsPos.find(poke);
+	if (itr == pokemonsPos.end()) {
+		pokemonsPos.emplace(std::make_pair(poke, pos));
+	}
+	else {
+		pokemonsPos.at(poke) = pos;
+	}
+	return true;
+}
+bool Board::MovePokemon(Pokemon* poke, sf::Vector2i move) {
+	if (poke == nullptr)
+		return false;
+	auto itr = pokemonsPos.find(poke);
+	if (itr == pokemonsPos.end())
+		return false;
+	return SetPokemonPos(poke, itr->second + move);
+}
 
-	context->eventManager->AddCallback("MouseMove", &Board::UpdateCursor, this);
+bool Board::CheckMove(Pokemon* poke, sf::Vector2i pos) {
+	if (poke == nullptr)
+		return false;
+	sf::IntRect hitbox1(pos, poke->GetSize());
+	for (auto& itr : pokemonsPos) {
+		if (itr.first == poke)
+			continue;
+		sf::IntRect hitbox2(itr.second, itr.first->GetSize());
+		if (hitbox1.findIntersection(hitbox2).has_value())
+			return false;
+	}
+	sf::IntRect boardHitBox = sf::IntRect({ 0,0 }, size);
+	return boardHitBox.contains(pos + poke->GetSize() - sf::Vector2i({1,1}));
+}
+
+sf::Vector2i Board::GetPokemonPosition(Pokemon* poke) {
+	return pokemonsPos[poke];
+}
+
+Pokemon* Board::GetPokemonFromPos(sf::Vector2i pos){
+	for (auto& itr : pokemonsPos) {
+		if (pos.x >= itr.second.x && pos.x <= itr.second.x + itr.first->GetSize().x
+			&& pos.y >= itr.second.y && pos.y <= itr.second.y + itr.first->GetSize().y)
+			return itr.first;
+	}
+	return nullptr;
+}
+
+void Board::Draw(sf::Shape& shape, sf::Vector2i pos){
+	shape.setPosition(GetBoxMiddle(pos));
+	context->window->Draw(shape);
+}
+
+void Board::SetCallbacks() {
+	
 }
 
 void Board::CreateBoxes() {
@@ -136,12 +146,4 @@ void Board::CreateBoxes() {
 bool Board::isBoxInBoard(sf::Vector2i boxCoord) {
 	return boxCoord.x >= 0 && boxCoord.x < size.x
 		&& boxCoord.y >= 0 && boxCoord.y < size.y;
-}
-
-void Board::UpdateCursor() {
-	sf::Vector2i pix_mousepos = context->window->GetMousePos();
-	sf::Vector2f world_mousePos = context->window->GetRenderWindow()->mapPixelToCoords(pix_mousepos);
-
-	sf::Vector2i hoverBox((int)std::floor(world_mousePos.x / boxSize), (int)std::floor(world_mousePos.y / boxSize));
-	cursor.Update(this, hoverBox);	
 }

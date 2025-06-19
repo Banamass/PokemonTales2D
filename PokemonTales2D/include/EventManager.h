@@ -32,9 +32,21 @@ private:
 
 class WindowEvent : public ASfmlEvent {
 public:
-    enum EType { Closed, MouseMove };
+    enum EType { Closed };
 
     WindowEvent(EType l_type);
+    bool match();
+    bool match(const sf::Event& event);
+
+private:
+    EType type;
+};
+
+class MouseEvent : public ASfmlEvent {
+public:
+    enum EType { Moved, LClick, RClick };
+
+    MouseEvent(EType l_type);
     bool match();
     bool match(const sf::Event& event);
 
