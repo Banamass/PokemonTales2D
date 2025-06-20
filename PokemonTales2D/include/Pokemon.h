@@ -11,10 +11,13 @@ public:
 
 	sf::Vector2i GetSize();
 	sf::RectangleShape GetFrame();
+	int GetMoveRange();
+	void SetMoveRange(int l_range);
 
 private:
 	sf::CircleShape sprite;
 	sf::RectangleShape frame;
 
 	sf::Vector2i size; //in nb box takes
+	int moveRange;
 };

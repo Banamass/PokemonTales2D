@@ -75,12 +75,23 @@ void SquareArea::setRealPosOffset() {
 /*------------------------MoveArea------------------------*/
 
 bool MoveArea::IsIn(sf::Vector2i l_pos) {
-	return sf::IntRect(pos - sf::Vector2i(range, range), sf::Vector2i(range, range) * 2).contains(l_pos);
+
+	for (auto& itr : boxDistance) {
+		if (itr.first->GetBoardPos() == l_pos) {
+			return itr.second >= 0;
+		}
+	}
+	return false;
+}
+
+int MoveArea::Distance(Board* board, sf::Vector2i l_pos) {
+	return boxDistance[board->GetBox(l_pos)];
 }
 
 void MoveArea::Update(Board* board, sf::Vector2i l_pos) {
 	Clear();
-	sf::Vector2i boxPos;
+	pos = l_pos;
+	/*sf::Vector2i boxPos;
 	sf::Vector2i size(range, range);
 	for (int i = -size.x; i < size.x; i++) {
 		for (int j = -size.y; j < size.y; j++) {
@@ -89,7 +100,46 @@ void MoveArea::Update(Board* board, sf::Vector2i l_pos) {
 			Add(board->GetBox(boxPos));
 		}
 	}
-	pos = l_pos;
+	pos = l_pos;*/
+	sf::Vector2i boardSize = board->GetSize();
+	for (int i = 0; i < boardSize.x; i++) {
+		for (int j = 0; j < boardSize.y; j++) {
+			boxDistance.emplace(board->GetBox({ i, j }), -2); //-2 corresponds to an unvisited box
+		}
+	}
+
+	Box* originBox = board->GetBox(pos);
+	boxDistance[originBox] = 0;
+	std::queue<Box*> toExplore;
+	toExplore.push(originBox);
+	Add(originBox);
+	while (!toExplore.empty()) {
+		Box* curr = toExplore.front();
+		toExplore.pop();
+		int currRange = boxDistance[curr];
+		if (currRange == range)
+			continue;
+		sf::Vector2i currPos = curr->GetBoardPos();
+		sf::Vector2i neigh[4] = { currPos - sf::Vector2i(1,0), currPos - sf::Vector2i(-1,0),
+							currPos - sf::Vector2i(0,1), currPos - sf::Vector2i(0,-1) };
+		for (sf::Vector2i n_pos : neigh) {
+			Box* n = board->GetBox(n_pos);
+			if (n == nullptr || boxDistance[n] != -2)
+				continue;
+			if (!board->CheckMove(movingPokemon, n_pos)) {
+				boxDistance[n] = -1;
+				continue;
+			}
+			boxDistance[n] = currRange + 1;
+			toExplore.push(n);
+			Add(n);
+		}
+	}
+}
+
+void MoveArea::Clear() {
+	AbstractArea::Clear();
+	boxDistance.clear();
 }
 
 /*------------------------APlayer------------------------*/

@@ -2,7 +2,8 @@
 
 /*------------------------Box------------------------*/
 
-Box::Box(sf::Vector2f l_pos, float l_size, sf::Color color): pos(l_pos), size(l_size), defaultColor(color){
+Box::Box(sf::Vector2f l_pos, sf::Vector2i l_boardPos, float l_size, sf::Color color)
+	: pos(l_pos), size(l_size), defaultColor(color), boardPos(l_boardPos){
 	float oulineThickness = Constants::GAP_SIZE;
 
 	sprite.setPosition({ pos.x + oulineThickness, pos.y + oulineThickness });
@@ -26,6 +27,10 @@ void Box::ResetColor() {
 
 sf::Vector2f Box::GetPos() {
 	return pos;
+}
+
+sf::Vector2i Box::GetBoardPos() {
+	return boardPos;
 }
 
 /*------------------------Board------------------------*/
@@ -74,6 +79,10 @@ Box* Board::GetBox(sf::Vector2i boxCoord) {
 	return isBoxInBoard(boxCoord) ? &boxes[boxCoord.x][boxCoord.y] : nullptr;
 }
 
+sf::Vector2i Board::GetSize() {
+	return size;
+}
+
 bool Board::SetPokemonPos(Pokemon* poke, sf::Vector2i pos) {
 	if (poke == nullptr)
 		return false;
@@ -118,8 +127,8 @@ sf::Vector2i Board::GetPokemonPosition(Pokemon* poke) {
 
 Pokemon* Board::GetPokemonFromPos(sf::Vector2i pos){
 	for (auto& itr : pokemonsPos) {
-		if (pos.x >= itr.second.x && pos.x <= itr.second.x + itr.first->GetSize().x
-			&& pos.y >= itr.second.y && pos.y <= itr.second.y + itr.first->GetSize().y)
+		sf::IntRect hitbox(itr.second, itr.first->GetSize());
+		if(hitbox.contains(pos))
 			return itr.first;
 	}
 	return nullptr;
@@ -138,7 +147,7 @@ void Board::CreateBoxes() {
 	for (int i = 0; i < size.x; i++) {
 		boxes.push_back({});
 		for (int j = 0; j < size.y; j++) {
-			boxes[i].emplace_back(sf::Vector2f(i * boxSize, j * boxSize), boxSize);
+			boxes[i].emplace_back(sf::Vector2f(i * boxSize, j * boxSize), sf::Vector2i(i, j), boxSize);
 		}
 	}
 }

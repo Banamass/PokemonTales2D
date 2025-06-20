@@ -27,3 +27,5 @@ void Pokemon::Render(Window* win, sf::Vector2f pos) {
 
 sf::Vector2i Pokemon::GetSize() { return size; }
 sf::RectangleShape Pokemon::GetFrame () { return frame; }
+int Pokemon::GetMoveRange() { return moveRange; }
+void Pokemon::SetMoveRange(int l_range) { moveRange = l_range; }

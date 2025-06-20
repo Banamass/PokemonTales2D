@@ -6,7 +6,7 @@
 
 class Box {
 public:
-	Box(sf::Vector2f l_pos, float l_size, sf::Color l_color = sf::Color::White);
+	Box(sf::Vector2f l_pos, sf::Vector2i l_boardPos, float l_size, sf::Color l_color = sf::Color::White);
 	~Box();
 
 	void Render(Window* win);
@@ -14,9 +14,11 @@ public:
 	void SetColor(sf::Color l_color);
 	void ResetColor();
 	sf::Vector2f GetPos();
+	sf::Vector2i GetBoardPos();
 
 private:
 	sf::Vector2f pos;
+	sf::Vector2i boardPos;
 	float size;
 	sf::RectangleShape sprite;
 
@@ -35,6 +37,7 @@ public:
 	sf::Vector2i GetMousePosition();
 	sf::Vector2f GetBoxMiddle(sf::Vector2i boxCoord);
 	Box* GetBox(sf::Vector2i boxCoord);
+	sf::Vector2i GetSize();
 
 	/*Modify pokemonsPos[poke] if the key exist or create a new entry to pokemonsPos and store the position
 	The position is in board coords

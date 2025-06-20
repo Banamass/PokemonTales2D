@@ -5,6 +5,8 @@
 Player::Player(SharedContext* l_context) : APlayer(l_context), state(nullptr){
 	pokemons.push_back(new Pokemon(20, sf::Color::Red, sf::Vector2i({2,2})));
 	pokemons.push_back(new Pokemon(20, sf::Color::Green, sf::Vector2i({ 3,2 })));
+	pokemons[0]->SetMoveRange(5);
+	pokemons[1]->SetMoveRange(4);
 
 	SetBindings();
 
@@ -119,7 +121,7 @@ void Player::PokeSelectedState::Move() {
 /*-----------------------------PokeMoveState-----------------------------*/
 
 Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemon) 
-	: State(l_player), selectedPokemon(l_selectedPokemon), moveArea(5, sf::Color(255,255, 255, 200)) {
+	: State(l_player), selectedPokemon(l_selectedPokemon), moveArea(l_selectedPokemon, sf::Color(255,255, 255, 200)) {
 	type = StateType::PokeMove;
 	pokeFrame = selectedPokemon->GetFrame();
 }
@@ -147,7 +149,7 @@ void Player::PokeMoveState::Unmove() {
 
 void Player::PokeMoveState::Move() {
 	sf::Vector2i mousePos = player->context->board->GetMousePosition();
-	if (!moveArea.IsIn(mousePos))
+	if (moveArea.Distance(player->context->board, mousePos) < 0)
 		return;
 	bool hasMoved = player->context->board->SetPokemonPos(selectedPokemon, mousePos);
 	if (!hasMoved)
