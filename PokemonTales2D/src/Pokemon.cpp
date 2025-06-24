@@ -1,6 +1,7 @@
 #include "Pokemon.h"
 
-Pokemon::Pokemon(int size, sf::Color color, sf::Vector2i l_size) :size(l_size) {
+Pokemon::Pokemon(const std::string& l_name,int size, sf::Color color, sf::Vector2i l_size, APlayer* l_trainer)
+	: name(l_name), size(l_size), trainer(l_trainer) {
 	sprite.setFillColor(color);
 	sprite.setRadius(size);
 	sprite.setOrigin({ (float)size, (float)size });
@@ -13,6 +14,9 @@ Pokemon::Pokemon(int size, sf::Color color, sf::Vector2i l_size) :size(l_size) {
 	frame.setOutlineColor(color);
 	frame.setOrigin({ (float)Constants::BOX_SIZE / 2 - oulineThickness
 		, (float)Constants::BOX_SIZE / 2 - oulineThickness });
+
+	health = 100;
+	moveRange = 0;
 }
 Pokemon::~Pokemon() {
 
@@ -25,7 +29,13 @@ void Pokemon::Render(Window* win, sf::Vector2f pos) {
 	win->Draw(sprite);
 }
 
+void Pokemon::TakeDamages(float l_damages) {
+	health -= l_damages;
+}
+
 sf::Vector2i Pokemon::GetSize() { return size; }
 sf::RectangleShape Pokemon::GetFrame () { return frame; }
 int Pokemon::GetMoveRange() { return moveRange; }
 void Pokemon::SetMoveRange(int l_range) { moveRange = l_range; }
+APlayer* Pokemon::GetTrainer() { return trainer; }
+std::string Pokemon::GetName() { return name; }

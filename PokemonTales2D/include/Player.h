@@ -8,13 +8,16 @@ public:
 	virtual ~Player();
 
 	void Setup();
-	void Update();
+	void PlayTurn();
 	void Render();
+	void EndTurn();
 
 private:
 	void SetBindings();
+	void SetGlobalCallbacks();
+	void UnsetGlobalCallbacks();
 
-	enum StateType {None, Default, PokeSelected, PokeMove};
+	enum StateType {None, Default, PokeSelected, PokeMove, PokeAttack};
 
 	class State {
 	public:
@@ -55,6 +58,7 @@ private:
 		void UpdateCursor();
 		void Unselect();
 		void Move();
+		void Attack();
 
 	private:
 		Pokemon* selectedPokemon;
@@ -76,5 +80,19 @@ private:
 		Pokemon* selectedPokemon;
 		sf::RectangleShape pokeFrame;
 		MoveArea moveArea;
+	};
+
+	class PokeAttackState : public State {
+	public:
+		PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon);
+		void SetCallbacks();
+		void UnsetCallbacks();
+
+		void UpdateCursor();
+		void Attack();
+
+	private:
+		Pokemon* selectedPokemon;
+		SquareArea cursor;
 	};
 };

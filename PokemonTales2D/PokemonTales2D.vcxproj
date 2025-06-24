@@ -25,8 +25,10 @@
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GameSystem.h" />
     <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\PlayerAI.h" />
     <ClInclude Include="include\Pokemon.h" />
     <ClInclude Include="include\SharedTypes.h" />
+    <ClInclude Include="include\Widgets.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -37,7 +39,9 @@
     <ClCompile Include="src\GameSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\PlayerAI.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
+    <ClCompile Include="src\Widgets.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

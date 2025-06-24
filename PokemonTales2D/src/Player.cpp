@@ -1,28 +1,29 @@
 #include "Player.h"
+#include "GameSystem.h"
 
 /*-----------------------------Player-----------------------------*/
 
 Player::Player(SharedContext* l_context) : APlayer(l_context), state(nullptr){
-	pokemons.push_back(new Pokemon(20, sf::Color::Red, sf::Vector2i({2,2})));
-	pokemons.push_back(new Pokemon(20, sf::Color::Green, sf::Vector2i({ 3,2 })));
-	pokemons[0]->SetMoveRange(5);
-	pokemons[1]->SetMoveRange(4);
-
 	SetBindings();
-
-	SwitchState(new DefaultState(this));
+	SetGlobalCallbacks();
 }
 Player::~Player() {
-
+	UnsetGlobalCallbacks();
 }
 
 void Player::Setup() {
+	pokemons.push_back(new Pokemon("Carapuce", 20, sf::Color::Red, sf::Vector2i({ 2,2 }), this));
+	pokemons.push_back(new Pokemon("Salamèche", 20, sf::Color::Green, sf::Vector2i({ 3,2 }), this));
+	pokemons[0]->SetMoveRange(2);
+	pokemons[1]->SetMoveRange(3);
+
 	context->board->SetPokemonPos(pokemons[0], { 5,5 });
 	context->board->SetPokemonPos(pokemons[1], { 10,10 });
 }
 
-void Player::Update() {
-
+void Player::PlayTurn() {
+	APlayer::PlayTurn();
+	SwitchState(new DefaultState(this));
 }
 
 void Player::Render() {
@@ -45,7 +46,25 @@ void Player::SetBindings() {
 	b = new Binding("AClick");
 	b->BindEvent(new KeyboardEvent(KeyboardEvent::Pressed, sf::Keyboard::Key::A));
 	context->eventManager->AddBinding(b);
+
+	b = new Binding("Num1Click");
+	b->BindEvent(new KeyboardEvent(KeyboardEvent::Pressed, sf::Keyboard::Key::Num1));
+	context->eventManager->AddBinding(b);
+
+	b = new Binding("QClick");
+	b->BindEvent(new KeyboardEvent(KeyboardEvent::Pressed, sf::Keyboard::Key::Q));
+	context->eventManager->AddBinding(b);
 }
+
+void Player::SetGlobalCallbacks() {
+	context->eventManager->AddCallback("QClick", &Player::EndTurn, this);
+}
+
+void Player::UnsetGlobalCallbacks() {
+	context->eventManager->RemoveCallback("QClick");
+}
+
+void Player::EndTurn() { isPlaying = false; }
 
 void Player::SwitchState(State* newState) {
 	if (newState == nullptr)
@@ -68,16 +87,13 @@ Player::DefaultState::DefaultState(Player* l_player) : State(l_player) {
 }
 
 void Player::DefaultState::SetCallbacks() {
-	std::cout << "Set default state callbacks " << std::endl;
 	player->context->eventManager->AddCallback("MouseLClick", &Player::DefaultState::Select, this);
 }
 void Player::DefaultState::UnsetCallbacks() {
-	std::cout << "UnSet default state callbacks " << std::endl;
 	player->context->eventManager->RemoveCallback("MouseLClick");
 }
 
 void Player::DefaultState::Select() {
-	std::cout << "Select" << std::endl;
 	Pokemon* poke = player->context->board->GetPokemonFromPos(player->context->board->GetMousePosition());
 	if (poke == nullptr)
 		return;
@@ -92,18 +108,18 @@ Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_select
 }
 
 void Player::PokeSelectedState::SetCallbacks() {
-	std::cout << "Set poke select state callbacks " << std::endl;
 	player->context->eventManager->AddCallback("MouseMove", &Player::PokeSelectedState::UpdateCursor, this);
 	player->context->eventManager->AddCallback("MouseRClick", &Player::PokeSelectedState::Unselect, this);
 	player->context->eventManager->AddCallback("AClick", &Player::PokeSelectedState::Move, this);
+	player->context->eventManager->AddCallback("Num1Click", &Player::PokeSelectedState::Attack, this);
 
 	UpdateCursor();
 }
 void Player::PokeSelectedState::UnsetCallbacks() {
-	std::cout << "UnSet poke select state callbacks " << std::endl;
 	player->context->eventManager->RemoveCallback("MouseMove");
 	player->context->eventManager->RemoveCallback("MouseRClick");
 	player->context->eventManager->RemoveCallback("AClick");
+	player->context->eventManager->RemoveCallback("Num1Click");
 }
 
 void Player::PokeSelectedState::UpdateCursor() {
@@ -118,6 +134,10 @@ void Player::PokeSelectedState::Move() {
 	player->SwitchState(new PokeMoveState(player, selectedPokemon));
 }
 
+void Player::PokeSelectedState::Attack() {
+	player->SwitchState(new PokeAttackState(player, selectedPokemon));
+}
+
 /*-----------------------------PokeMoveState-----------------------------*/
 
 Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemon) 
@@ -127,14 +147,12 @@ Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemo
 }
 
 void Player::PokeMoveState::SetCallbacks() {
-	std::cout << "Set poke move state callbacks " << std::endl;
 	player->context->eventManager->AddCallback("MouseRClick", &Player::PokeMoveState::Unmove, this);
 	player->context->eventManager->AddCallback("MouseLClick", &Player::PokeMoveState::Move, this);
 
 	moveArea.Update(player->context->board, player->context->board->GetPokemonPosition(selectedPokemon));
 }
 void Player::PokeMoveState::UnsetCallbacks() {
-	std::cout << "Set poke move state callbacks " << std::endl;
 	player->context->eventManager->RemoveCallback("MouseRClick");
 	player->context->eventManager->RemoveCallback("MouseLClick");
 }
@@ -156,4 +174,33 @@ void Player::PokeMoveState::Move() {
 		return;
 	moveArea.Update(player->context->board, player->context->board->GetPokemonPosition(selectedPokemon));
 	player->SwitchState(new PokeSelectedState(player, selectedPokemon));
+}
+
+/*-----------------------------PokeAttackState-----------------------------*/
+Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon)
+	: State(l_player), selectedPokemon(l_selectedPokemon), cursor({ 3,3}, sf::Color::Red) {
+	type = StateType::PokeAttack;
+}
+
+void Player::PokeAttackState::SetCallbacks() {
+	player->context->eventManager->AddCallback("MouseLClick", &Player::PokeAttackState::Attack, this);
+	player->context->eventManager->AddCallback("MouseMove", &Player::PokeAttackState::UpdateCursor, this);
+
+	cursor.Update(player->context->board, player->context->board->GetPokemonPosition(selectedPokemon));
+}
+void Player::PokeAttackState::UnsetCallbacks() {
+	player->context->eventManager->RemoveCallback("MouseLClick");
+	player->context->eventManager->RemoveCallback("MouseMove");
+}
+
+void Player::PokeAttackState::Attack() {
+	Board* board = player->context->board;
+	std::vector<Pokemon*> attackedPokemon = board->GetPokemonCollision(cursor.GetIntRect());
+	for (Pokemon* poke : attackedPokemon) {
+		player->context->gameSystem->Attack(selectedPokemon, poke);
+	}
+}
+
+void Player::PokeAttackState::UpdateCursor() {
+	cursor.Update(player->context->board, player->context->board->GetMousePosition());
 }

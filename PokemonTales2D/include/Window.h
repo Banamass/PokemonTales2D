@@ -10,6 +10,8 @@ public:
 
 	void BeginDraw();
 	void Draw(sf::Drawable& l_drawable);
+	void StartDrawDefaultView();
+	void EndDrawDefaultView();
 	void EndDraw();
 	void Update();
 
@@ -20,6 +22,7 @@ public:
 	sf::RenderWindow* GetRenderWindow();
 	sf::FloatRect GetViewSpace();
 	sf::Vector2i GetMousePos();
+	void SetView(sf::View view);
 
 	void ToggleFullscreen();
 	void Close();
@@ -34,6 +37,7 @@ protected:
 	sf::RenderWindow window;
 	sf::Vector2u windowSize;
 	std::string windowTitle;
+	sf::View view;
 
 	bool isDone;
 	bool isFullscreen;

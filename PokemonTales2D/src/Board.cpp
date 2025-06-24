@@ -48,7 +48,7 @@ void Board::Update(){
 	sf::FloatRect viewSpace = context->window->GetViewSpace();
 	viewSpace.position.x = size.x * boxSize / 2 - viewSpace.size.x / 2;
 	viewSpace.position.y = size.y * boxSize / 2 - viewSpace.size.y / 2;
-	context->window->GetRenderWindow()->setView(sf::View(viewSpace));
+	context->window->SetView(sf::View(viewSpace));
 }
 
 void Board::Render(){
@@ -125,13 +125,30 @@ sf::Vector2i Board::GetPokemonPosition(Pokemon* poke) {
 	return pokemonsPos[poke];
 }
 
+sf::IntRect Board::GetPokemonHitbox(Pokemon* poke) {
+	auto itr = pokemonsPos.find(poke);
+	if (itr == pokemonsPos.end())
+		return sf::IntRect();
+	return sf::IntRect(itr->second, itr->first->GetSize());
+}
+
 Pokemon* Board::GetPokemonFromPos(sf::Vector2i pos){
 	for (auto& itr : pokemonsPos) {
-		sf::IntRect hitbox(itr.second, itr.first->GetSize());
+		sf::IntRect hitbox = GetPokemonHitbox(itr.first);
 		if(hitbox.contains(pos))
 			return itr.first;
 	}
 	return nullptr;
+}
+std::vector<Pokemon*> Board::GetPokemonCollision(sf::IntRect hitbox) {
+	std::vector<Pokemon*> res;
+	for (auto& itr : pokemonsPos) {
+		sf::IntRect pokeHitbox = GetPokemonHitbox(itr.first);
+		if (pokeHitbox.findIntersection(hitbox).has_value()) {
+			res.push_back(itr.first);
+		}
+	}
+	return res;
 }
 
 void Board::Draw(sf::Shape& shape, sf::Vector2i pos){

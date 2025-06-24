@@ -59,6 +59,7 @@ void SquareArea::Update(Board* board, sf::Vector2i l_pos) {
 		}
 	}
 	pos = l_pos;
+	setIntRect();
 }
 
 void SquareArea::setRealPosOffset() {
@@ -91,16 +92,6 @@ int MoveArea::Distance(Board* board, sf::Vector2i l_pos) {
 void MoveArea::Update(Board* board, sf::Vector2i l_pos) {
 	Clear();
 	pos = l_pos;
-	/*sf::Vector2i boxPos;
-	sf::Vector2i size(range, range);
-	for (int i = -size.x; i < size.x; i++) {
-		for (int j = -size.y; j < size.y; j++) {
-			boxPos.x = l_pos.x + i;
-			boxPos.y = l_pos.y + j;
-			Add(board->GetBox(boxPos));
-		}
-	}
-	pos = l_pos;*/
 	sf::Vector2i boardSize = board->GetSize();
 	for (int i = 0; i < boardSize.x; i++) {
 		for (int j = 0; j < boardSize.y; j++) {
@@ -120,8 +111,14 @@ void MoveArea::Update(Board* board, sf::Vector2i l_pos) {
 		if (currRange == range)
 			continue;
 		sf::Vector2i currPos = curr->GetBoardPos();
-		sf::Vector2i neigh[4] = { currPos - sf::Vector2i(1,0), currPos - sf::Vector2i(-1,0),
-							currPos - sf::Vector2i(0,1), currPos - sf::Vector2i(0,-1) };
+		std::vector<sf::Vector2i> neigh;
+		for (int i = -1; i < 2; i++){
+			for (int j = -1; j < 2; j++) {
+				if (i == 0 && j == 0)
+					continue;
+				neigh.emplace_back(currPos.x + i, currPos.y + j);
+			}
+		}
 		for (sf::Vector2i n_pos : neigh) {
 			Box* n = board->GetBox(n_pos);
 			if (n == nullptr || boxDistance[n] != -2)
@@ -144,7 +141,8 @@ void MoveArea::Clear() {
 
 /*------------------------APlayer------------------------*/
 
-APlayer::APlayer(SharedContext* l_context) : context(l_context){
+APlayer::APlayer(SharedContext* l_context) 
+	: context(l_context), isPlaying(false){
 	
 }
 APlayer::~APlayer() {
@@ -152,3 +150,9 @@ APlayer::~APlayer() {
 		delete poke;
 	}
 }
+
+void APlayer::PlayTurn() {
+	isPlaying = true;
+}
+
+bool APlayer::Playing() { return isPlaying; }

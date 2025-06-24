@@ -10,6 +10,7 @@ void Window::Setup(const std::string& l_title, const sf::Vector2u l_size) {
 	SetCallbacks();
 
 	Create();
+	view = window.getDefaultView();
 }
 
 void Window::SetCallbacks() {
@@ -33,7 +34,7 @@ void Window::SetCallbacks() {
 	eventManager.AddCallback("LCtrlFKey", &Window::ToggleFullscreen, this);
 }
 
-Window::Window(const std::string& l_title, const sf::Vector2u l_size, SharedContext* context) {
+Window::Window(const std::string& l_title, const sf::Vector2u l_size, SharedContext* context){
 	Setup(l_title, l_size);
 	context->eventManager = &eventManager;
 }
@@ -46,6 +47,12 @@ void Window::BeginDraw(){
 }
 void Window::Draw(sf::Drawable& l_drawable) {
 	window.draw(l_drawable);
+}
+void Window::StartDrawDefaultView() {
+	window.setView(window.getDefaultView());
+}
+void Window::EndDrawDefaultView() {
+	window.setView(view);
 }
 void Window::EndDraw(){
 	window.display();
@@ -79,6 +86,10 @@ sf::FloatRect Window::GetViewSpace() {
 	sf::Vector2f viewSizeHalf(viewSize.x / 2, viewSize.y / 2);
 	sf::FloatRect viewSpace(viewCenter - viewSizeHalf, viewSize);
 	return viewSpace;
+}
+void Window::SetView(sf::View l_view) {
+	window.setView(view);
+	view = l_view;
 }
 
 void Window::ToggleFullscreen() {

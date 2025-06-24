@@ -12,11 +12,13 @@ class Window;
 class Game;
 class EventManager;
 class Board;
+class GameSystem;
 
 struct SharedContext {
 	Game* game;
 	Window* window;
 	EventManager* eventManager;
 	Board* board;
+	GameSystem* gameSystem;
 };
 

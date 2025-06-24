@@ -48,9 +48,14 @@ public:
 	If the move is impossible then do nothing and return false, either move and return true*/
 	bool MovePokemon(Pokemon* poke, sf::Vector2i move);
 	sf::Vector2i GetPokemonPosition(Pokemon* poke);
+	/*Return the hit box of a pokemon
+	If the poke isn't on the board, return an empty intrect*/
+	sf::IntRect GetPokemonHitbox(Pokemon* poke);
 
 	/*Return if the poke poke can be move to position pos*/
 	bool CheckMove(Pokemon* poke, sf::Vector2i pos);
+	/*Return the list of pokemons who are touched by the hitbox*/
+	std::vector<Pokemon*> GetPokemonCollision(sf::IntRect hitbox);
 
 	/*Get the pokemon whose area contains pos, if there is no pokemon that match, then return nullptr
 	The position is in board coords
