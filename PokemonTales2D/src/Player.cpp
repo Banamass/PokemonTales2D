@@ -12,8 +12,8 @@ Player::~Player() {
 }
 
 void Player::Setup() {
-	pokemons.push_back(new Pokemon("Carapuce", 20, sf::Color::Red, sf::Vector2i({ 2,2 }), this));
-	pokemons.push_back(new Pokemon("Salamèche", 20, sf::Color::Green, sf::Vector2i({ 3,2 }), this));
+	pokemons.push_back(new Pokemon("Carapuce", 20, sf::Color::Red, sf::Vector2i({ 1,1 }), this));
+	pokemons.push_back(new Pokemon("Salamèche", 20, sf::Color::Green, sf::Vector2i({ 1,1 }), this));
 	pokemons[0]->SetMoveRange(2);
 	pokemons[1]->SetMoveRange(3);
 

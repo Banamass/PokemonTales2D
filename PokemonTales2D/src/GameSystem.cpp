@@ -25,6 +25,23 @@ void GameSystem::Update() {
 		}
 		playingPlayer->PlayTurn();
 	}
+	for (Pokemon* poke : player.GetPokemons()) {
+		if (poke->IsKO()) {
+			gameInfoField.AddMessage(poke->GetName() + " is KO");
+			player.PokemonKO(poke);
+			board.RemovePokemon(poke);
+		}
+	}
+	for (Pokemon* poke : opponent.GetPokemons()) {
+		if (poke->IsKO()) {
+			gameInfoField.AddMessage(poke->GetName() + " is KO");
+			opponent.PokemonKO(poke);
+			board.RemovePokemon(poke);
+		}
+	}
+	for (Pokemon* poke : player.GetPokemons()) {
+
+	}
 	board.Update();
 }
 void GameSystem::Render() {

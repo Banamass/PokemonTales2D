@@ -155,4 +155,14 @@ void APlayer::PlayTurn() {
 	isPlaying = true;
 }
 
+void APlayer::PokemonKO(Pokemon* poke) {
+	for (auto itr = pokemons.begin(); itr != pokemons.end(); itr++) {
+		if (*itr == poke) {
+			pokemons.erase(itr);
+			return;
+		}
+	}
+}
+
 bool APlayer::Playing() { return isPlaying; }
+std::vector<Pokemon*>& APlayer::GetPokemons() { return pokemons; }

@@ -60,3 +60,24 @@ void TextField::Render(Window* win) {
 		posText.y += fontSize;
 	}
 }
+
+/*------------------------------HealthBar------------------------------*/
+
+HealthBar::HealthBar(float* l_health, float l_maxHealth, WidgetsAttributs l_attrs)
+	: health(l_health), maxHealth(l_maxHealth), attrs(l_attrs) {
+	frame.setFillColor(attrs.frameColor);
+	frame.setSize(attrs.size);
+	frame.setOutlineThickness(attrs.frameThickness);
+	frame.setOutlineColor(attrs.frameBackgroundColor);
+
+	bar.setFillColor(attrs.color);
+}
+
+void HealthBar::Render(Window* win, sf::Vector2f refPos) {
+	frame.setPosition(refPos + attrs.pos);
+	win->Draw(frame);
+
+	bar.setPosition(refPos + attrs.pos);
+	bar.setSize({ attrs.size.x * std::max((*health) / maxHealth, 0.0f), attrs.size.y });
+	win->Draw(bar);
+}

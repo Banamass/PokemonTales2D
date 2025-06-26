@@ -151,6 +151,10 @@ std::vector<Pokemon*> Board::GetPokemonCollision(sf::IntRect hitbox) {
 	return res;
 }
 
+void Board::RemovePokemon(Pokemon* poke) {
+	pokemonsPos.erase(pokemonsPos.find(poke));
+}
+
 void Board::Draw(sf::Shape& shape, sf::Vector2i pos){
 	shape.setPosition(GetBoxMiddle(pos));
 	context->window->Draw(shape);

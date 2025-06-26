@@ -62,6 +62,8 @@ public:
 	Rq : If there two pokemons that match, then return any of them*/
 	Pokemon* GetPokemonFromPos(sf::Vector2i pos);
 
+	void RemovePokemon(Pokemon* poke);
+
 	void Draw(sf::Shape& shape, sf::Vector2i pos);
 
 private:
