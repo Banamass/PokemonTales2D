@@ -39,12 +39,21 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\std_image.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\SimpleVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\ModelVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\ModelFragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

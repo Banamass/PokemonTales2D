@@ -2,8 +2,10 @@
 
 Game::Game() 
 	: window(800, 600, "PokeTales3D"), eventManager(&window)
-	,shader("shaders\\SimpleVertexShader.glsl", "shaders\\SimpleFragmentShader.glsl"),
-	camera(&eventManager, &window){
+	,shader("shaders\\SimpleVertexShader.glsl", "shaders\\SimpleFragmentShader.glsl")
+	,modelShader("shaders\\ModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl"),
+	camera(&eventManager, &window),
+	backpack("Resources\\backpack\\backpack.obj"){
 	context.win = &window;
 	context.eventManager = &eventManager;
 	model.SetShader(&shader);
@@ -18,7 +20,8 @@ void Game::Update(double dt){
 void Game::Render(){
 	window.StartDraw();
 
-	model.Draw(camera.GetTransformMatrix());
+	//model.Draw(camera.GetTransformMatrix());
+	backpack.Draw(modelShader, camera.GetTransformMatrix());
 
 	window.EndDraw();
 }

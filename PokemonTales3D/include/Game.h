@@ -22,5 +22,7 @@ private:
 	Camera camera;
 
 	Shader shader;
+	Shader modelShader;
 	Object model;
+	Model backpack;
 };

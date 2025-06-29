@@ -10,6 +10,7 @@ Window::Window(int l_width, int l_height, const std::string& winName)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	window = glfwCreateWindow(800, 600, winName.c_str(), NULL, NULL);
 	if (window == NULL) {
@@ -28,6 +29,7 @@ Window::Window(int l_width, int l_height, const std::string& winName)
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 }
 Window::~Window() {
 	glfwTerminate();
