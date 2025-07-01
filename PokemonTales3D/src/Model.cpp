@@ -11,9 +11,10 @@ Mesh::Mesh(std::vector<Vertex> l_vertices, std::vector<unsigned int> l_indices,
 	setupMesh();
 }
 
-void Mesh::Draw(Shader& shader, glm::mat4 transform) {
-	shader.use();
-	shader.SetUniform("transform", glm::value_ptr(transform));
+void Mesh::Draw(Shader* shader, glm::mat4& cameraMatrix, glm::mat4& modelMatrix) {
+	shader->use();
+	shader->SetUniform("transform", glm::value_ptr(cameraMatrix * modelMatrix));
+	shader->SetUniform("model", glm::value_ptr(modelMatrix));
 	
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
@@ -28,7 +29,7 @@ void Mesh::Draw(Shader& shader, glm::mat4 transform) {
 		else if(name == "texture_specular")
 			number = std::to_string(specularNr++);
 
-		shader.SetUniform(("material." + name + number).c_str(),(float) i);
+		shader->SetUniform(("material." + name + number).c_str(),(float) i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 	glActiveTexture(GL_TEXTURE0);
@@ -64,9 +65,9 @@ void Mesh::setupMesh() {
 
 /*-------------------Model-------------------*/
 
-void Model::Draw(Shader& shader, glm::mat4 transform) {
+void Model::Draw(Shader* shader, glm::mat4 cameraMatrix, glm::mat4 modelMatrix) {
 	for (Mesh& mesh : meshes)
-		mesh.Draw(shader, transform);
+		mesh.Draw(shader, cameraMatrix, modelMatrix);
 }
 
 void Model::loadModel(std::string path) {
@@ -140,8 +141,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
-	std::cout << "End Process Mesh" << std::endl;
-
 	return Mesh(vertices, indices, textures);
 }
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat
@@ -201,87 +200,4 @@ unsigned int TextureFromFile(const char* name, std::string directory) {
 	stbi_image_free(data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return textureID;
-}
-
-Object::Object() :shader(nullptr) {
-	float vertices[] = {
-		//positions      //textcoords
-		-0.5f,-0.5f,-0.5f, 0.0f, 0.0f,
-		0.5f,-0.5f,-0.5f, 1.0f, 0.0f,
-		0.5f, 0.5f,-0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f,-0.5f, 1.0f, 1.0f,
-		-0.5f, 0.5f,-0.5f, 0.0f,1.0f,
-		-0.5f,-0.5f,-0.5f, 0.0f,0.0f,
-		-0.5f,-0.5f, 0.5f, 0.0f,0.0f,
-		0.5f,-0.5f, 0.5f, 1.0f,0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f,1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f,1.0f,
-		-0.5f, 0.5f, 0.5f, 0.0f,1.0f,
-		-0.5f,-0.5f, 0.5f, 0.0f,0.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f,0.0f,
-		-0.5f, 0.5f,-0.5f, 1.0f,1.0f,
-		-0.5f,-0.5f,-0.5f, 0.0f,1.0f,
-		-0.5f,-0.5f,-0.5f, 0.0f,1.0f,
-		-0.5f,-0.5f, 0.5f, 0.0f,0.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f,0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f,0.0f,
-		0.5f, 0.5f,-0.5f, 1.0f,1.0f,
-		0.5f,-0.5f,-0.5f, 0.0f,1.0f,
-		0.5f,-0.5f,-0.5f, 0.0f,1.0f,
-		0.5f,-0.5f, 0.5f, 0.0f,0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f,0.0f,
-		-0.5f,-0.5f,-0.5f, 0.0f,1.0f,
-		0.5f,-0.5f,-0.5f, 1.0f,1.0f,
-		0.5f,-0.5f, 0.5f, 1.0f,0.0f,
-		0.5f,-0.5f, 0.5f, 1.0f,0.0f,
-		-0.5f,-0.5f, 0.5f, 0.0f,0.0f,
-		-0.5f,-0.5f,-0.5f, 0.0f,1.0f,
-		-0.5f, 0.5f,-0.5f, 0.0f,1.0f,
-		0.5f, 0.5f,-0.5f, 1.0f,1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f,0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f,0.0f,
-		-0.5f, 0.5f, 0.5f, 0.0f,0.0f,
-		-0.5f, 0.5f,-0.5f, 0.0f,1.0f
-	};
-
-	glGenBuffers(1, &VBO);
-	glGenVertexArrays(1, &VAO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	modelMatrix = glm::mat4(1.0f);
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-}
-Object::~Object(){
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-}
-
-void Object::SetShader(Shader* l_shader) {
-	shader = l_shader;
-}
-
-void Object::Draw(const glm::mat4& cameraMatrix){
-	if (shader == nullptr) {
-		std::cout << "Set up a shader for drawing" << std::endl;
-		return;
-	}
-	glm::mat4 transform = cameraMatrix * modelMatrix;
-	shader->use();
-	shader->SetUniform("transform", glm::value_ptr(transform));
-
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
 }

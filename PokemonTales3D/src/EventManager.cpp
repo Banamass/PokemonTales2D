@@ -1,10 +1,12 @@
 #include "EventManager.h"
 
-EventManager::EventManager(Window* l_window)
-	: window(l_window->GetGLFWwindow()){
+EventManager::EventManager(SharedContext* l_context)
+	: window(l_context->win->GetGLFWwindow()), context(l_context){
 	glfwSetWindowUserPointer(window, this);
 	glfwSetCursorPosCallback(window, EventManager::_MouseMoveCallback);
 	glfwSetScrollCallback(window, EventManager::_ScrollCallback);
+
+	context->eventManager = this;
 }
 EventManager::~EventManager(){}
 

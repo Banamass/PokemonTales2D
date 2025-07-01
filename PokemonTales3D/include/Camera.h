@@ -1,11 +1,10 @@
 #pragma once
 
 #include "EventManager.h"
-#include "Window.h"
 
 class Camera {
 public:
-	Camera(EventManager* eventManager, Window* l_window);
+	Camera(SharedContext* l_context);
 	~Camera();
 
 	void Update(const double& dt);
@@ -20,6 +19,7 @@ public:
 	void SetFoV(float newFoV);
 
 private:
+	SharedContext* context;
 	Window* window;
 
 	glm::mat4 view;

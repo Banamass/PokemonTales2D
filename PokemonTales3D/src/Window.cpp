@@ -1,7 +1,63 @@
 #include "Window.h"
+#include "Camera.h"
 
-Window::Window(int l_width, int l_height, const std::string& winName)
-	: width(l_width), height(l_height){
+/*------------------------Drawable------------------------*/
+
+Drawable::Drawable(Model* l_model, Shader* l_shader)
+	: model(l_model), shader(l_shader) {
+	material.ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+	material.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
+	material.specular = glm::vec3(0.0f, 0.0f, 0.0f);
+	material.shininess = 1.0f;
+	ResetTransformations();
+}
+Drawable::Drawable(Model* model, Shader* shader, Material l_material)
+	: material(l_material) {
+	ResetTransformations();
+}
+Drawable::~Drawable() {}
+
+void Drawable::SetMaterial(const Material& l_materiel) {
+	material = l_materiel;
+}
+
+void Drawable::ResetTransformations() {
+	rotation = glm::vec3(0.0f);
+	translation = glm::vec3(0.0f);
+	scaling = glm::vec3(1.0f);
+	transform = glm::mat4(1.0f);
+}
+
+void Drawable::Move(glm::vec3 move) {
+	translation += move;
+	ComputeTransform();
+}
+
+void Drawable::Scale(glm::vec3 scale) {
+	scaling.x *= scale.x;
+	scaling.y *= scale.y;
+	scaling.z *= scale.z;
+	ComputeTransform();
+}
+
+void Drawable::Rotate(glm::vec3 l_rotation) {
+	rotation += l_rotation;
+	ComputeTransform();
+}
+
+void Drawable:: ComputeTransform() {
+	transform = glm::mat4(1.0f);
+	transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	transform = glm::translate(transform, translation);
+	transform = glm::scale(transform, scaling);
+}
+
+/*------------------------Window------------------------*/
+
+Window::Window(int l_width, int l_height, const std::string& winName, SharedContext* l_context)
+	: width(l_width), height(l_height), context(l_context){
 	glewExperimental = true;
 
 	glfwInit();
@@ -30,6 +86,8 @@ Window::Window(int l_width, int l_height, const std::string& winName)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
+
+	context->win = this;
 }
 Window::~Window() {
 	glfwTerminate();
@@ -47,6 +105,17 @@ void Window::StartDraw() {
 void Window::EndDraw() {
 	glfwSwapBuffers(window);
 	glfwPollEvents();
+}
+
+void Window::Draw(Drawable& drawable) {
+	Shader* shader = drawable.shader;
+	shader->use();
+	shader->SetUniform("material.ambient", drawable.material.ambient);
+	shader->SetUniform("material.diffuse", drawable.material.diffuse);
+	shader->SetUniform("material.specular", drawable.material.specular);
+	shader->SetUniform("material.shininess", drawable.material.shininess);
+	shader->unuse();
+	drawable.model->Draw(shader, context->camera->GetTransformMatrix(), drawable.transform);
 }
 
 void Window::SetCursorCapture(bool capture) {

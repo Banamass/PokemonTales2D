@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Shader.h"
-#include "Window.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -30,7 +29,7 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
 		std::vector<Texture> textures);
 
-	void Draw(Shader& shader, glm::mat4 transform);
+	void Draw(Shader* shader, glm::mat4& cameraMatrix, glm::mat4& modelMatrix);
 
 private:
 	unsigned int VAO, VBO, EBO;
@@ -47,7 +46,7 @@ public:
 		loadModel(path);
 	}
 
-	void Draw(Shader& shader, glm::mat4 transform);
+	void Draw(Shader* shader, glm::mat4 cameraMatrix, glm::mat4 modelMatrix);
 
 private:
 	std::vector<Mesh> meshes;
@@ -60,22 +59,4 @@ private:
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat
 		, aiTextureType type, std::string typeName);
-};
-
-class Object {
-public:
-	Object();
-	~Object();
-	
-	void SetShader(Shader* l_shader);
-
-	void Draw(const glm::mat4& cameraMatrix);
-
-private:
-	Shader* shader;
-
-	unsigned int VBO;
-	unsigned int VAO;
-
-	glm::mat4 modelMatrix;
 };

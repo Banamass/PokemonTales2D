@@ -1,15 +1,10 @@
 #include "Game.h"
 
 Game::Game() 
-	: window(800, 600, "PokeTales3D"), eventManager(&window)
-	,shader("shaders\\SimpleVertexShader.glsl", "shaders\\SimpleFragmentShader.glsl")
-	,modelShader("shaders\\ModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl"),
-	camera(&eventManager, &window),
-	backpack("Resources\\backpack\\backpack.obj"){
-	context.win = &window;
-	context.eventManager = &eventManager;
-	model.SetShader(&shader);
-
+	: window(800, 600, "PokeTales3D", &context), eventManager(&context),
+	camera(&context), shaderManager(&context),
+	board(glm::vec2(4, 3), &context)
+	,light(glm::vec3(10.0f, 3.0f, 10.0f), &context){
 	window.SetCursorCapture(true);
 }
 Game::~Game(){}
@@ -20,8 +15,8 @@ void Game::Update(double dt){
 void Game::Render(){
 	window.StartDraw();
 
-	//model.Draw(camera.GetTransformMatrix());
-	backpack.Draw(modelShader, camera.GetTransformMatrix());
+	board.Draw();
+	light.Draw(&window);
 
 	window.EndDraw();
 }

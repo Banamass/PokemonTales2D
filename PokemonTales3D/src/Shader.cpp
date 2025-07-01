@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+/*---------------------Shader---------------------*/
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath){
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -107,6 +109,10 @@ void Shader::use(){
 	glUseProgram(ID);
 }
 
+void Shader::unuse() {
+	glUseProgram(0);
+}
+
 void Shader::SetUniform(const std::string& name, bool value) const{
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
@@ -116,8 +122,59 @@ void Shader::SetUniform(const std::string& name, int value) const {
 void Shader::SetUniform(const std::string& name, float value) const {
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
+void Shader::SetUniform(const std::string& name, glm::vec3 value) const {
+	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
+}
 void Shader::SetUniform(const std::string& name, const GLfloat* matrix) const {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, matrix);
 }
 
 unsigned int Shader::GetID() { return ID; }
+
+/*---------------------ShaderManager---------------------*/
+
+ShaderManager::ShaderManager(SharedContext* context) {
+	context->shaderManager = this;
+
+	this->LoadShader("SimpleShader"
+		, "shaders\\SimpleVertexShader.glsl", "shaders\\SimpleFragmentShader.glsl");
+	this->LoadShader("ModelShader"
+		, "shaders\\ModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl");
+}
+ShaderManager::~ShaderManager() {
+
+}
+
+bool ShaderManager::LoadShader(const std::string& shaderName,
+	const char* vertexPath, const char* fragmentPath) {
+	if (shaders.find(shaderName) != shaders.end())
+		return false;
+
+	auto itr = shaders.emplace(std::piecewise_construct,
+		std::forward_as_tuple(shaderName),
+		std::forward_as_tuple(vertexPath, fragmentPath));
+
+	return itr.second && itr.first->second.GetID() != 0;
+}
+Shader* ShaderManager::GetShader(const std::string& shaderName) {
+	auto itr = shaders.find(shaderName);
+	if (itr == shaders.end())
+		return nullptr;
+	return &itr->second;
+}
+
+void ShaderManager::SetLightPos(glm::vec3 pos) {
+	for (auto& itr : shaders) {
+		itr.second.use();
+		itr.second.SetUniform("lightPos", pos);
+		itr.second.unuse();
+	}
+}
+
+void ShaderManager::SetViewPos(glm::vec3 pos) {
+	for (auto& itr : shaders) {
+		itr.second.use();
+		itr.second.SetUniform("viewPos", pos);
+		itr.second.unuse();
+	}
+}

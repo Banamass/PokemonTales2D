@@ -53,7 +53,7 @@ using CallbackContainer = std::unordered_map<EventType, CallbackVector, EnumHash
 
 class EventManager {
 public:
-	EventManager(Window* l_window);
+	EventManager(SharedContext* l_context);
 	~EventManager();
 
 	template <class T>
@@ -73,6 +73,7 @@ public:
 
 private:
 	GLFWwindow* window;
+	SharedContext* context;
 
 	CallbackContainer callbacks;
 };

@@ -1,7 +1,7 @@
 #include "Camera.h"
 
-Camera::Camera(EventManager* eventManager, Window* l_window)
-	:window(l_window) {
+Camera::Camera(SharedContext* l_context)
+	:window(context->win), context(l_context) {
 	glm::vec2 l_windowSize = window->GetWindowSize();
 
 	pos = glm::vec3(-3.0f, 0.0f, 0.0f);
@@ -23,8 +23,10 @@ Camera::Camera(EventManager* eventManager, Window* l_window)
 
 	zoomSensitivity = 1.0f;
 
-	eventManager->AddCallback(EventType::MouseMove, &Camera::MouseMouseCallback, this);
-	eventManager->AddCallback(EventType::Scroll, &Camera::ScrollCallback, this);
+	context->eventManager->AddCallback(EventType::MouseMove, &Camera::MouseMouseCallback, this);
+	context->eventManager->AddCallback(EventType::Scroll, &Camera::ScrollCallback, this);
+
+	context->camera = this;
 }
 Camera::~Camera(){
 	
@@ -44,7 +46,14 @@ void Camera::Update(const double& dt) {
 	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS)
 		move -= (float)dt * (speed * rightMove);
 
+	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_UP) == GLFW_PRESS)
+		move.y -= (float)dt * speed;
+	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
+		move.y += (float)dt * speed;
+
 	SetPosition(pos + move);
+
+	context->shaderManager->SetViewPos(pos);
 }
 
 void Camera::SetFront(glm::vec3 newFront) {
@@ -110,7 +119,7 @@ void Camera::ScrollCallback(CallbackData data) {
 	if (mdata == nullptr)
 		return;
 
-	float newFoV = FoV + zoomSensitivity * mdata->yoffset;
+	float newFoV = FoV - zoomSensitivity * mdata->yoffset;
 	newFoV = std::max(1.0f, newFoV);
 	newFoV = std::min(170.0f, newFoV);
 	SetFoV(newFoV);

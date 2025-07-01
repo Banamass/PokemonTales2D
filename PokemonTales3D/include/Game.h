@@ -3,6 +3,8 @@
 #include "Window.h"
 #include "Model.h"
 #include "Camera.h"
+#include "Board.h"
+#include "Light.h"
 
 class Game {
 public:
@@ -18,11 +20,11 @@ private:
 	SharedContext context;
 
 	Window window;
+	ShaderManager shaderManager;
 	EventManager eventManager;
 	Camera camera;
 
-	Shader shader;
-	Shader modelShader;
-	Object model;
-	Model backpack;
+	Light light;
+
+	Board board;
 };
