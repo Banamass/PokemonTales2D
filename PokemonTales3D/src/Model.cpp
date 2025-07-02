@@ -37,6 +37,7 @@ void Mesh::Draw(Shader* shader, glm::mat4& cameraMatrix, glm::mat4& modelMatrix)
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+	shader->unuse();
 }
 
 void Mesh::setupMesh() {
@@ -67,7 +68,7 @@ void Mesh::setupMesh() {
 
 void Model::Draw(Shader* shader, glm::mat4 cameraMatrix, glm::mat4 modelMatrix) {
 	for (Mesh& mesh : meshes)
-		mesh.Draw(shader, cameraMatrix, modelMatrix);
+		mesh.Draw(shader, cameraMatrix, modelMatrix); 
 }
 
 void Model::loadModel(std::string path) {

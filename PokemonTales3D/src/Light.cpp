@@ -12,5 +12,7 @@ Light::~Light() {
 }
 
 void Light::Draw(Window* win) {
+	shader->use();
+	shader->SetUniform("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	win->Draw(sprite);
 }

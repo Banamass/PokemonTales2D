@@ -23,6 +23,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Model.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\EventManager.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\GUI.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Shader.h" />

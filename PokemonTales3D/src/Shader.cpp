@@ -125,6 +125,9 @@ void Shader::SetUniform(const std::string& name, float value) const {
 void Shader::SetUniform(const std::string& name, glm::vec3 value) const {
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
 }
+void Shader::SetUniform(const std::string& name, glm::vec4 value) const {
+	glUniform4f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z, value.w);
+}
 void Shader::SetUniform(const std::string& name, const GLfloat* matrix) const {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, matrix);
 }

@@ -27,6 +27,7 @@ public:
 	void SetUniform(const std::string& name, int value) const;
 	void SetUniform(const std::string& name, float value) const;
 	void SetUniform(const std::string& name, glm::vec3 value) const;
+	void SetUniform(const std::string& name, glm::vec4 value) const;
 	void SetUniform(const std::string& name, const GLfloat* matrix) const;
 
 	unsigned int GetID();

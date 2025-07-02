@@ -36,7 +36,7 @@ public:
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 
-	void SetMaterial(const Material& l_materiel);
+	void SetMaterial(const Material& l_material);
 
 private:
 	void ResetTransformations();
@@ -61,7 +61,9 @@ public:
 
 	void StartDraw();
 	void EndDraw();
+
 	void Draw(Drawable& drawable);
+	void DrawOutlined(Drawable& drawable, glm::vec4 color, float thickness);
 
 	void SetCursorCapture(bool capture);
 

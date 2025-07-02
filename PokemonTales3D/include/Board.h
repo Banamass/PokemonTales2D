@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 #include "SharedTypes.h"
 #include "Window.h"
 #include "Model.h"
@@ -11,8 +13,16 @@ public:
 
 	void Draw(Window* win);
 
+	void Select();
+	void Unselect();
+
+	void SetColor(glm::vec3 color);
+
 private:
 	Drawable sprite;
+
+	glm::vec3 unselectedColor;
+	glm::vec3 selectedColor;
 
 	glm::vec2 pos;
 	float size;
@@ -26,12 +36,17 @@ public:
 	void Update(double dt);
 	void Draw();
 
+	bool Contain(const glm::ivec2& pos);
+	Box* GetBox(const glm::ivec2& pos);
+
 private:
 	Model boxModel;
 	Shader* boxShader;
 	SharedContext* context;
 
-	glm::vec2 size;
+	glm::ivec2 size;
 
-	std::vector<Box> boxes;
+	Box* selectedBox;
+
+	std::vector<std::vector<Box>> boxes;
 };

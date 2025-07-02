@@ -100,7 +100,7 @@ void Window::ProcessInput() {
 
 void Window::StartDraw() {
 	ProcessInput();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 void Window::EndDraw() {
 	glfwSwapBuffers(window);
@@ -114,8 +114,32 @@ void Window::Draw(Drawable& drawable) {
 	shader->SetUniform("material.diffuse", drawable.material.diffuse);
 	shader->SetUniform("material.specular", drawable.material.specular);
 	shader->SetUniform("material.shininess", drawable.material.shininess);
-	shader->unuse();
 	drawable.model->Draw(shader, context->camera->GetTransformMatrix(), drawable.transform);
+}
+
+void Window::DrawOutlined(Drawable& drawable, glm::vec4 color, float thickness) {
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
+	Draw(drawable);
+
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	glDisable(GL_DEPTH_TEST);
+	Shader* simpleShader = context->shaderManager->GetShader("SimpleShader");
+	simpleShader->use();
+	simpleShader->SetUniform("color", color);
+	glm::vec3 scaling = (1.0f + thickness) * glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 tempScaling = drawable.scaling;
+	glm::mat4 tempTransform = drawable.transform;
+	drawable.Scale(scaling);
+	drawable.model->Draw(simpleShader, context->camera->GetTransformMatrix(), drawable.transform);
+	drawable.scaling = tempScaling;
+	drawable.transform = tempTransform;
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Window::SetCursorCapture(bool capture) {

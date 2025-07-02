@@ -128,3 +128,11 @@ void Camera::ScrollCallback(CallbackData data) {
 const glm::mat4& Camera::GetTransformMatrix(){
 	return transformMatrix;
 }
+
+glm::vec3 Camera::GetMouseDirection() {
+	return glm::normalize(front);
+}
+
+glm::vec3 Camera::GetPosition() {
+	return pos;
+}

@@ -18,6 +18,9 @@ public:
 	void SetPosition(glm::vec3 newPos);
 	void SetFoV(float newFoV);
 
+	glm::vec3 GetMouseDirection();
+	glm::vec3 GetPosition();
+
 private:
 	SharedContext* context;
 	Window* window;
