@@ -39,21 +39,34 @@ void Box::SetColor(glm::vec3 color) {
 /*------------------Board------------------*/
 
 Board::Board(glm::vec2 l_size, SharedContext* l_context)
-	: context(l_context), size(l_size), selectedBox(nullptr),
+	: context(l_context), size(l_size), selectedBox(nullptr), boxesDrawable(nullptr), boxDrawable(nullptr),
 	boxModel("Resources\\Box\\box.obj"){
-	boxShader = context->shaderManager->GetShader("ModelShader");
+	boxShader = context->shaderManager->GetShader("InstancedModelShader");
 	if (boxShader == nullptr) {
 		std::cout << "Impossible to create board : boxShader is null" << std::endl;
 		return;
 	}
+
 	for (int i = 0; i < size.x; i++) {
 		boxes.push_back({});
 		for (int j = 0; j < size.y; j++) {
 			boxes[i].emplace_back(glm::vec2(i * (Constants::BOX_SIZE), j * (Constants::BOX_SIZE)), &boxModel, boxShader);
+			//transforms.push_back(boxes[i][j].GetTransform());
+			Transform* transform = new Transform(*boxes[i][j].GetTransform());
+			transforms.push_back(transform);
 		}
 	}
+
+	boxDrawable = new Drawable(&boxModel, boxShader);
+	boxesDrawable = new DrawableInstanced(boxDrawable, transforms);
 }
-Board::~Board() {}
+Board::~Board() {
+	delete boxesDrawable;
+	delete boxDrawable;
+	for (Transform* trans : transforms) {
+		delete trans;
+	}
+}
 
 void Board::Update(double dt) {
 	glm::vec3 mouseDir = context->camera->GetMouseDirection();
@@ -76,12 +89,13 @@ void Board::Update(double dt) {
 }
 
 void Board::Draw() {
-	for (int i = 0; i < size.x; i++) {
+	/*for (int i = 0; i < size.x; i++) {
 		boxes.push_back({});
 		for (int j = 0; j < size.y; j++) {
 			boxes[i][j].Draw(context->win);
 		}
-	}
+	}*/
+	context->win->DrawInstanced(boxesDrawable);
 }
 
 bool Board::Contain(const glm::ivec2& pos) {

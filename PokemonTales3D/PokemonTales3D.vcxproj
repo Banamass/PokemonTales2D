@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Drawable.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GUI.cpp" />
@@ -32,6 +33,8 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\InstancedModelFragmentShader.glsl" />
+    <None Include="shaders\InstancedModelVertexShader.glsl" />
     <None Include="shaders\ModelFragmentShader.glsl" />
     <None Include="shaders\ModelVertexShader.glsl" />
     <None Include="shaders\SimpleFragmentShader.glsl" />
@@ -40,6 +43,7 @@
   <ItemGroup>
     <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\Drawable.h" />
     <ClInclude Include="include\EventManager.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GUI.h" />

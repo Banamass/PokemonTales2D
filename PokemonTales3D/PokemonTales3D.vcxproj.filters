@@ -57,6 +57,9 @@
     <ClCompile Include="src\GUI.cpp">
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\Drawable.cpp">
+      <Filter>Fichiers sources\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
@@ -69,6 +72,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\ModelFragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\InstancedModelVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\InstancedModelFragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -101,6 +110,9 @@
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\GUI.h">
+      <Filter>Fichiers d%27en-tête\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Drawable.h">
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

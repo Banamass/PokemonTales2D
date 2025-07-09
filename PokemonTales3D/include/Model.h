@@ -7,6 +7,9 @@
 #include <unordered_map>
 #include "stb_image.h"
 
+class Transform;
+class DrawableInstanced;
+
 struct Vertex{
 	glm::vec3 Position;
 	glm::vec3 Normal;
@@ -30,6 +33,8 @@ public:
 		std::vector<Texture> textures);
 
 	void Draw(Shader* shader, glm::mat4& cameraMatrix, glm::mat4& modelMatrix);
+	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vector<Transform*>& instanceTransform);
+	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable);
 
 private:
 	unsigned int VAO, VBO, EBO;
@@ -47,6 +52,8 @@ public:
 	}
 
 	void Draw(Shader* shader, glm::mat4 cameraMatrix, glm::mat4 modelMatrix);
+	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vector<Transform*>& instanceTransform);
+	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable);
 
 private:
 	std::vector<Mesh> meshes;

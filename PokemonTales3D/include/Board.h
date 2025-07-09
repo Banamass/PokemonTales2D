@@ -17,6 +17,8 @@ public:
 	void Unselect();
 
 	void SetColor(glm::vec3 color);
+	
+	Transform* GetTransform() { return sprite.GetTransform(); }
 
 private:
 	Drawable sprite;
@@ -49,4 +51,7 @@ private:
 	Box* selectedBox;
 
 	std::vector<std::vector<Box>> boxes;
+	Drawable* boxDrawable;
+	std::vector<Transform*> transforms;
+	DrawableInstanced* boxesDrawable;
 };

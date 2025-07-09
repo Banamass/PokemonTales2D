@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "Drawable.h"
 
 /*-------------------Mesh-------------------*/
 
@@ -40,6 +41,62 @@ void Mesh::Draw(Shader* shader, glm::mat4& cameraMatrix, glm::mat4& modelMatrix)
 	shader->unuse();
 }
 
+void Mesh::DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vector<Transform*>& instanceTransform) {
+	unsigned int instanceVBO;
+}
+
+void Mesh::DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable) {
+	if (!drawable->IsVAOSetup()) {
+		std::cout << "Setup VAO" << std::endl;
+		glBindBuffer(GL_ARRAY_BUFFER, drawable->GetInstanceVBO());
+		glBindVertexArray(VAO);
+		std::size_t v4s = sizeof(glm::vec4);
+		std::cout << "Instance VBO : " << drawable->GetInstanceVBO() << std::endl;
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)(1 * v4s));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)(2 * v4s));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)(3 * v4s));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
+
+		drawable->VAOSetup();
+	}
+	shader->use();
+	shader->SetUniform("cameraMatrix", glm::value_ptr(cameraMatrix));
+
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
+
+	for (unsigned int i = 0; i < textures.size(); i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		std::string number;
+		std::string name = textures[i].type;
+		if (name == "texture_diffuse") {
+			number = std::to_string(diffuseNr++);
+		}
+		else if (name == "texture_specular")
+			number = std::to_string(specularNr++);
+
+		shader->SetUniform(("material." + name + number).c_str(), (float)i);
+		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+	}
+	glActiveTexture(GL_TEXTURE0);
+
+	glBindVertexArray(VAO);
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, drawable->GetNbInstance());
+	glBindVertexArray(0);
+	shader->unuse();
+}
+
 void Mesh::setupMesh() {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -69,6 +126,16 @@ void Mesh::setupMesh() {
 void Model::Draw(Shader* shader, glm::mat4 cameraMatrix, glm::mat4 modelMatrix) {
 	for (Mesh& mesh : meshes)
 		mesh.Draw(shader, cameraMatrix, modelMatrix); 
+}
+
+void Model::DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vector<Transform*>& instanceTransform) {
+	for (Mesh& mesh : meshes)
+		mesh.DrawInstanced(shader, cameraMatrix, instanceTransform);
+}
+
+void Model::DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable) {
+	for (Mesh& mesh : meshes)
+		mesh.DrawInstanced(shader, cameraMatrix, drawable);
 }
 
 void Model::loadModel(std::string path) {

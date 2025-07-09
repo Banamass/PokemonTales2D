@@ -143,6 +143,8 @@ ShaderManager::ShaderManager(SharedContext* context) {
 		, "shaders\\SimpleVertexShader.glsl", "shaders\\SimpleFragmentShader.glsl");
 	this->LoadShader("ModelShader"
 		, "shaders\\ModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl");
+	this->LoadShader("InstancedModelShader"
+		, "shaders\\InstancedModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl");
 }
 ShaderManager::~ShaderManager() {
 
