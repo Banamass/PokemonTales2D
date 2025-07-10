@@ -47,11 +47,9 @@ void Mesh::DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vect
 
 void Mesh::DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable) {
 	if (!drawable->IsVAOSetup()) {
-		std::cout << "Setup VAO" << std::endl;
 		glBindBuffer(GL_ARRAY_BUFFER, drawable->GetInstanceVBO());
 		glBindVertexArray(VAO);
 		std::size_t v4s = sizeof(glm::vec4);
-		std::cout << "Instance VBO : " << drawable->GetInstanceVBO() << std::endl;
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)0);
 		glEnableVertexAttribArray(4);
@@ -233,6 +231,116 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat
 	return textures;
 }
 
+/*-------------------Cubemap-------------------*/
+
+Cubemap::Cubemap(Shader* l_shader, std::vector<std::string>& faces, std::string dir)
+	: shader(l_shader){	
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	std::string sep = (*(dir.end() - 1) == '\\') ? "" : "\\";
+
+	glGenTextures(1, &textures);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textures);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++) {
+		unsigned char* data = stbi_load((dir + sep + faces[i]).c_str(),
+			&width, &height, &nrChannels, 0);
+
+		GLenum format = GL_RGB;
+		if (nrChannels == 1)
+			format = GL_RED;
+		else if (nrChannels == 3)
+			format = GL_RGB;
+		else if (nrChannels == 4)
+			format = GL_RGBA;
+
+		if (data) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format,
+				width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else {
+			std::cout << "Cubemapfailedtoloadatpath:" << faces[i]
+				<< std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S,
+		GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T,
+		GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
+		GL_CLAMP_TO_EDGE);
+}
+Cubemap::~Cubemap(){}
+
+void Cubemap::Draw(glm::mat4 transform) {
+	glDepthMask(GL_FALSE);
+	shader->use();
+	shader->SetUniform("transform", glm::value_ptr(transform));
+
+	glBindVertexArray(VAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textures);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	shader->unuse();
+	glDepthMask(GL_TRUE);
+}
+
 /*-------------------Helper functions-------------------*/
 
 unsigned int TextureFromFile(const char* name, std::string directory) {
@@ -241,7 +349,7 @@ unsigned int TextureFromFile(const char* name, std::string directory) {
 	std::string fullPath = directory + "\\" + std::string(name);
 	data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
 	
-	GLenum format;
+	GLenum format = GL_RGB;
 	if (nrChannels == 1)
 		format = GL_RED;
 	else if (nrChannels == 3)

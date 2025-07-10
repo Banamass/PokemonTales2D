@@ -3,8 +3,9 @@
 #include "Window.h"
 #include "Model.h"
 #include "Camera.h"
-#include "Board.h"
+#include "GameSystem.h"
 #include "Light.h"
+#include "GUI.h"
 
 class Game {
 public:
@@ -17,6 +18,9 @@ public:
 	bool IsOver();
 
 private:
+
+	void InitFont();
+
 	SharedContext context;
 
 	Window window;
@@ -26,5 +30,8 @@ private:
 
 	Light light;
 
-	Board board;
+	Cubemap* skybox;
+
+	GameSystem gameSystem;
+	GUI gui;
 };

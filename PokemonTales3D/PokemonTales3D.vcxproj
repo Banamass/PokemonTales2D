@@ -19,11 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\APlayer.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Drawable.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
+    <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameSystem.cpp" />
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -33,6 +36,8 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\CubemapFragmentShader.glsl" />
+    <None Include="shaders\CubemapVertexShader.glsl" />
     <None Include="shaders\InstancedModelFragmentShader.glsl" />
     <None Include="shaders\InstancedModelVertexShader.glsl" />
     <None Include="shaders\ModelFragmentShader.glsl" />
@@ -41,11 +46,14 @@
     <None Include="shaders\SimpleVertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\APlayer.h" />
     <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Drawable.h" />
     <ClInclude Include="include\EventManager.h" />
+    <ClInclude Include="include\Font.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\GameSystem.h" />
     <ClInclude Include="include\GUI.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\Model.h" />
@@ -106,7 +114,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\enjal\Documents\JVDev\OpenGL\libraries\assimp\lib\Debug;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\enjal\Documents\JVDev\OpenGL\libraries\freetype-2.10.0\build\Debug;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\assimp\lib\Debug;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -142,14 +150,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\enjal\Documents\JVDev\OpenGL\libraries\assimp\include;C:\Users\enjal\Documents\JVDev\PokeTales\PokemonTales2D\PokemonTales3D\include;C:\Users\enjal\Documents\JVDev\OpenGL\libraries;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glm-0.9.9.7\glm;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glew-2.1.0-win32\glew-2.1.0\include;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;%(AdditionalUsingDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\enjal\Documents\JVDev\OpenGL\libraries\freetype-2.10.0\freetype-2.10.0\include;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\assimp\include;C:\Users\enjal\Documents\JVDev\PokeTales\PokemonTales2D\PokemonTales3D\include;C:\Users\enjal\Documents\JVDev\OpenGL\libraries;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glm-0.9.9.7\glm;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glew-2.1.0-win32\glew-2.1.0\include;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;%(AdditionalUsingDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\enjal\Documents\JVDev\OpenGL\libraries\assimp\lib\Debug;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mtd.lib;glfw3.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\enjal\Documents\JVDev\OpenGL\libraries\freetype-2.10.0\build\Debug;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\assimp\lib\Debug;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;C:\Users\enjal\Documents\JVDev\OpenGL\libraries\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freetyped.lib;assimp-vc143-mtd.lib;glfw3.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

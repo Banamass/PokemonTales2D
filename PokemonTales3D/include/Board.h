@@ -5,28 +5,22 @@
 #include "SharedTypes.h"
 #include "Window.h"
 #include "Model.h"
+#include "APlayer.h"
 
 class Box {
 public:
-	Box(glm::vec2 l_pos, Model* model, Shader* shader);
+	Box(glm::ivec2 l_pos);
 	~Box();
-
-	void Draw(Window* win);
 
 	void Select();
 	void Unselect();
 
-	void SetColor(glm::vec3 color);
-	
-	Transform* GetTransform() { return sprite.GetTransform(); }
+	glm::vec2 GetPos() { return pos; }
 
 private:
-	Drawable sprite;
-
-	glm::vec3 unselectedColor;
 	glm::vec3 selectedColor;
 
-	glm::vec2 pos;
+	glm::ivec2 pos;
 	float size;
 };
 
@@ -42,16 +36,19 @@ public:
 	Box* GetBox(const glm::ivec2& pos);
 
 private:
-	Model boxModel;
-	Shader* boxShader;
 	SharedContext* context;
+
+	Model boxModel;
+	Shader* instancedModelShader;
+	Shader* modelShader;
 
 	glm::ivec2 size;
 
-	Box* selectedBox;
-
 	std::vector<std::vector<Box>> boxes;
+	std::vector<Transform*> boxesTransforms;
 	Drawable* boxDrawable;
-	std::vector<Transform*> transforms;
 	DrawableInstanced* boxesDrawable;
+
+	Drawable* cursorDrawable;
+	SquareArea cursor;
 };

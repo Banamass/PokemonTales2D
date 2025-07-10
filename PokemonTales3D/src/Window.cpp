@@ -55,23 +55,34 @@ void Window::EndDraw() {
 }
 
 void Window::Draw(Drawable& drawable) {
-	Shader* shader = drawable.shader;
-	shader->use();
-	shader->SetUniform("material.ambient", drawable.material.ambient);
-	shader->SetUniform("material.diffuse", drawable.material.diffuse);
-	shader->SetUniform("material.specular", drawable.material.specular);
-	shader->SetUniform("material.shininess", drawable.material.shininess);
-	drawable.model->Draw(shader, context->camera->GetTransformMatrix(), drawable.transform.GetTransform());
+	Draw(&drawable);
 }
 
-void Window::DrawInstanced(Drawable& drawable, const std::vector<Transform*>& transforms) {
-	Shader* shader = drawable.shader;
+void Window::Draw(Drawable* drawable) {
+	Shader* shader = drawable->shader;
 	shader->use();
-	shader->SetUniform("material.ambient", drawable.material.ambient);
-	shader->SetUniform("material.diffuse", drawable.material.diffuse);
-	shader->SetUniform("material.specular", drawable.material.specular);
-	shader->SetUniform("material.shininess", drawable.material.shininess);
-	drawable.model->DrawInstanced(shader, context->camera->GetTransformMatrix(), transforms);
+	shader->SetUniform("material.ambient", drawable->material.ambient);
+	shader->SetUniform("material.diffuse", drawable->material.diffuse);
+	shader->SetUniform("material.specular", drawable->material.specular);
+	shader->SetUniform("material.shininess", drawable->material.shininess);
+	drawable->model->Draw(shader, context->camera->GetTransformMatrix(), drawable->transform.GetTransform());
+}
+
+void Window::Draw(Cubemap& cubemap) {
+	Draw(&cubemap);
+}
+void Window::Draw(Cubemap* cubemap) {
+	cubemap->Draw(context->camera->GetSkyboxTransformMatrix());
+}
+
+void Window::DrawStatic(Drawable* drawable) {
+	Shader* shader = drawable->shader;
+	shader->use();
+	shader->SetUniform("material.ambient", drawable->material.ambient);
+	shader->SetUniform("material.diffuse", drawable->material.diffuse);
+	shader->SetUniform("material.specular", drawable->material.specular);
+	shader->SetUniform("material.shininess", drawable->material.shininess);
+	drawable->model->Draw(shader, glm::mat4(1.0f), drawable->transform.GetTransform());
 }
 
 void Window::DrawInstanced(DrawableInstanced* drawableInstanced) {

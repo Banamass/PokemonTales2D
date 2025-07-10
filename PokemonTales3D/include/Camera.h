@@ -10,6 +10,7 @@ public:
 	void Update(const double& dt);
 
 	const glm::mat4& GetTransformMatrix();
+	glm::mat4 GetSkyboxTransformMatrix();
 
 	void MouseMouseCallback(CallbackData data);
 	void ScrollCallback(CallbackData data);

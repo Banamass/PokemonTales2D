@@ -129,6 +129,10 @@ const glm::mat4& Camera::GetTransformMatrix(){
 	return transformMatrix;
 }
 
+glm::mat4 Camera::GetSkyboxTransformMatrix() {
+	return projection * glm::mat4(glm::mat3(view));
+}
+
 glm::vec3 Camera::GetMouseDirection() {
 	return glm::normalize(front);
 }

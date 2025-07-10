@@ -30,6 +30,11 @@ void Transform::Rotate(glm::vec3 l_rotation) {
 	ComputeTransform();
 }
 
+void Transform::SetPosition(glm::vec3 pos) {
+	translation = pos;
+	ComputeTransform();
+}
+
 void Transform::ComputeTransform() {
 	transform = glm::mat4(1.0f);
 	transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -74,6 +79,10 @@ void Drawable::Rotate(glm::vec3 l_rotation) {
 	transform.Rotate(l_rotation);
 }
 
+void Drawable::SetPosition(glm::vec3 pos) {
+	transform.SetPosition(pos);
+}
+
 /*------------------------DrawableInstanced------------------------*/
 
 DrawableInstanced::DrawableInstanced(Drawable* l_drawable, std::vector<Transform*>& l_instanceTransforms)
@@ -83,7 +92,6 @@ DrawableInstanced::DrawableInstanced(Drawable* l_drawable, std::vector<Transform
 		instanceMatrix.push_back(trans->GetTransform());
 		instanceTransforms.push_back(trans);
 	}
-	std::cout << instanceMatrix.size() << std::endl;
 	glGenBuffers(1, &instanceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	glBufferData(GL_ARRAY_BUFFER, instanceMatrix.size() * sizeof(glm::mat4),

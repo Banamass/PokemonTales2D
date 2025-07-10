@@ -22,15 +22,18 @@
     <Filter Include="Fichiers sources\Graphics">
       <UniqueIdentifier>{40afa6fd-4d54-4b3f-ae3f-9df94ef00105}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Game">
+      <UniqueIdentifier>{6756b3d4-1833-4425-9fa3-3a631fc26633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Game">
+      <UniqueIdentifier>{7532367e-0fe3-4050-864f-7ae675259326}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\EventManager.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\Camera.cpp">
@@ -48,9 +51,6 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Board.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Light.cpp">
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
@@ -58,6 +58,21 @@
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Drawable.cpp">
+      <Filter>Fichiers sources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\APlayer.cpp">
+      <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Board.cpp">
+      <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game.cpp">
+      <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameSystem.cpp">
+      <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Font.cpp">
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,12 +95,15 @@
     <None Include="shaders\InstancedModelFragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\CubemapVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\CubemapFragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EventManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Game.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="include\SharedTypes.h">
@@ -103,9 +121,6 @@
     <ClInclude Include="include\Camera.h">
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Board.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="include\Light.h">
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
@@ -113,6 +128,21 @@
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawable.h">
+      <Filter>Fichiers d%27en-tête\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game.h">
+      <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\APlayer.h">
+      <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Board.h">
+      <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameSystem.h">
+      <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Font.h">
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

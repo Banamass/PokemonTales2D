@@ -25,6 +25,8 @@ public:
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 
+	void SetPosition(glm::vec3 pos);
+
 	glm::mat4 GetTransform();
 
 private:
@@ -57,6 +59,8 @@ public:
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 
+	void SetPosition(glm::vec3 pos);
+
 	void SetMaterial(const Material& l_material);
 
 	Transform* GetTransform() { return &transform; }
@@ -81,10 +85,11 @@ public:
 	void VAOSetup();
 
 private:
+	//Reference drawable for multiple drawing
 	Drawable* drawable;
 	std::vector<Transform*> instanceTransforms;
 
-	unsigned instanceVBO;
+	unsigned int instanceVBO;
 	bool isVAOSetup;
 
 	friend class Window;

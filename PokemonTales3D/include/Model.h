@@ -67,3 +67,17 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat
 		, aiTextureType type, std::string typeName);
 };
+
+class Cubemap {
+public:
+	Cubemap(Shader* l_shader, std::vector<std::string>& faces, std::string dir = "");
+	~Cubemap();
+
+	void Draw(glm::mat4 transform);
+
+private:
+	Shader* shader;
+	unsigned int textures;
+	unsigned int VAO;
+	unsigned int VBO;
+};
