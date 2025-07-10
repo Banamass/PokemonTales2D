@@ -147,6 +147,8 @@ ShaderManager::ShaderManager(SharedContext* context) {
 		, "shaders\\InstancedModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl");
 	this->LoadShader("CubemapShader"
 		, "shaders\\CubemapVertexShader.glsl", "shaders\\CubemapFragmentShader.glsl");
+	this->LoadShader("FontShader"
+		, "shaders\\FontVertexShader.glsl", "shaders\\FontFragmentShader.glsl");
 }
 ShaderManager::~ShaderManager() {
 

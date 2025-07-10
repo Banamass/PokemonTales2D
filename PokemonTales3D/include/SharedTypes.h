@@ -4,6 +4,8 @@
 
 namespace Constants{
 	constexpr float BOX_SIZE = 2.0f;
+	constexpr float WIN_WIDTH = 800.0f;
+	constexpr float WIN_HEIGHT = 600.0f;
 }
 
 class Window;

@@ -92,13 +92,16 @@
     <None Include="shaders\InstancedModelVertexShader.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\InstancedModelFragmentShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\CubemapVertexShader.glsl">
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\CubemapFragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\FontVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\FontFragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

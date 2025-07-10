@@ -34,6 +34,9 @@ Window::Window(int l_width, int l_height, const std::string& winName, SharedCont
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	context->win = this;
 }
 Window::~Window() {
@@ -83,6 +86,10 @@ void Window::DrawStatic(Drawable* drawable) {
 	shader->SetUniform("material.specular", drawable->material.specular);
 	shader->SetUniform("material.shininess", drawable->material.shininess);
 	drawable->model->Draw(shader, glm::mat4(1.0f), drawable->transform.GetTransform());
+}
+
+void Window::DrawStatic(Text* text) {
+	text->Draw(context->shaderManager->GetShader("FontShader"));
 }
 
 void Window::DrawInstanced(DrawableInstanced* drawableInstanced) {

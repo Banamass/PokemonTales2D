@@ -38,7 +38,8 @@
   <ItemGroup>
     <None Include="shaders\CubemapFragmentShader.glsl" />
     <None Include="shaders\CubemapVertexShader.glsl" />
-    <None Include="shaders\InstancedModelFragmentShader.glsl" />
+    <None Include="shaders\FontFragmentShader.glsl" />
+    <None Include="shaders\FontVertexShader.glsl" />
     <None Include="shaders\InstancedModelVertexShader.glsl" />
     <None Include="shaders\ModelFragmentShader.glsl" />
     <None Include="shaders\ModelVertexShader.glsl" />
