@@ -5,9 +5,7 @@ Game::Game()
 	camera(&context), shaderManager(&context),
 	gameSystem(&context),
 	light(glm::vec3(10.0f, 50.0f, 10.0f), &context),
-	gui(&context),
-	font("Resources\\fonts\\arial.ttf"),
-	text(&font, "Bonjour")
+	gui(&context)
 {
 	window.SetCursorCapture(true);
 
@@ -22,9 +20,6 @@ Game::Game()
 			"back.jpg"
 	};
 	skybox = new Cubemap(shaderManager.GetShader("CubemapShader"), faces, dir);
-
-	text.SetPos(glm::vec2(0, 400));
-	text.SetCharacterSize(10);
 }
 Game::~Game(){}
 
@@ -40,8 +35,6 @@ void Game::Render(){
 	gameSystem.Render();
 	gui.Render();
 	light.Draw(&window);
-
-	window.DrawStatic(&text);
 
 	window.EndDraw();
 }

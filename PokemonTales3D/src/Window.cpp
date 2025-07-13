@@ -89,7 +89,11 @@ void Window::DrawStatic(Drawable* drawable) {
 }
 
 void Window::DrawStatic(Text* text) {
-	text->Draw(context->shaderManager->GetShader("FontShader"));
+	text->Draw();
+}
+
+void Window::DrawStatic(RectangleShape* shape) {
+	shape->Draw();
 }
 
 void Window::DrawInstanced(DrawableInstanced* drawableInstanced) {

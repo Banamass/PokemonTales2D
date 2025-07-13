@@ -39,14 +39,21 @@ private:
 
 class Text {
 public:
-	Text(Font* l_font, std::string l_text);
+	Text(Font* l_font, std::string l_text, Shader* l_shader);
 	~Text();
 
-	void Draw(Shader* l_shader);
+	void Draw();
+
+	void SetText(std::string l_text);
+	void AddText(std::string l_textAdded);
+	void RemoveText(unsigned int nbCh);
 
 	void SetPos(glm::vec2 l_pos);
 	void SetCharacterSize(float l_size);
 	void SetColor(glm::vec3 l_color);
+
+	FloatRect GetFloatRect();
+	std::string GetText();
 
 private:
 	struct CharacterData {
@@ -56,8 +63,10 @@ private:
 		const Character* cInfos;
 	};
 
-	void ComputeCharacterDatas();
+	//Compute the data of character data textData[offset, .., size[
+	void ComputeCharacterDatas(int offset);
 
+	Shader* shader;
 	unsigned int VAO, VBO;
 
 	Font* font;
@@ -66,6 +75,7 @@ private:
 	glm::vec2 pos;
 	float scale;
 	glm::vec3 color;
+	FloatRect hitbox;
 
 	std::vector<CharacterData> textData;
 };

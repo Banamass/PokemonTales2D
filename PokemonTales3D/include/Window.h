@@ -2,6 +2,7 @@
 
 #include "Drawable.h"
 #include "Font.h"
+#include "Shape.h"
 
 class Window {
 public:
@@ -18,6 +19,7 @@ public:
 
 	void DrawStatic(Drawable* drawable);
 	void DrawStatic(Text* text);
+	void DrawStatic(RectangleShape* shape);
 	void DrawInstanced(DrawableInstanced* drawableInstanced);
 	void DrawOutlined(Drawable& drawable, glm::vec4 color, float thickness);
 	void SetCursorCapture(bool capture);

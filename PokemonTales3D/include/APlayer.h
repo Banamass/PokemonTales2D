@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Window.h"
+#include "Pokemon.h"
 #include <algorithm>
 
 class Board;
@@ -53,4 +53,24 @@ protected:
 	Location origin;
 	glm::ivec2 originOffset;
 	IntRect intRect;
+};
+
+class APlayer {
+public:
+	APlayer(SharedContext* l_context);
+	virtual ~APlayer();
+
+	virtual void Setup() = 0;
+	virtual void PlayTurn();
+
+	void PokemonKO(Pokemon* poke);
+
+	bool Playing();
+	std::vector<Pokemon*>& GetPokemons();
+
+protected:
+	SharedContext* context;
+
+	bool isPlaying;
+	std::vector<Pokemon*> pokemons;
 };

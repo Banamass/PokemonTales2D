@@ -71,14 +71,8 @@ int Font::GetGlyphSize() { return glyphSize; }
 
 /*----------------Text-------------------*/
 
-Text::Text(Font* l_font, std::string l_text) :font(l_font), text(l_text) {
-	for (char c : l_text) {
-		const Character* cInfos = font->GetCharacter(c);
-		if (cInfos == nullptr)
-			std::cout << "error c isn't supported by the given font" << std::endl;
-		textData.emplace_back(cInfos);
-		(textData.end() - 1)->cInfos = cInfos;
-	}
+Text::Text(Font* l_font, std::string l_text, Shader* l_shader) 
+	:font(l_font), shader(l_shader) {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
@@ -93,18 +87,31 @@ Text::Text(Font* l_font, std::string l_text) :font(l_font), text(l_text) {
 	scale = 1.0f;
 	color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	ComputeCharacterDatas();
+	SetText(l_text);
 }
 Text::~Text() {}
 
-void Text::ComputeCharacterDatas() {
-	float x = pos.x;
-	for (CharacterData& cData : textData) {
-		float xpos = x + cData.cInfos->bearing.x * scale;
-		float ypos = pos.y - (cData.cInfos->size.y - cData.cInfos->bearing.y) * scale;
+void Text::ComputeCharacterDatas(int offset) {
+	if (textData.size() == 0)
+		return;
 
-		float w = cData.cInfos->size.x * scale;
-		float h = cData.cInfos->size.y * scale;
+	float x = pos.x;
+	float minypos = Constants::WIN_HEIGHT * 2;
+	float maxh = -1;
+
+	auto cData = textData.begin();
+	for (; cData != textData.begin() + offset && cData != textData.end(); cData++) {
+		unsigned int advance = cData->cInfos->advance;
+		x += (advance >> 6) * scale; //bitshift by 6
+		float ypos = pos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
+		minypos = std::min(ypos, minypos);
+	}
+	for (; cData != textData.end(); cData++) {
+		float xpos = x + cData->cInfos->bearing.x * scale;
+		float ypos = pos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
+
+		float w = cData->cInfos->size.x * scale;
+		float h = cData->cInfos->size.y * scale;
 
 		float vertices[6][4] = {
 			{xpos, ypos + h, 0.0f,0.0f},
@@ -116,14 +123,21 @@ void Text::ComputeCharacterDatas() {
 		};
 		for (int i = 0; i < 6; i++)
 			for (int j = 0; j < 4; j++)
-				cData.vertices[i][j] = vertices[i][j];
+				cData->vertices[i][j] = vertices[i][j];
 
-		unsigned int advance = cData.cInfos->advance;
-		x += (advance >> 6) * scale;
+		unsigned int advance = cData->cInfos->advance;
+		x += (advance >> 6) * scale; //bitshift by 6
+
+		minypos = std::min(ypos, minypos);
+		maxh = std::max(h, maxh);
 	}
+	hitbox.size.x = x - pos.x;
+	hitbox.size.y = std::max(maxh, hitbox.size.y);
+	hitbox.pos.x = pos.x;
+	hitbox.pos.y = minypos;
 }
 
-void Text::Draw(Shader* shader) {
+void Text::Draw() {
 	shader->use();
 	glm::mat4 projection = glm::ortho(0.0f, Constants::WIN_WIDTH, 0.0f, Constants::WIN_HEIGHT);
 	shader->SetUniform("projection", glm::value_ptr(projection));
@@ -146,6 +160,60 @@ void Text::Draw(Shader* shader) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Text::SetPos(glm::vec2 l_pos) { pos = l_pos; ComputeCharacterDatas(); }
-void Text::SetCharacterSize(float l_size) { scale = l_size / font->GetGlyphSize(); ComputeCharacterDatas(); }
-void Text::SetColor(glm::vec3 l_color) { color = l_color; ComputeCharacterDatas(); }
+void Text::SetText(std::string l_text) {
+	text = l_text;
+	textData.clear();
+	for (char c : l_text) {
+		const Character* cInfos = font->GetCharacter(c);
+		if (cInfos == nullptr)
+			std::cout << "error c isn't supported by the given font" << std::endl;
+		textData.emplace_back(cInfos);
+		(textData.end() - 1)->cInfos = cInfos;
+	}
+
+	ComputeCharacterDatas(0);
+}
+void Text::AddText(std::string l_textAdded) {
+	int offset = text.size();
+	text = text + l_textAdded;
+	for (char c : l_textAdded) {
+		const Character* cInfos = font->GetCharacter(c);
+		if (cInfos == nullptr)
+			std::cout << "error c isn't supported by the given font" << std::endl;
+		textData.emplace_back(cInfos);
+		(textData.end() - 1)->cInfos = cInfos;
+	}
+
+	ComputeCharacterDatas(offset);
+}
+
+void Text::RemoveText(unsigned int nbCh) {
+	for (int i = 0; i < nbCh && !text.empty(); i++) {
+		textData.pop_back();
+		text.pop_back();
+	}
+	float minypos = Constants::WIN_HEIGHT * 2;
+	float maxh = -1;
+	float x = 0;
+
+	auto cData = textData.begin();
+	for (; cData != textData.end(); cData++) {
+		unsigned int advance = cData->cInfos->advance;
+		x += (advance >> 6) * scale; //bitshift by 6
+		float ypos = pos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
+		minypos = std::min(ypos, minypos);
+		float h = cData->cInfos->size.y * scale;
+		maxh = std::max(h, maxh);
+	}
+
+	hitbox.size.x = x - pos.x;
+	hitbox.size.y = maxh;
+	hitbox.pos.y = minypos;
+}
+
+FloatRect Text::GetFloatRect() { return hitbox; }
+std::string Text::GetText() { return text; }
+
+void Text::SetPos(glm::vec2 l_pos) { pos = l_pos; ComputeCharacterDatas(0); }
+void Text::SetCharacterSize(float l_size) { scale = l_size / font->GetGlyphSize(); ComputeCharacterDatas(0); }
+void Text::SetColor(glm::vec3 l_color) { color = l_color; }

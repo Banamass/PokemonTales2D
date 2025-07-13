@@ -24,14 +24,11 @@ private:
 	Window window;
 	ShaderManager shaderManager;
 	EventManager eventManager;
-	Font font;
 	Camera camera;
 
 	Light light;
 
 	Cubemap* skybox;
-
-	Text text;
 
 	GameSystem gameSystem;
 	GUI gui;
