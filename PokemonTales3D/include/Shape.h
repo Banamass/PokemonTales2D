@@ -2,7 +2,21 @@
 
 #include "Shader.h"
 
-class RectangleShape {
+class Shape {
+public:
+	Shape() : pos(0.0f, 0.0f){}
+	virtual ~Shape(){}
+
+	virtual void Draw() = 0;
+
+	virtual void SetPos(glm::vec2 l_pos) { pos = l_pos; }
+	virtual glm::vec2 GetPos() { return pos; }
+
+protected:
+	glm::vec2 pos;
+};
+
+class RectangleShape : public Shape {
 public:
 	RectangleShape(Shader* l_shader);
 	RectangleShape(glm::vec2 size, Shader* l_shader);
@@ -28,7 +42,6 @@ private:
 	glm::vec3 vertices[4];
 
 	glm::vec2 size;
-	glm::vec2 pos;
 	glm::vec2 origin;
 	glm::vec4 color;
 };

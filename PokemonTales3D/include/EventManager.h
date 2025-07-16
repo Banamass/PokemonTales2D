@@ -26,8 +26,23 @@ struct EnumHash {
 };
 
 enum class EventType {
+	Key,
+	MouseButton,
 	MouseMove,
 	Scroll
+};
+
+struct Key_Data {
+	int key;
+	int scancode;
+	int action;
+	int mods;
+};
+
+struct MouseButton_Data {
+	int button;
+	int action;
+	int	mods;
 };
 
 struct MouseMove_Data {
@@ -43,6 +58,8 @@ struct Scroll_Data {
 struct CallbackData {
 	GLFWwindow* window;
 	std::variant<
+		Key_Data,
+		MouseButton_Data,
 		MouseMove_Data,
 		Scroll_Data
 	> data;
@@ -68,8 +85,14 @@ public:
 	static void _MouseMoveCallback(GLFWwindow* l_window, double xpos, double ypos);
 	void MouseMoveCallback(double xpos, double ypos);
 
+	static void _MouseButtonCallback(GLFWwindow* l_window, int button, int action, int mods);
+	void MouseButtonCallback(int button, int action, int mods);
+
 	static void _ScrollCallback(GLFWwindow* l_window, double xoffset, double yoffset);
 	void ScrollCallback(double xoffset, double yoffset);
+
+	static void _KeyCallback(GLFWwindow* l_window, int key, int scancode, int action, int mods);
+	void KeyCallback(int key, int scancode, int action, int mods);
 
 private:
 	GLFWwindow* window;

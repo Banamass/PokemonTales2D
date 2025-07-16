@@ -157,7 +157,6 @@ void Text::Draw() {
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Text::SetText(std::string l_text) {
@@ -212,6 +211,7 @@ void Text::RemoveText(unsigned int nbCh) {
 }
 
 FloatRect Text::GetFloatRect() { return hitbox; }
+glm::vec2 Text::GetPos() { return pos; }
 std::string Text::GetText() { return text; }
 
 void Text::SetPos(glm::vec2 l_pos) { pos = l_pos; ComputeCharacterDatas(0); }

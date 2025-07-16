@@ -28,6 +28,7 @@ public:
 	void SetPosition(glm::vec3 pos);
 
 	glm::mat4 GetTransform();
+	glm::vec3 GetScaling();
 
 private:
 	void ResetTransformations();
@@ -39,6 +40,23 @@ private:
 	glm::mat4 transform;
 
 	friend class Window;
+};
+
+class OBB {
+public:
+	OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax);
+	~OBB() {}
+
+	bool TestRayOBBIntersection(
+		glm::vec3 ray_origin,
+		glm::vec3 ray_direction,
+		glm::mat4 ModelMatrix,
+		float& interstion_distance,
+		glm::vec3 scaling = glm::vec3(1.0f));
+
+private:
+	glm::vec3 AABBMin;
+	glm::vec3 AABBMax;
 };
 
 class Drawable {
@@ -54,6 +72,11 @@ public:
 	Drawable(Model* model, Shader* shader);
 	Drawable(Model* model, Shader* shader, Material l_material);
 	~Drawable();
+
+	bool TestRayIntersection(
+		const glm::vec3& ray_origin,
+		const glm::vec3& ray_direction,
+		float& interstion_distance);
 
 	void Move(glm::vec3 move);
 	void Scale(glm::vec3 scale);
@@ -71,6 +94,7 @@ private:
 	Model* model;
 	Shader* shader;
 	Transform transform;
+	OBB obb;
 
 	friend class Window;
 };

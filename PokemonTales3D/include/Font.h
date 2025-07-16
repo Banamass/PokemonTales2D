@@ -53,6 +53,7 @@ public:
 	void SetColor(glm::vec3 l_color);
 
 	FloatRect GetFloatRect();
+	glm::vec2 GetPos();
 	std::string GetText();
 
 private:

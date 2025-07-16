@@ -19,7 +19,7 @@ public:
 
 	void DrawStatic(Drawable* drawable);
 	void DrawStatic(Text* text);
-	void DrawStatic(RectangleShape* shape);
+	void DrawStatic(Shape* shape);
 	void DrawInstanced(DrawableInstanced* drawableInstanced);
 	void DrawOutlined(Drawable& drawable, glm::vec4 color, float thickness);
 	void SetCursorCapture(bool capture);

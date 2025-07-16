@@ -14,6 +14,7 @@ class Camera;
 class ShaderManager;
 class GameSystem;
 class GUI;
+class Board;
 
 struct SharedContext {
 	Window* win;
@@ -22,6 +23,7 @@ struct SharedContext {
 	ShaderManager* shaderManager;
 	GameSystem* gameSystem;
 	GUI* gui;
+	Board* board;
 };
 
 enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };

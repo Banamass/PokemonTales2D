@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <unordered_map>
+#include <utility>
 #include "stb_image.h"
 
 class Transform;
@@ -36,6 +37,9 @@ public:
 	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vector<Transform*>& instanceTransform);
 	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable);
 
+	/*Return (aabbMin, aabbMax)*/
+	std::pair<glm::vec3, glm::vec3> GetAABBMinMax();
+
 private:
 	unsigned int VAO, VBO, EBO;
 
@@ -55,7 +59,14 @@ public:
 	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, const std::vector<Transform*>& instanceTransform);
 	void DrawInstanced(Shader* shader, glm::mat4 cameraMatrix, DrawableInstanced* drawable);
 
+	/*Return (aabbMin, aabbMax)*/
+	std::pair<glm::vec3, glm::vec3> GetAABBMinMax();
+
 private:
+	void SetAABBMinMax();
+	glm::vec3 AABBMin;
+	glm::vec3 AABBMax;
+
 	std::vector<Mesh> meshes;
 	std::string directory;
 

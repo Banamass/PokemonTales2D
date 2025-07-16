@@ -20,8 +20,10 @@ void Box::Unselect() {
 
 Board::Board(glm::vec2 l_size, SharedContext* l_context)
 	: context(l_context), size(l_size), boxesDrawable(nullptr)
-	, boxDrawable(nullptr), cursorDrawable(nullptr), cursor(glm::vec2(1,1)),
-	boxModel("Resources\\Box\\box.obj") {
+	, boxDrawable(nullptr),boxModel("Resources\\Box\\box.obj")
+{
+	context->board = this;
+
 	instancedModelShader = context->shaderManager->GetShader("InstancedModelShader");
 	modelShader = context->shaderManager->GetShader("ModelShader");
 	if (instancedModelShader == nullptr) {
@@ -55,24 +57,24 @@ Board::Board(glm::vec2 l_size, SharedContext* l_context)
 	boxDrawable = new Drawable(&boxModel, instancedModelShader);
 	boxDrawable->SetMaterial(mat);
 	boxesDrawable = new DrawableInstanced(boxDrawable, boxesTransforms);
-
-	cursorDrawable = new Drawable(&boxModel, modelShader);
-	mat.ambient = 0.3f * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	mat.diffuse = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	cursorDrawable->SetMaterial(mat);
-
-	cursor.Update(this, glm::ivec2(1, 1));
 }
 Board::~Board() {
 	delete boxesDrawable;
 	delete boxDrawable;
-	delete cursorDrawable;
 	for (Transform* trans : boxesTransforms) {
 		delete trans;
 	}
 }
 
 void Board::Update(double dt) {
+	
+}
+
+void Board::Draw() {
+	context->win->DrawInstanced(boxesDrawable);
+}
+
+glm::ivec2 Board::GetMousePos() {
 	glm::vec3 mouseDir = context->camera->GetMouseDirection();
 	glm::vec3 camPos = context->camera->GetPosition();
 
@@ -80,23 +82,11 @@ void Board::Update(double dt) {
 		float lambda = camPos.y / mouseDir.y;
 		glm::vec3 proj = glm::vec3(camPos.x - lambda * mouseDir.x, 0, camPos.z - lambda * mouseDir.z);
 		proj += glm::vec3(Constants::BOX_SIZE / 2.0f, 0, Constants::BOX_SIZE / 2.0f);
-		
-		glm::ivec2 boardPos((int)(proj.x / Constants::BOX_SIZE), (int)(proj.z / Constants::BOX_SIZE));
-		cursor.Update(this, boardPos);
-	}
-}
 
-void Board::Draw() {
-	for (Box* box : cursor.GetBoxes()) {
-		glm::ivec2 pos = box->GetPos();
-		cursorDrawable->SetPosition(glm::ivec3(
-			pos.x * Constants::BOX_SIZE,
-			0.0f,
-			pos.y * Constants::BOX_SIZE
-		));
-		context->win->Draw(cursorDrawable);
+		glm::ivec2 boardPos((int)(proj.x / Constants::BOX_SIZE), (int)(proj.z / Constants::BOX_SIZE));
+		return boardPos;
 	}
-	context->win->DrawInstanced(boxesDrawable);
+	return glm::ivec2(-1.0f, -1.0f);
 }
 
 bool Board::Contain(const glm::ivec2& pos) {
@@ -107,4 +97,80 @@ Box* Board::GetBox(const glm::ivec2& pos) {
 	if (!Contain(pos))
 		return nullptr;
 	return &boxes[pos.x][pos.y];
+}
+
+glm::ivec2 Board::GetSize() {
+	return size;
+}
+
+bool Board::SetPokemonPos(Pokemon* poke, glm::ivec2 pos) {
+	if (poke == nullptr)
+		return false;
+	if (!CheckMove(poke, pos))
+		return false;
+	auto itr = pokemonsPos.find(poke);
+	if (itr == pokemonsPos.end()) {
+		pokemonsPos.emplace(std::make_pair(poke, pos));
+	}
+	else {
+		pokemonsPos.at(poke) = pos;
+	}
+	return true;
+}
+bool Board::MovePokemon(Pokemon* poke, glm::ivec2 move) {
+	if (poke == nullptr)
+		return false;
+	auto itr = pokemonsPos.find(poke);
+	if (itr == pokemonsPos.end())
+		return false;
+	return SetPokemonPos(poke, itr->second + move);
+}
+
+bool Board::CheckMove(Pokemon* poke, glm::ivec2 pos) {
+	if (poke == nullptr)
+		return false;
+	IntRect hitbox1(pos, poke->GetSize());
+	for (auto& itr : pokemonsPos) {
+		if (itr.first == poke)
+			continue;
+		IntRect hitbox2(itr.second, itr.first->GetSize());
+		if (hitbox1.Intersects(hitbox2))
+			return false;
+	}
+	IntRect boardHitBox = IntRect({ 0,0 }, size);
+	return boardHitBox.Contains(pos + poke->GetSize() - glm::ivec2({ 1,1 }));
+}
+
+glm::ivec2 Board::GetPokemonPosition(Pokemon* poke) {
+	return pokemonsPos[poke];
+}
+
+IntRect Board::GetPokemonHitbox(Pokemon* poke) {
+	auto itr = pokemonsPos.find(poke);
+	if (itr == pokemonsPos.end())
+		return IntRect();
+	return IntRect(itr->second, itr->first->GetSize());
+}
+
+Pokemon* Board::GetPokemonFromPos(glm::ivec2 pos) {
+	for (auto& itr : pokemonsPos) {
+		IntRect hitbox = GetPokemonHitbox(itr.first);
+		if (hitbox.Contains(pos))
+			return itr.first;
+	}
+	return nullptr;
+}
+std::vector<Pokemon*> Board::GetPokemonCollision(IntRect hitbox) {
+	std::vector<Pokemon*> res;
+	for (auto& itr : pokemonsPos) {
+		IntRect pokeHitbox = GetPokemonHitbox(itr.first);
+		if (pokeHitbox.Intersects(hitbox)) {
+			res.push_back(itr.first);
+		}
+	}
+	return res;
+}
+
+void Board::RemovePokemon(Pokemon* poke) {
+	pokemonsPos.erase(pokemonsPos.find(poke));
 }

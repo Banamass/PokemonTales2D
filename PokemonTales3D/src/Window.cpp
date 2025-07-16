@@ -92,7 +92,7 @@ void Window::DrawStatic(Text* text) {
 	text->Draw();
 }
 
-void Window::DrawStatic(RectangleShape* shape) {
+void Window::DrawStatic(Shape* shape) {
 	shape->Draw();
 }
 

@@ -1,23 +1,5 @@
 #include "APlayer.h"
 
-/*
-void SelectedBoxArea::UpdateCross(Board* board, sf::Vector2i centerCoord) {
-	Add(board->GetBox(sf::Vector2i(centerCoord.x, centerCoord.y)));
-	for (int i = 1; i < size; i++) {
-		Add(board->GetBox(sf::Vector2i(centerCoord.x - i, centerCoord.y)));
-		Add(board->GetBox(sf::Vector2i(centerCoord.x + i, centerCoord.y)));
-		Add(board->GetBox(sf::Vector2i(centerCoord.x, centerCoord.y - i)));
-		Add(board->GetBox(sf::Vector2i(centerCoord.x, centerCoord.y + i)));
-	}
-}
-void SelectedBoxArea::UpdateDiamant(Board* board, sf::Vector2i centerCoord) {
-	for (int i = (-size + 1); i <= (size - 1); i++) {
-		for (int j = (-size + 1) + std::abs(i); j <= (size - 1) - std::abs(i); j++) {
-			Add(board->GetBox(sf::Vector2i(centerCoord.x + i, centerCoord.y + j)));
-		}
-	}
-}
-*/
 /*------------------------AbstractArea------------------------*/
 
 void AbstractArea::Clear() {

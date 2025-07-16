@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Board.h"
+#include "EventManager.h"
+#include "GUI.h"
+#include "Player.h"
 
 class GameSystem {
 public:
@@ -10,8 +13,22 @@ public:
 	void Update(double dt);
 	void Render();
 
+	void Attack(Pokemon* attacker, Pokemon* attacked);
+
 private:
+	void UpdatePlayingPlayer();
+	void UpdateHoverPokemon();
+	
+	void HoverPokemon(Pokemon* poke);
+	void UnHoverPokemon();
+
 	SharedContext* context;
 
+	std::vector<Pokemon*> playingPokemons;
+	Pokemon* hoverPoke;
+
 	Board board;
+	Player player;
+	Player opponent;
+	Player* playingPlayer;
 };

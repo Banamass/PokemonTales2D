@@ -14,15 +14,15 @@ glm::vec2 LocationToPosition(glm::vec2 size, Location loc) {
 }
 
 bool IntRect::Contains(glm::ivec2 v) const {
-	return (v.x >= pos.x && v.x <= pos.x + size.x
-		&& v.y >= pos.y && v.y <= pos.y + size.y);
+	return (v.x >= pos.x && v.x < pos.x + size.x
+		&& v.y >= pos.y && v.y < pos.y + size.y);
 }
 
 bool IntRect::Intersects(IntRect rect) const {
-	return !(pos.x > rect.pos.x + rect.size.x
-		|| rect.pos.x > pos.x + size.x
-		|| pos.y > rect.pos.y + rect.size.y
-		|| rect.pos.y > pos.y + size.y);
+	return !(pos.x >= rect.pos.x + rect.size.x
+		|| rect.pos.x >= pos.x + size.x
+		|| pos.y >= rect.pos.y + rect.size.y
+		|| rect.pos.y >= pos.y + size.y);
 }
 
 bool FloatRect::Contains(glm::ivec2 v) const {

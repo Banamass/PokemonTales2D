@@ -118,6 +118,23 @@ void Mesh::setupMesh() {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 }
 
+std::pair<glm::vec3, glm::vec3> Mesh::GetAABBMinMax() {
+	auto itr = vertices.begin();
+	if (vertices.end() == itr)
+		return std::make_pair(glm::vec3(0.0f), glm::vec3(0.0f));
+	glm::vec3 AABBMin = itr->Position;
+	glm::vec3 AABBMax = itr->Position;
+	itr++;
+	for (; itr != vertices.end(); itr++) {
+		AABBMin.x = std::min(AABBMin.x, itr->Position.x);
+		AABBMin.y = std::min(AABBMin.y, itr->Position.y);
+		AABBMin.x = std::min(AABBMin.y, itr->Position.y);
+		AABBMax.x = std::max(AABBMax.x, itr->Position.x);
+		AABBMax.y = std::max(AABBMax.y, itr->Position.y);
+		AABBMax.z = std::max(AABBMax.z, itr->Position.z);
+	}
+	return std::make_pair(AABBMin, AABBMax);
+}
 
 /*-------------------Model-------------------*/
 
@@ -148,6 +165,8 @@ void Model::loadModel(std::string path) {
 	directory = path.substr(0, path.find_last_of('\\'));
 
 	processNode(scene->mRootNode, scene);
+
+	SetAABBMinMax();
 }
 void Model::processNode(aiNode* node, const aiScene* scene) {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -229,6 +248,30 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat
 		}
 	}
 	return textures;
+}
+
+void Model::SetAABBMinMax() {
+	auto itr = meshes.begin();
+	if (meshes.end() == itr)
+		return;
+	auto pair = itr->GetAABBMinMax();
+	AABBMin = pair.first;
+	AABBMax = pair.second;
+	itr++;
+	int i = 0;
+	for (; itr != meshes.end(); itr++) {
+		auto pair = itr->GetAABBMinMax();
+		AABBMin.x = std::min(AABBMin.x, pair.first.x);
+		AABBMin.y = std::min(AABBMin.y, pair.first.y);
+		AABBMin.x = std::min(AABBMin.y, pair.first.z);
+		AABBMax.x = std::max(AABBMax.x, pair.second.x);
+		AABBMax.y = std::max(AABBMax.y, pair.second.y);
+		AABBMax.z = std::max(AABBMax.z, pair.second.z);
+	}
+}
+
+std::pair<glm::vec3, glm::vec3> Model::GetAABBMinMax() {
+	return std::make_pair(AABBMin, AABBMax);
 }
 
 /*-------------------Cubemap-------------------*/
