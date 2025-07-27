@@ -4,8 +4,8 @@
 
 namespace Constants{
 	constexpr float BOX_SIZE = 2.0f;
-	constexpr float WIN_WIDTH = 800.0f;
-	constexpr float WIN_HEIGHT = 600.0f;
+	constexpr float WIN_WIDTH = 1200.0f;
+	constexpr float WIN_HEIGHT = 900.0f;
 }
 
 class Window;
@@ -15,6 +15,7 @@ class ShaderManager;
 class GameSystem;
 class GUI;
 class Board;
+class DataManager;
 
 struct SharedContext {
 	Window* win;
@@ -24,6 +25,7 @@ struct SharedContext {
 	GameSystem* gameSystem;
 	GUI* gui;
 	Board* board;
+	DataManager* gameData;
 };
 
 enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };

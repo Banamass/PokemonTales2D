@@ -9,6 +9,7 @@ RectangleShape::RectangleShape(Shader* l_shader) : shader(l_shader) {
 	pos = glm::vec2(0, 0);
 	origin = glm::vec2(0, 0);
 	color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	z = 0.0f;
 	SetupGraphics();
 }
 RectangleShape::RectangleShape(glm::vec2 l_size, Shader* l_shader) : shader(l_shader) {
@@ -16,10 +17,13 @@ RectangleShape::RectangleShape(glm::vec2 l_size, Shader* l_shader) : shader(l_sh
 	pos = glm::vec2(0, 0);
 	origin = glm::vec2(0, 0);
 	color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	z = 0.0f;
 	SetupGraphics();
 }
 
 void RectangleShape::Draw() {
+	if (compute)
+		ComputeVertices();
 	shader->use();
 	shader->SetUniform("color", color);
 	glm::mat4 projection = glm::ortho(0.0f, Constants::WIN_WIDTH, 0.0f, Constants::WIN_HEIGHT);
@@ -48,26 +52,49 @@ void RectangleShape::SetupGraphics() {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	ComputeVertices();
+	compute = true;
 }
 
 
 void RectangleShape::ComputeVertices() {
 	glm::vec2 realPos = pos - origin;
-	vertices[0] = glm::vec3(realPos.x, realPos.y, 0.0f);
-	vertices[1] = glm::vec3(realPos.x, realPos.y + size.y, 0.0f);
-	vertices[2] = glm::vec3(realPos.x + size.x, realPos.y + size.y, 0.0f);
-	vertices[3] = glm::vec3(realPos.x + size.x, realPos.y, 0.0f);
+	vertices[0] = glm::vec3(realPos.x, realPos.y, z);
+	vertices[1] = glm::vec3(realPos.x, realPos.y + size.y, z);
+	vertices[2] = glm::vec3(realPos.x + size.x, realPos.y + size.y, z);
+	vertices[3] = glm::vec3(realPos.x + size.x, realPos.y, z);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	compute = false;
 }
 
+void RectangleShape::SetZ(float l_z) {
+	if (l_z == z)
+		return;
+	z = l_z;
+	compute = true;
+}
 void RectangleShape::SetOrigin(Location location) { SetOrigin(LocationToPosition(size, location)); }
-void RectangleShape::SetSize(glm::vec2 l_size) { size = l_size; ComputeVertices(); }
-void RectangleShape::SetPos(glm::vec2 l_pos) { pos = l_pos; ComputeVertices(); }
-void RectangleShape::SetOrigin(glm::vec2 l_origin) { origin = l_origin; ComputeVertices(); }
+void RectangleShape::SetSize(glm::vec2 l_size) { 
+	if (l_size == size)
+		return;
+	size = l_size; 
+	compute = true;
+}
+void RectangleShape::SetPos(glm::vec2 l_pos) { 
+	if (l_pos == pos)
+		return;
+	pos = l_pos;
+	compute = true;
+}
+void RectangleShape::SetOrigin(glm::vec2 l_origin) {
+	if (l_origin == origin)
+		return;
+	origin = l_origin;
+	compute = true;
+}
 void RectangleShape::SetColor(glm::vec4 l_color) { color = l_color; }

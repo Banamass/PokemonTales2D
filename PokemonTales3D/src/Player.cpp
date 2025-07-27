@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "GameSystem.h"
+#include "Camera.h"
 
 /*-----------------------------Player-----------------------------*/
 
@@ -50,7 +51,7 @@ void Player::Update(double dt) {
 
 void Player::Render() {
 	APlayer::Render();
-	if(state != nullptr)
+	if(state != nullptr && isPlaying)
 		state->Render();
 }
 
@@ -246,6 +247,8 @@ Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPo
 	mat.shininess = 32.0f;
 	cursorDrawable.SetMaterial(mat);
 	cursor.SetSize(glm::ivec2(2, 1));
+
+	player->context->camera->SetIsFollowingMouse(false);
 }
 
 void Player::PokeAttackState::KeyCallback(Key_Data& data) {
@@ -280,5 +283,6 @@ void Player::PokeAttackState::Attack() {
 
 void Player::PokeAttackState::Unattack() {
 	player->context->gui->GetGameInfosField()->AddMessage("Unattack " + selectedPokemon->GetName());
+	player->context->camera->SetIsFollowingMouse(true);
 	player->SwitchState(new PokeSelectedState(player, selectedPokemon));
 }

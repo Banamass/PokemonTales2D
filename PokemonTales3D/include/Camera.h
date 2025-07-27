@@ -18,6 +18,7 @@ public:
 	void SetFront(glm::vec3 newFront);
 	void SetPosition(glm::vec3 newPos);
 	void SetFoV(float newFoV);
+	void SetIsFollowingMouse(float b);
 
 	glm::vec3 GetMouseDirection();
 	glm::vec3 GetPosition();
@@ -39,6 +40,7 @@ private:
 
 	bool firstMouse;
 	glm::vec2 lastMousPos;
+	bool isFollowingMouse;
 
 	float yaw;
 	float pitch;

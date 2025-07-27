@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera(SharedContext* l_context)
-	:window(context->win), context(l_context) {
+	:window(context->win), context(l_context), isFollowingMouse(true) {
 	glm::vec2 l_windowSize = window->GetWindowSize();
 
 	pos = glm::vec3(-3.0f, 0.0f, 0.0f);
@@ -85,7 +85,14 @@ void Camera::SetFoV(float newFoV) {
 	transformMatrix = projection * view;
 }
 
+void Camera::SetIsFollowingMouse(float b) {
+	isFollowingMouse = b;
+	context->win->SetCursorCapture(b);
+}
+
 void Camera::MouseMouseCallback(CallbackData data) {
+	if (!isFollowingMouse)
+		return;
 	MouseMove_Data* mdata = std::get_if<MouseMove_Data>(&data.data);
 	if (mdata == nullptr)
 		return;

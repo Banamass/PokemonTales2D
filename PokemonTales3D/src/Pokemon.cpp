@@ -1,14 +1,16 @@
 #include "Pokemon.h"
 
-Pokemon::Pokemon(const std::string& l_name, glm::ivec2 l_size, APlayer* l_trainer,
+Pokemon::Pokemon(const PokemonData* l_data, APlayer* l_trainer,
 	ShaderManager* shaderMgr, glm::vec3 l_color)
-	: name(l_name), size(l_size), trainer(l_trainer), model("Resources\\Box\\cube.obj"),
+	: trainer(l_trainer), model("Resources\\Pokemons\\Salameche.obj"),
 	sprite(&model, shaderMgr->GetShader("ModelShader")), color(l_color),
-	OBB(&model, shaderMgr->GetShader("ModelShader"))
+	OBB(&model, shaderMgr->GetShader("ModelShader")), data(l_data),
+	movePool()
 {
-	health = 100.0f;
-	moveRange = 5;
-	height = 1.0f + 0.6f*2.0f;
+	health = data->stats.hp;
+	for (int i = 0; i < 4; i++) {
+		movePool[i] = nullptr;
+	}
 
 	Drawable::Material mat;
 	mat.ambient = 0.6f * color;
@@ -17,14 +19,19 @@ Pokemon::Pokemon(const std::string& l_name, glm::ivec2 l_size, APlayer* l_traine
 	mat.shininess = 32.0f;
 	
 	sprite.SetMaterial(mat);
-	sprite.Scale(glm::vec3(0.6f));
+	sprite.Scale(glm::vec3(0.2f));
 
 	Drawable::Material matOBB;
 	matOBB.ambient = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	OBB.SetMaterial(matOBB);
 	OBB.Scale(glm::vec3(0.65f));
 }
-Pokemon::~Pokemon(){}
+Pokemon::~Pokemon(){
+	for (int i = 0; i < 4; i++) {
+		if(movePool[i])
+			delete movePool[i];
+	}
+}
 
 bool Pokemon::TestRayIntersection(
 	const glm::vec3& ray_origin,
@@ -35,23 +42,24 @@ bool Pokemon::TestRayIntersection(
 }
 
 void Pokemon::Render(Window* win, glm::ivec2 pos){
-	glm::vec3 realPos(pos.x * Constants::BOX_SIZE, 1.0f, pos.y * Constants::BOX_SIZE);
+	glm::vec3 realPos(pos.x * Constants::BOX_SIZE, 0.4f, pos.y * Constants::BOX_SIZE);
 	sprite.SetPosition(realPos);
 	OBB.SetPosition(realPos);
 
 	win->Draw(sprite);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	win->Draw(OBB);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-glm::ivec2 Pokemon::GetSize() { return size; }
-float Pokemon::GetHeight() { return height; }
-int Pokemon::GetMoveRange() { return moveRange; }
-void Pokemon::SetMoveRange(int l_range) { moveRange = l_range; }
+float Pokemon::GetHealth() { return health; }
+float Pokemon::GetMaxHealth() { return data->stats.hp; }
+glm::ivec2 Pokemon::GetSize() { return data->size; }
+int Pokemon::GetMoveRange() { return data->stats.move; }
 APlayer* Pokemon::GetTrainer() { return trainer; }
-std::string Pokemon::GetName() { return name; }
+std::string Pokemon::GetName() { return data->name; }
 bool Pokemon::IsKO() { return health <= 0; }
+PokemonMove* Pokemon::GetMove(int i) { return movePool[i]; }
+void Pokemon::SetMovePool(int i, const MoveData* l_data) { movePool[i] = new PokemonMove(l_data); }
 
-void Pokemon::TakeDamages(float l_damages) { health -= l_damages; }
+void Pokemon::TakeDamages(float l_damages) { 
+	health -= l_damages; 
+	health = std::max(health, 0.0f);
+}

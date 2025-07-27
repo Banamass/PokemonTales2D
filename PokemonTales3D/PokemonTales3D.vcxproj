@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\GameData.cpp" />
     <ClCompile Include="src\APlayer.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Camera.cpp" />
@@ -40,6 +41,10 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\GameData\Moves\Ember.json" />
+    <None Include="Resources\GameData\Moves\Moves.json" />
+    <None Include="Resources\GameData\Pokemons\Charmander.json" />
+    <None Include="Resources\GameData\Pokemons\Pokemons.json" />
     <None Include="shaders\CubemapFragmentShader.glsl" />
     <None Include="shaders\CubemapVertexShader.glsl" />
     <None Include="shaders\FontFragmentShader.glsl" />
@@ -58,8 +63,10 @@
     <ClInclude Include="include\EventManager.h" />
     <ClInclude Include="include\Font.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\GameData.h" />
     <ClInclude Include="include\GameSystem.h" />
     <ClInclude Include="include\GUI.h" />
+    <ClInclude Include="include\json.hpp" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Player.h" />
@@ -68,6 +75,9 @@
     <ClInclude Include="include\Shape.h" />
     <ClInclude Include="include\SharedTypes.h" />
     <ClInclude Include="include\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\GameData\ResourcesDescription.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

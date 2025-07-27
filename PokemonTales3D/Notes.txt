@@ -1,0 +1,3 @@
+A faire:
+- Pour les panels faire en sorte que les positions des élèments soient par rapport à la position du panel, sans changer la position à chaquey frame
+- Faire un resource manager (class abstraite) pour les font, model, etc

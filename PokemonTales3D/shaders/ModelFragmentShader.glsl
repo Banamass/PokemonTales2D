@@ -23,7 +23,7 @@ uniform Material material;
 
 void main()
 {    
-    vec3 ambient = lightColor * material.ambient;
+    vec3 ambient = lightColor * material.ambient /* *texture(texture_diffuse1, TexCoords).rgb*/;
     
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPos - FragWorldPos);

@@ -117,5 +117,6 @@ private:
 
 	private:
 		Pokemon* selectedPokemon;
+		
 	};
 };

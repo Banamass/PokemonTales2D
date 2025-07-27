@@ -1,0 +1,41 @@
+./Pokemons:
+PokeName.json:
+{
+	"ID":%int,
+	"Name" : %str,
+	"Type" : [%str, (%str)],
+	"Stats" : {
+		"HP":%int, 
+		"Attack":%int,
+		"Defense":%int,
+		"Sp.Atk":%int,
+		"Sp.Def":%int,
+		"Speed":%int,
+		"Distance":%int
+	}
+	"Sprite":%str
+	"Size" : [%int, %int]
+	"AttackPool":[%int, ..]
+}
+
+./Move:
+MoveName.json
+
+Syntax:
+- '-1' pour une valeur entière non renseignée
+- '-2' pour une valeur infinie
+- None pour une valeur string non renseignée
+
+{
+	"ID":%int,
+	"Name":%str,
+	"Type":%str,
+	"Cat":%str,
+	"Power"":%int,
+	"Acc.":%int,
+	"PP":%int,
+	"Effect":%str,
+	"Prob":%int,
+	"HitZone":[%int, %int],
+	"Range":%int
+}

@@ -28,6 +28,7 @@ public:
 	void SetOrigin(glm::vec2 l_origin);
 	void SetOrigin(Location location);
 	void SetColor(glm::vec4 l_color);
+	void SetZ(float l_z);
 
 	glm::vec2 GetSize() { return size; }
 
@@ -41,7 +42,10 @@ private:
 	unsigned int VAO, VBO, EBO;
 	glm::vec3 vertices[4];
 
+	float z;
 	glm::vec2 size;
 	glm::vec2 origin;
 	glm::vec4 color;
+
+	bool compute;
 };

@@ -28,6 +28,15 @@
     <Filter Include="Fichiers sources\Game">
       <UniqueIdentifier>{7532367e-0fe3-4050-864f-7ae675259326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{90de9737-a25a-47f6-ade4-7081be374a5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Pokemons">
+      <UniqueIdentifier>{bd8f5cff-378f-44ca-87c7-562abb407d10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Moves">
+      <UniqueIdentifier>{6feca21c-5ad2-4af8-bd6f-a5df4809a088}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -87,6 +96,9 @@
     <ClCompile Include="src\Player.cpp">
       <Filter>Fichiers sources\Game</Filter>
     </ClCompile>
+    <ClCompile Include="include\GameData.cpp">
+      <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
@@ -115,6 +127,18 @@
     </None>
     <None Include="shaders\FontFragmentShader.glsl">
       <Filter>shaders</Filter>
+    </None>
+    <None Include="Resources\GameData\Moves\Ember.json">
+      <Filter>Resources\Moves</Filter>
+    </None>
+    <None Include="Resources\GameData\Pokemons\Charmander.json">
+      <Filter>Resources\Pokemons</Filter>
+    </None>
+    <None Include="Resources\GameData\Moves\Moves.json">
+      <Filter>Resources\Moves</Filter>
+    </None>
+    <None Include="Resources\GameData\Pokemons\Pokemons.json">
+      <Filter>Resources\Pokemons</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -169,5 +193,16 @@
     <ClInclude Include="include\Player.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
+    <ClInclude Include="include\json.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData.h">
+      <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\GameData\ResourcesDescription.txt">
+      <Filter>Resources</Filter>
+    </Text>
   </ItemGroup>
 </Project>

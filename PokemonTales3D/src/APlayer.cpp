@@ -140,6 +140,7 @@ APlayer::~APlayer() {
 
 void APlayer::AddPokemon(Pokemon* poke, glm::ivec2 initialPos) {
 	pokemons.push_back(poke);
+	poke->SetMovePool(0, context->gameData->GetMoveData(1));
 	context->board->SetPokemonPos(poke, initialPos);
 }
 

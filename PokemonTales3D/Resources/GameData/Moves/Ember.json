@@ -1,0 +1,13 @@
+{
+  "ID": 1,
+  "Name": "Ember",
+  "Type": "Fire",
+  "Cat": "Spe",
+  "Power": 40,
+  "Acc.": 100,
+  "PP": 25,
+  "Effect": "May burn opponent",
+  "Prob": 10,
+  "HitZone": [ 1, 1 ],
+  "Range": 5
+}

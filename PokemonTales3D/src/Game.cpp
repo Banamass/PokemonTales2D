@@ -27,6 +27,7 @@ Game::~Game(){}
 void Game::Update(double dt){
 	camera.Update(dt);
 	gameSystem.Update(dt);
+	gui.Update(dt);
 }
 void Game::Render(){
 	window.StartDraw();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 #include "Window.h"
 #include "SharedTypes.h"
 #include "Font.h"
@@ -30,25 +31,29 @@ public:
 	Panel(ShaderManager* l_shaderMgr, glm::vec2 l_pos);
 	virtual ~Panel();
 
-	void Render(Window* win);
+	virtual void Render(Window* win);
 
 	/*Add a new shape in the panel, return this shape, or nullptr if the name already exist*/
-	Shape* AddShape(const std::string& name, Shape* shape);
+	Shape* AddShape(const std::string& name, Shape* shape, int zindex = 0);
 	/*Add a new widget in the panel, return this widget, or nullptr if the name already exist*/
 	GUIWidget* AddWidget(const std::string& name, GUIWidget* widget);
 
 	Shape* GetShape(const std::string& name);
 	GUIWidget* GetWidgets(const std::string& name);
 
-	void SetPosition(glm::vec2 pos);
+	virtual void SetPosition(glm::vec2 pos);
 
 protected:
+	void AddZindex(Shape* shape, int zindex);
+
 	ShaderManager* shaderMgr;
 
 	glm::vec2 pos;
 
 	std::unordered_map<std::string, Shape*> shapes;
 	std::unordered_map<std::string, GUIWidget*> widgets;
+
+	std::map<int, std::vector<Shape*>> shapesZIndex;
 };
 
 class GUIText : public GUIWidget {
@@ -78,11 +83,11 @@ public:
 	~TextField();
 
 	void SetPadding(glm::vec2 l_padding);
-	void SetPos(glm::vec2);
+	virtual void SetPos(glm::vec2);
 
 	void AddMessage(const std::string& mess);
 
-	void Render(Window* win);
+	virtual void Render(Window* win);
 
 protected:
 	void SetLinesPosition();
@@ -99,18 +104,41 @@ protected:
 	std::vector<Text> lines;
 };
 
+class PokemonMoveBar : public GUIWidget {
+public:
+	PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
+	virtual ~PokemonMoveBar();
+
+	virtual void Render(Window* win);
+
+	void SetPokemonMove(PokemonMove* l_move);
+	virtual void SetPos(glm::vec2 l_pos);
+	glm::vec2 GetSize();
+
+private:
+	PokemonMove* move;
+
+	glm::vec2 size;
+	Panel panel;
+	GUIText* moveName;
+	GUIText* ppText;
+	GUIText* powerText;
+	RectangleShape* frame;
+};
+
 class PokemonStatsBar : public GUIWidget {
 public:
 	PokemonStatsBar(Pokemon* l_poke, Font* l_font, ShaderManager* shaderMgr);
 	virtual ~PokemonStatsBar();
 
-	void Render(Window* win);
+	void Update(double dt);
+	virtual void Render(Window* win);
 
 	void SetPokemon(Pokemon* poke);
-	void SetPos(glm::vec2 pos);
+	virtual void SetPos(glm::vec2 pos);
 
 	glm::vec2 GetSize();
-	glm::vec2 GetPos();
+	virtual glm::vec2 GetPos();
 	Pokemon* GetPokemon();
 
 protected:
@@ -121,12 +149,20 @@ protected:
 	glm::vec2 size;
 	Panel panel;
 	GUIText* pokeName;
+	GUIText* healthText;
+
+	glm::vec2 healthBarSize;
+	glm::vec2 healthBarPos;
+	RectangleShape* healthBar;
+	RectangleShape* healthBarFrame;
+	RectangleShape* healthBarBack;
 };
 
 class GUI {
 public:
 	GUI(SharedContext* l_context);
 
+	void Update(double dt);
 	void Render();
 
 	TextField* GetGameInfosField();
@@ -141,8 +177,14 @@ private:
 	Font font;
 
 	Panel gameName;
+
 	PokemonStatsBar hoverPokeBar;
-	PokemonStatsBar selectedPokeBar;
+
+	Panel selectedPokeInfos;
+	PokemonMoveBar* moveBars[4];
+	RectangleShape* moveBarsFrame;
+	PokemonStatsBar* selectedPokeBar;
+
 
 	Model cursorModel;
 	TextField gameInfos;

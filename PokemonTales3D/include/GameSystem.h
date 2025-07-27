@@ -4,6 +4,7 @@
 #include "EventManager.h"
 #include "GUI.h"
 #include "Player.h"
+#include "GameData.h"
 
 class GameSystem {
 public:
@@ -23,6 +24,8 @@ private:
 	void UnHoverPokemon();
 
 	SharedContext* context;
+
+	DataManager dataManager;
 
 	std::vector<Pokemon*> playingPokemons;
 	Pokemon* hoverPoke;
