@@ -9,5 +9,5 @@
   "Effect": "May burn opponent",
   "Prob": 10,
   "HitZone": [ 1, 1 ],
-  "Range": 5
+  "Range": 4
 }

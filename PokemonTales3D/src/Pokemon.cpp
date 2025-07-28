@@ -57,6 +57,7 @@ APlayer* Pokemon::GetTrainer() { return trainer; }
 std::string Pokemon::GetName() { return data->name; }
 bool Pokemon::IsKO() { return health <= 0; }
 PokemonMove* Pokemon::GetMove(int i) { return movePool[i]; }
+std::pair<PokeType, PokeType> Pokemon::GetType() { return data->types; }
 void Pokemon::SetMovePool(int i, const MoveData* l_data) { movePool[i] = new PokemonMove(l_data); }
 
 void Pokemon::TakeDamages(float l_damages) { 

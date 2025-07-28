@@ -35,6 +35,7 @@ public:
 	std::string GetName();
 	bool IsKO();
 	PokemonMove* GetMove(int i);
+	std::pair<PokeType, PokeType> GetType();
 	void SetMovePool(int i, const MoveData* l_data);
 
 	void TakeDamages(float l_damages);

@@ -8,6 +8,23 @@ PokeType GetPokeTypeFromString(const std::string& type){
 	else
 		return PokeType::None;
 }
+std::string GetStringFromPokeType(PokeType type) {
+	if (type == PokeType::Fire)
+		return "Fire";
+	if (type == PokeType::Water)
+		return "Water";
+	else
+		return "None";
+}
+
+glm::vec4 GetColorFromPokeType(PokeType type) {
+	if (type == PokeType::Fire)
+		return glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	if (type == PokeType::Water)
+		return glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	else
+		return glm::vec4(0.0f);
+}
 
 CatType GetCatTypeFromString(const std::string& type) {
 	if (type == "Spe")

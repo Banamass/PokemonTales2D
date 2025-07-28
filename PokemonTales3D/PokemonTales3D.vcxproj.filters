@@ -140,6 +140,9 @@
     <None Include="Resources\GameData\Pokemons\Pokemons.json">
       <Filter>Resources\Pokemons</Filter>
     </None>
+    <None Include="Resources\GameData\Moves\Bubble.json">
+      <Filter>Resources\Moves</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EventManager.h">

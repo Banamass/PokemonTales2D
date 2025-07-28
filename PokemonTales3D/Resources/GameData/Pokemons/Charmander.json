@@ -9,7 +9,7 @@
     "Sp.Atk": 60,
     "Sp.Def": 50,
     "Speed": 65,
-    "Move": 2
+    "Move": 5
   },
   "Sprite": "Salameche.obj",
   "Size": [1, 1],

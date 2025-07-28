@@ -1,0 +1,13 @@
+{
+  "ID": 2,
+  "Name": "Bubble",
+  "Type": "Water",
+  "Cat": "Spe",
+  "Power": 40,
+  "Acc.": 100,
+  "PP": 30,
+  "Effect": "May lower opponent's Speed",
+  "Prob": 10,
+  "HitZone": [ 3, 3 ],
+  "Range": 2
+}

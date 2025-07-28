@@ -101,10 +101,14 @@ void GameSystem::Render(){
 	opponent.Render();
 }
 
-void GameSystem::Attack(Pokemon* attacker, Pokemon* attacked) {
-	float damage = 10;
+void GameSystem::Attack(Pokemon* attacker, Pokemon* attacked, PokemonMove* move) {
+	float damage = ComputeDamages(attacker, attacked, move);
 	std::stringstream mess;
 	mess << attacker->GetName() << " inflicts " << damage << " damages to " << attacked->GetName();
 	context->gui->GetGameInfosField()->AddMessage(mess.str());
-	attacked->TakeDamages(10);
+	attacked->TakeDamages(damage);
+}
+
+float GameSystem::ComputeDamages(Pokemon* attacker, Pokemon* attacked, PokemonMove* move) {
+	return move->pp;
 }

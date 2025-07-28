@@ -34,6 +34,7 @@ public:
 	SquareArea(glm::ivec2 l_size, Location l_origin = Location::Middle)
 		: AbstractArea(), size(l_size), origin(l_origin), originOffset({ 0, 0 })
 	{
+		compute = true;
 		SetRealPosOffset();
 		SetIntRect();
 	}
@@ -53,14 +54,16 @@ protected:
 	Location origin;
 	glm::ivec2 originOffset;
 	IntRect intRect;
+
+	bool compute;
 };
 
 class MoveArea : public AbstractArea {
 public:
-	MoveArea(Pokemon* l_movingPokemon)
+	MoveArea(Pokemon* l_movingPokemon, int nbStep)
 		: AbstractArea(), pos(glm::ivec2(-100, -100)), movingPokemon(l_movingPokemon)
 	{
-		range = movingPokemon->GetMoveRange();
+		range = nbStep;
 	}
 	~MoveArea() {}
 
@@ -101,4 +104,12 @@ protected:
 
 	bool isPlaying;
 	std::vector<Pokemon*> pokemons;
+
+
+	struct PokemonState {
+		int nbStepLeft;
+		int nbMove;
+		bool lock;
+	};
+	std::unordered_map<Pokemon*, PokemonState> pokemonState;
 };

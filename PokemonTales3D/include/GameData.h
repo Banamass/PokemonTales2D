@@ -15,6 +15,8 @@ enum PokeType {
 	Fire, Water, None
 };
 PokeType GetPokeTypeFromString(const std::string& type);
+std::string GetStringFromPokeType(PokeType type);
+glm::vec4 GetColorFromPokeType(PokeType type);
 
 enum CatType{Spe, Phy};
 CatType GetCatTypeFromString(const std::string& type);

@@ -14,7 +14,8 @@ public:
 	void Update(double dt);
 	void Render();
 
-	void Attack(Pokemon* attacker, Pokemon* attacked);
+	void Attack(Pokemon* attacker, Pokemon* attacked, PokemonMove* move);
+	float ComputeDamages(Pokemon* attacker, Pokemon* attacked, PokemonMove* move);
 
 private:
 	void UpdatePlayingPlayer();

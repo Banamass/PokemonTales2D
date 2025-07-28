@@ -21,6 +21,7 @@ void SquareArea::SetSize(glm::ivec2 l_size) {
 	size = l_size;
 	SetIntRect();
 	SetRealPosOffset();
+	compute = true;
 }
 
 IntRect SquareArea::GetIntRect() {
@@ -36,7 +37,7 @@ bool SquareArea::IsIn(glm::ivec2 pos) {
 }
 
 void SquareArea::Update(Board* board, glm::ivec2 l_pos) {
-	if (pos == l_pos)
+	if (pos == l_pos && !compute)
 		return;
 	Clear();
 	glm::ivec2 boxPos;
@@ -49,6 +50,8 @@ void SquareArea::Update(Board* board, glm::ivec2 l_pos) {
 	}
 	pos = l_pos;
 	SetIntRect();
+
+	compute = false;
 }
 
 void SquareArea::SetRealPosOffset() {
@@ -140,7 +143,9 @@ APlayer::~APlayer() {
 
 void APlayer::AddPokemon(Pokemon* poke, glm::ivec2 initialPos) {
 	pokemons.push_back(poke);
+	pokemonState.emplace(poke, PokemonState());
 	poke->SetMovePool(0, context->gameData->GetMoveData(1));
+	poke->SetMovePool(1, context->gameData->GetMoveData(2));
 	context->board->SetPokemonPos(poke, initialPos);
 }
 
@@ -152,6 +157,11 @@ void APlayer::Render() {
 
 void APlayer::PlayTurn() {
 	isPlaying = true;
+	for (auto& itr : pokemonState) {
+		itr.second.lock = false;
+		itr.second.nbStepLeft = itr.first->GetMoveRange();
+		itr.second.nbMove = 0;
+	}
 }
 
 void APlayer::PokemonKO(Pokemon* poke) {
@@ -161,6 +171,9 @@ void APlayer::PokemonKO(Pokemon* poke) {
 			return;
 		}
 	}
+	auto itr = pokemonState.find(poke);
+	if (itr != pokemonState.end())
+		pokemonState.erase(itr);
 }
 
 bool APlayer::Playing() { return isPlaying; }

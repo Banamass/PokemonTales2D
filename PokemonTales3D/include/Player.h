@@ -76,7 +76,7 @@ private:
 
 		void Unselect();
 		void Move();
-		void Attack();
+		void Attack(int moveId);
 
 	private:
 		Pokemon* selectedPokemon;
@@ -104,7 +104,7 @@ private:
 
 	class PokeAttackState : public State {
 	public:
-		PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon);
+		PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon, int moveId);
 
 		virtual void KeyCallback(Key_Data& data);
 		virtual void MouseButtonCallback(MouseButton_Data& data);
@@ -116,7 +116,9 @@ private:
 		void Attack();
 
 	private:
+		void SetMove(int id);
+
 		Pokemon* selectedPokemon;
-		
+		PokemonMove* move;
 	};
 };

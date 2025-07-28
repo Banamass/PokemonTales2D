@@ -41,6 +41,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\GameData\Moves\Bubble.json" />
     <None Include="Resources\GameData\Moves\Ember.json" />
     <None Include="Resources\GameData\Moves\Moves.json" />
     <None Include="Resources\GameData\Pokemons\Charmander.json" />

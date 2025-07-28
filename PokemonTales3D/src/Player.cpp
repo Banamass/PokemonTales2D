@@ -139,6 +139,7 @@ void Player::DefaultState::Select() {
 Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_selectedPokemon)
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
 	type = StateType::PokeSelected;
+	player->context->gui->GetSelectedPokemonGUI()->SetNbStepsLeft(player->pokemonState[l_selectedPokemon].nbStepLeft);
 }
 
 void Player::PokeSelectedState::KeyCallback(Key_Data& data) {
@@ -146,32 +147,52 @@ void Player::PokeSelectedState::KeyCallback(Key_Data& data) {
 		Unselect();
 	else if (data.key == GLFW_KEY_3 && data.action == GLFW_RELEASE)
 		Move();
-	else if (data.key == GLFW_KEY_4 && data.action == GLFW_RELEASE)
-		Attack();
+	else if (data.key == GLFW_KEY_KP_1 && data.action == GLFW_RELEASE)
+		Attack(0);
+	else if (data.key == GLFW_KEY_KP_2 && data.action == GLFW_RELEASE)
+		Attack(1);
+	else if (data.key == GLFW_KEY_KP_3 && data.action == GLFW_RELEASE)
+		Attack(2);
+	else if (data.key == GLFW_KEY_KP_4 && data.action == GLFW_RELEASE)
+		Attack(3);
 }
 
 void Player::PokeSelectedState::Unselect() {
+	if (player->pokemonState[selectedPokemon].lock) {
+		player->context->gui->GetGameInfosField()->AddMessage("Impossible to unselect");
+		return;
+	}
 	player->context->gui->GetGameInfosField()->AddMessage("Unselect " + selectedPokemon->GetName());
 	player->context->gui->SetSelectedPokemon(nullptr);
 	player->SwitchState(new DefaultState(player));
 }
 
 void Player::PokeSelectedState::Move() {
+	if (player->pokemonState[selectedPokemon].nbStepLeft == 0) {
+		player->context->gui->GetGameInfosField()->AddMessage("No step left");
+		return;
+	}
 	player->SwitchState(new PokeMoveState(player, selectedPokemon));
 }
 
-void Player::PokeSelectedState::Attack() {
-	player->SwitchState(new PokeAttackState(player, selectedPokemon));
+void Player::PokeSelectedState::Attack(int moveId) {
+	if (player->pokemonState[selectedPokemon].nbMove > 0) {
+		player->context->gui->GetGameInfosField()->AddMessage("Max move in a turn reached");
+		return;
+	}
+	if (selectedPokemon->GetMove(moveId) == nullptr)
+		return;
+	player->SwitchState(new PokeAttackState(player, selectedPokemon, moveId));
 }
 
 /*-----------------------------PokeMoveState-----------------------------*/
 
 Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemon)
-	: State(l_player), selectedPokemon(l_selectedPokemon), moveArea(l_selectedPokemon),
+	: State(l_player), selectedPokemon(l_selectedPokemon)
+	, moveArea(l_selectedPokemon, player->pokemonState[l_selectedPokemon].nbStepLeft),
 	moveBox(&player->boxModel, player->context->shaderManager->GetShader("ModelShader"))
 {
 	type = StateType::PokeMove;
-	//pokeFrame = selectedPokemon->GetFrame();
 
 	Drawable::Material mat;
 	glm::vec4 color(0.0f, 1.0f, 0.0f, 1.0f);
@@ -224,18 +245,20 @@ void Player::PokeMoveState::Unmove() {
 void Player::PokeMoveState::Move() {
 	
 	glm::ivec2 movePos = cursor.GetIntRect().pos;
-	if (moveArea.Distance(player->context->board, movePos) < 0)
+	int dist = moveArea.Distance(player->context->board, movePos);
+	if (dist <= 0)
 		return;
 	bool hasMoved = player->context->board->SetPokemonPos(selectedPokemon, movePos);
 	if (!hasMoved)
 		return;
-	moveArea.Update(player->context->board, player->context->board->GetPokemonPosition(selectedPokemon));
 	player->context->gui->GetGameInfosField()->AddMessage("Move " + selectedPokemon->GetName());
+	player->pokemonState[selectedPokemon].nbStepLeft -= dist;
+	player->pokemonState[selectedPokemon].lock = true;
 	player->SwitchState(new PokeSelectedState(player, selectedPokemon));
 }
 
 /*-----------------------------PokeAttackState-----------------------------*/
-Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon)
+Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon, int moveId)
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
 	type = StateType::PokeAttack;
 
@@ -246,15 +269,30 @@ Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPo
 	mat.specular = glm::vec4(1.0);
 	mat.shininess = 32.0f;
 	cursorDrawable.SetMaterial(mat);
-	cursor.SetSize(glm::ivec2(2, 1));
+	
+	SetMove(moveId);
+}
 
-	player->context->camera->SetIsFollowingMouse(false);
+void Player::PokeAttackState::SetMove(int id) {
+	if (selectedPokemon->GetMove(id) == nullptr)
+		return;
+	move = selectedPokemon->GetMove(id);
+	player->context->gui->GetSelectedPokemonGUI()->SetSelectedMove(id);
+	cursor.SetSize(move->data->hitZone);
 }
 
 void Player::PokeAttackState::KeyCallback(Key_Data& data) {
 	if (data.key == GLFW_KEY_2 && data.action == GLFW_RELEASE) {
 		Unattack();
 	}
+	else if (data.key == GLFW_KEY_KP_1 && data.action == GLFW_RELEASE)
+		SetMove(0);
+	else if (data.key == GLFW_KEY_KP_2 && data.action == GLFW_RELEASE)
+		SetMove(1);
+	else if (data.key == GLFW_KEY_KP_3 && data.action == GLFW_RELEASE)
+		SetMove(2);
+	else if (data.key == GLFW_KEY_KP_4 && data.action == GLFW_RELEASE)
+		SetMove(3);
 }
 
 void Player::PokeAttackState::MouseButtonCallback(MouseButton_Data& data) {
@@ -265,6 +303,10 @@ void Player::PokeAttackState::MouseButtonCallback(MouseButton_Data& data) {
 }
 
 void Player::PokeAttackState::Update(double dt) {
+	SharedContext* context = player->context;
+	std::vector<Pokemon*> attackedPokemon = context->board->GetPokemonCollision(cursor.GetIntRect());
+	context->gui->GetSelectedPokemonGUI()->SetAimedPoke(attackedPokemon, move);
+
 	UpdateCursor();
 }
 
@@ -276,13 +318,19 @@ void Player::PokeAttackState::Render()
 void Player::PokeAttackState::Attack() {
 	Board* board = player->context->board;
 	std::vector<Pokemon*> attackedPokemon = board->GetPokemonCollision(cursor.GetIntRect());
+	if (attackedPokemon.size() == 0)
+		return;
 	for (Pokemon* poke : attackedPokemon) {
-		player->context->gameSystem->Attack(selectedPokemon, poke);
+		player->context->gameSystem->Attack(selectedPokemon, poke, move);
 	}
+	player->pokemonState[selectedPokemon].nbMove++;
+	player->pokemonState[selectedPokemon].lock = true;
+	player->context->gui->GetSelectedPokemonGUI()->SetSelectedMove(-1);
+	player->SwitchState(new PokeSelectedState(player, selectedPokemon));
 }
 
 void Player::PokeAttackState::Unattack() {
 	player->context->gui->GetGameInfosField()->AddMessage("Unattack " + selectedPokemon->GetName());
-	player->context->camera->SetIsFollowingMouse(true);
+	player->context->gui->GetSelectedPokemonGUI()->SetSelectedMove(-1);
 	player->SwitchState(new PokeSelectedState(player, selectedPokemon));
 }

@@ -69,15 +69,24 @@ public:
 
 	void SetPokemonMove(PokemonMove* l_move);
 	glm::vec2 GetSize();
+	void SetSelect(bool b);
 
 private:
 	PokemonMove* move;
 
+	glm::vec2 typeFramePadding;
+	float charSize;
 	glm::vec2 size;
 	Text* moveName;
 	Text* ppText;
 	Text* powerText;
+	Text* typeText;
+	RectangleShape* typeFrame;
 	RectangleShape* frame;
+
+	bool isSelected;
+	glm::vec4 selectedColor;
+	glm::vec4 unselectedColor;
 };
 
 class PokemonStatsBar : public Panel {
@@ -89,6 +98,7 @@ public:
 	virtual void Draw(glm::mat4& cameraMatrix);
 
 	void SetPokemon(Pokemon* poke);
+	void SimulateDamages(float damages);
 
 	glm::vec2 GetSize();
 	Pokemon* GetPokemon();
@@ -107,11 +117,13 @@ protected:
 	RectangleShape* healthBar;
 	RectangleShape* healthBarFrame;
 	RectangleShape* healthBarBack;
+	RectangleShape* healthBarBackground;
+	float simulatedDamages;
 };
 
 class PokemonGUI : public Panel {
 public:
-	PokemonGUI(Pokemon* l_poke, Font* l_font, ShaderManager* shaderMgr);
+	PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context);
 	virtual ~PokemonGUI();
 
 	void Update(double dt);
@@ -119,13 +131,25 @@ public:
 
 	void SetPokemon(Pokemon* poke);
 	Pokemon* GetPokemon();
+	//With i outside [0,3], unselect all move
+	void SetSelectedMove(int i);
+	void SetAimedPoke(std::vector<Pokemon*>& aimedPoke, PokemonMove* move);
+	void SetNbStepsLeft(int l_nbStep);
 
 private:
+	void Reset();
+
 	Pokemon* poke;
+	SharedContext* context;
 
 	PokemonStatsBar* statsBar;
 	Panel* movesBar;
 	PokemonMoveBar* moveBars[4];
+	static const int MAX_AIMED_POKE = 10;
+	PokemonStatsBar* aimedPokeStatsBar[MAX_AIMED_POKE];
+	Panel* nbStepBar;
+	Text* nbStepText;
+	int nbStepLeft;
 };
 
 class GUI {
@@ -136,6 +160,7 @@ public:
 	void Render();
 
 	TextField* GetGameInfosField();
+	PokemonGUI* GetSelectedPokemonGUI();
 
 	void SetHoverPokemon(Pokemon* poke);
 	void UnsetHoverPokemon();
