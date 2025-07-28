@@ -102,6 +102,7 @@ private:
 class DrawableInstanced {
 public:
 	DrawableInstanced(Drawable* drawable, std::vector<Transform*>& instanceMatrix);
+	virtual ~DrawableInstanced(){}
 
 	unsigned int GetNbInstance();
 	unsigned int GetInstanceVBO();
@@ -117,4 +118,23 @@ private:
 	bool isVAOSetup;
 
 	friend class Window;
+};
+
+class DrawableStatic {
+public:
+	DrawableStatic() : pos(0.0f, 0.0f), offset(0.0f, 0.0f) {}
+	DrawableStatic(glm::vec2 l_pos) : pos(l_pos), offset(0.0f, 0.0f) {}
+	virtual ~DrawableStatic() {}
+
+	virtual void Draw(glm::mat4& cameraMatrix) = 0;
+
+	virtual void SetPos(glm::vec2 l_pos) { pos = l_pos; }
+	virtual glm::vec2 GetPos() { return pos; }
+
+	virtual void SetOffset(glm::vec2 l_offset) { offset = l_offset; };
+	virtual glm::vec2 SetOffset() { return offset; }
+
+protected:
+	glm::vec2 pos;
+	glm::vec2 offset;
 };

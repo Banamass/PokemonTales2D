@@ -11,6 +11,7 @@
 
 #include "Shader.h"
 #include "SharedTypes.h"
+#include "Drawable.h"
 
 struct Character {
 	unsigned int textureID;
@@ -37,23 +38,23 @@ private:
 	FT_Face face;
 };
 
-class Text {
+class Text : public DrawableStatic {
 public:
 	Text(Font* l_font, std::string l_text, Shader* l_shader);
-	~Text();
+	virtual ~Text();
 
-	void Draw();
+	virtual void Draw(glm::mat4& cameraMatrix);
 
 	void SetText(std::string l_text);
 	void AddText(std::string l_textAdded);
 	void RemoveText(unsigned int nbCh);
 
-	void SetPos(glm::vec2 l_pos);
+	virtual void SetPos(glm::vec2 l_pos);
+	virtual void SetOffset(glm::vec2 l_offset);
 	void SetCharacterSize(float l_size);
 	void SetColor(glm::vec3 l_color);
 
 	FloatRect GetFloatRect();
-	glm::vec2 GetPos();
 	std::string GetText();
 
 private:
@@ -73,7 +74,6 @@ private:
 	Font* font;
 
 	std::string text;
-	glm::vec2 pos;
 	float scale;
 	glm::vec3 color;
 	FloatRect hitbox;

@@ -72,7 +72,7 @@ int Font::GetGlyphSize() { return glyphSize; }
 /*----------------Text-------------------*/
 
 Text::Text(Font* l_font, std::string l_text, Shader* l_shader) 
-	:font(l_font), shader(l_shader) {
+	:DrawableStatic(), font(l_font), shader(l_shader) {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
@@ -91,24 +91,26 @@ Text::Text(Font* l_font, std::string l_text, Shader* l_shader)
 }
 Text::~Text() {}
 
-void Text::ComputeCharacterDatas(int offset) {
+void Text::ComputeCharacterDatas(int l_offset) {
 	if (textData.size() == 0)
 		return;
 
-	float x = pos.x;
+	glm::vec2 realPos = offset + pos;
+
+	float x = realPos.x;
 	float minypos = Constants::WIN_HEIGHT * 2;
 	float maxh = -1;
 
 	auto cData = textData.begin();
-	for (; cData != textData.begin() + offset && cData != textData.end(); cData++) {
+	for (; cData != textData.begin() + l_offset && cData != textData.end(); cData++) {
 		unsigned int advance = cData->cInfos->advance;
 		x += (advance >> 6) * scale; //bitshift by 6
-		float ypos = pos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
+		float ypos = realPos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
 		minypos = std::min(ypos, minypos);
 	}
 	for (; cData != textData.end(); cData++) {
 		float xpos = x + cData->cInfos->bearing.x * scale;
-		float ypos = pos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
+		float ypos = realPos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
 
 		float w = cData->cInfos->size.x * scale;
 		float h = cData->cInfos->size.y * scale;
@@ -131,16 +133,15 @@ void Text::ComputeCharacterDatas(int offset) {
 		minypos = std::min(ypos, minypos);
 		maxh = std::max(h, maxh);
 	}
-	hitbox.size.x = x - pos.x;
+	hitbox.size.x = x - realPos.x;
 	hitbox.size.y = std::max(maxh, hitbox.size.y);
-	hitbox.pos.x = pos.x;
+	hitbox.pos.x = realPos.x;
 	hitbox.pos.y = minypos;
 }
 
-void Text::Draw() {
+void Text::Draw(glm::mat4& cameraMatrix) {
 	shader->use();
-	glm::mat4 projection = glm::ortho(0.0f, Constants::WIN_WIDTH, 0.0f, Constants::WIN_HEIGHT);
-	shader->SetUniform("projection", glm::value_ptr(projection));
+	shader->SetUniform("projection", glm::value_ptr(cameraMatrix));
 	shader->SetUniform("textColor", color);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VAO);
@@ -173,7 +174,7 @@ void Text::SetText(std::string l_text) {
 	ComputeCharacterDatas(0);
 }
 void Text::AddText(std::string l_textAdded) {
-	int offset = text.size();
+	int off = text.size();
 	text = text + l_textAdded;
 	for (char c : l_textAdded) {
 		const Character* cInfos = font->GetCharacter(c);
@@ -183,7 +184,7 @@ void Text::AddText(std::string l_textAdded) {
 		(textData.end() - 1)->cInfos = cInfos;
 	}
 
-	ComputeCharacterDatas(offset);
+	ComputeCharacterDatas(off);
 }
 
 void Text::RemoveText(unsigned int nbCh) {
@@ -211,9 +212,19 @@ void Text::RemoveText(unsigned int nbCh) {
 }
 
 FloatRect Text::GetFloatRect() { return hitbox; }
-glm::vec2 Text::GetPos() { return pos; }
 std::string Text::GetText() { return text; }
 
-void Text::SetPos(glm::vec2 l_pos) { pos = l_pos; ComputeCharacterDatas(0); }
+void Text::SetPos(glm::vec2 l_pos) { 
+	if (pos == l_pos)
+		return;
+	pos = l_pos;
+	ComputeCharacterDatas(0); 
+}
+void Text::SetOffset(glm::vec2 l_offset) {
+	if (offset == l_offset)
+		return;
+	offset = l_offset;
+	ComputeCharacterDatas(0);
+}
 void Text::SetCharacterSize(float l_size) { scale = l_size / font->GetGlyphSize(); ComputeCharacterDatas(0); }
 void Text::SetColor(glm::vec3 l_color) { color = l_color; }

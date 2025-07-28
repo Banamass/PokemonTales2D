@@ -19,7 +19,8 @@ public:
 
 	void DrawStatic(Drawable* drawable);
 	void DrawStatic(Text* text);
-	void DrawStatic(Shape* shape);
+	void DrawStatic(RectangleShape* shape);
+	void DrawStatic(DrawableStatic* drawable);
 
 	void DrawInstanced(DrawableInstanced* drawableInstanced);
 	void DrawOutlined(Drawable& drawable, glm::vec4 color, float thickness);
@@ -38,4 +39,5 @@ private:
 	GLFWwindow* window;
 	int width;
 	int height;
+	glm::mat4 projectionMat;
 };

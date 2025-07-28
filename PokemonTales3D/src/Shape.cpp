@@ -4,7 +4,8 @@
 
 unsigned int RectangleShape::indices[6] = { 0, 1, 3, 1, 2, 3 };
 
-RectangleShape::RectangleShape(Shader* l_shader) : shader(l_shader) {
+RectangleShape::RectangleShape(Shader* l_shader) 
+	: DrawableStatic(), shader(l_shader) {
 	size = glm::vec2(0, 0);
 	pos = glm::vec2(0, 0);
 	origin = glm::vec2(0, 0);
@@ -12,7 +13,8 @@ RectangleShape::RectangleShape(Shader* l_shader) : shader(l_shader) {
 	z = 0.0f;
 	SetupGraphics();
 }
-RectangleShape::RectangleShape(glm::vec2 l_size, Shader* l_shader) : shader(l_shader) {
+RectangleShape::RectangleShape(glm::vec2 l_size, Shader* l_shader) 
+	:DrawableStatic(), shader(l_shader) {
 	size = l_size;
 	pos = glm::vec2(0, 0);
 	origin = glm::vec2(0, 0);
@@ -21,13 +23,14 @@ RectangleShape::RectangleShape(glm::vec2 l_size, Shader* l_shader) : shader(l_sh
 	SetupGraphics();
 }
 
-void RectangleShape::Draw() {
+RectangleShape::~RectangleShape() {}
+
+void RectangleShape::Draw(glm::mat4& cameraMatrix) {
 	if (compute)
 		ComputeVertices();
 	shader->use();
 	shader->SetUniform("color", color);
-	glm::mat4 projection = glm::ortho(0.0f, Constants::WIN_WIDTH, 0.0f, Constants::WIN_HEIGHT);
-	shader->SetUniform("transform", glm::value_ptr(projection));
+	shader->SetUniform("transform", glm::value_ptr(cameraMatrix));
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -57,7 +60,7 @@ void RectangleShape::SetupGraphics() {
 
 
 void RectangleShape::ComputeVertices() {
-	glm::vec2 realPos = pos - origin;
+	glm::vec2 realPos = pos - origin + offset;
 	vertices[0] = glm::vec3(realPos.x, realPos.y, z);
 	vertices[1] = glm::vec3(realPos.x, realPos.y + size.y, z);
 	vertices[2] = glm::vec3(realPos.x + size.x, realPos.y + size.y, z);
@@ -89,6 +92,12 @@ void RectangleShape::SetPos(glm::vec2 l_pos) {
 	if (l_pos == pos)
 		return;
 	pos = l_pos;
+	compute = true;
+}
+void RectangleShape::SetOffset(glm::vec2 l_offset) {
+	if (l_offset == offset)
+		return;
+	offset = l_offset;
 	compute = true;
 }
 void RectangleShape::SetOrigin(glm::vec2 l_origin) {

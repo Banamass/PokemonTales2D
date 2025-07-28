@@ -1,102 +1,78 @@
 #include "GUI.h"
 
-/*---------------GUIText---------------*/
-
-GUIText::GUIText(Font* l_font, std::string l_text, Shader* l_shader) : text(l_font, l_text, l_shader)
-{}
-GUIText::~GUIText(){}
-
-void GUIText::Render(Window* win) {
-	win->DrawStatic(&text);
-}
-
 /*---------------Panel---------------*/
 
 Panel::Panel(ShaderManager* l_shaderMgr)
-	: shaderMgr(l_shaderMgr), pos(0.0f, 0.0f)
-{
-}
+	: DrawableStatic(), shaderMgr(l_shaderMgr){}
 Panel::Panel(ShaderManager* l_shaderMgr, glm::vec2 l_pos)
-	: shaderMgr(l_shaderMgr), pos(l_pos)
+	: DrawableStatic(l_pos), shaderMgr(l_shaderMgr)
 {
 }
 
 Panel::~Panel() {
-	for (auto& itr : widgets)
-		delete itr.second;
-	for (auto& itr : shapes)
-		delete itr.second;
+	for (auto& layer : elements)
+		for (auto& elem : layer.second)
+			delete elem;
 }
 
-void Panel::Render(Window* win) {
-	for (auto& shapes : shapesZIndex) {
-		for (auto& shape : shapes.second) {
-			glm::vec2 temp = shape->GetPos();
-			shape->SetPos(temp + pos);
-			shape->Draw();
-			shape->SetPos(temp);
+void Panel::Draw(glm::mat4& cameraMatrix) {
+	for (auto& itr : elements) {
+		for (auto& elem : itr.second) {
+			elem->Draw(cameraMatrix);
 		}
 	}
-	for (auto& itr : widgets) {
-		glm::vec2 temp = itr.second->GetPos();
-		itr.second->SetPos(temp + pos);
-		itr.second->Render(win);
-		itr.second->SetPos(temp);
+}
+
+DrawableStatic* Panel::AddElement(DrawableStatic* elem, int zindex) {
+	if (elements.find(zindex) == elements.end()) {
+		elements.emplace(zindex, std::vector<DrawableStatic*>({ elem }));
+	}
+	else {
+		elements[zindex].push_back(elem);
+	}
+	elem->SetOffset(pos + offset);
+	return elem;
+}
+
+void Panel::DeleteElement(DrawableStatic* elem) {
+	for (auto& layer : elements) {
+		for (auto itr = layer.second.begin(); itr != layer.second.end(); itr++) {
+			if (elem == *itr) {
+				layer.second.erase(itr);
+				return;
+			}
+		}
 	}
 }
 
-Shape* Panel::AddShape(const std::string& name, Shape* shape, int zindex) {
-	auto itr = shapes.find(name);
-	if (itr != shapes.end())
-		return nullptr;
-	shapes.emplace(name, shape);
-	AddZindex(shape, zindex);
-	return shape;
-}
-GUIWidget* Panel::AddWidget(const std::string& name, GUIWidget* widget) {
-	auto itr = widgets.find(name);
-	if (itr != widgets.end())
-		return nullptr;
-	widgets.emplace(name, widget);
-	return widget;
+void Panel::UpdateElementsOffset() {
+	for (auto& layer : elements) 
+		for(auto& elem : layer.second)
+			elem->SetOffset(pos + offset);
 }
 
-Shape* Panel::GetShape(const std::string& name) {
-	auto itr = shapes.find(name);
-	if (itr == shapes.end())
-		return nullptr;
-	return itr->second;
-}
-GUIWidget* Panel::GetWidgets(const std::string& name) {
-	auto itr = widgets.find(name);
-	if (itr == widgets.end())
-		return nullptr;
-	return itr->second;
-}
-
-void Panel::SetPosition(glm::vec2 l_pos) {
-	pos = l_pos;
-}
-
-void Panel::AddZindex(Shape* shape, int zindex) {
-	if (shapesZIndex.find(zindex) == shapesZIndex.end()) {
-		shapesZIndex.emplace(zindex, std::vector<Shape*>({ shape }));
+void Panel::SetPos(glm::vec2 l_pos) {
+	if (pos == l_pos)
 		return;
-	}
-	shapesZIndex[zindex].push_back(shape);
+	pos = l_pos;
+	UpdateElementsOffset();
+}
+
+void Panel::SetOffset(glm::vec2 l_offset) {
+	if (offset == l_offset)
+		return;
+	offset = l_offset;
+	UpdateElementsOffset();
 }
 
 /*---------------TextField---------------*/
 
 TextField::TextField(glm::vec2 l_backSize, unsigned int l_fontSize, glm::vec2 l_pos, ShaderManager* l_shaderMgr)
-	: backSize(l_backSize), fontSize(l_fontSize),
-	shaderMgr(l_shaderMgr), textBox(l_shaderMgr->GetShader("SimpleShader"))
+	: Panel(l_shaderMgr, l_pos), backSize(l_backSize), fontSize(l_fontSize), shaderMgr(l_shaderMgr)
 {
-	pos = l_pos;
+	textBox = (RectangleShape*)AddElement(new RectangleShape(l_backSize, shaderMgr->GetShader("SimpleShader")), -1);
 
-	textBox.SetPos(pos);
-	textBox.SetSize(l_backSize);
-	textBox.SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	textBox->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
 
 	font = new Font("Resources\\fonts\\arial.ttf");
 
@@ -113,26 +89,29 @@ void TextField::AddMessage(const std::string& mess) {
 	if (mess == "")
 		return;
 	float maxTextWidth = backSize.x - padding.x * 2;
-	Text& itr = lines.emplace_back(font, "", shaderMgr->GetShader("FontShader"));
-	itr.SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	itr.SetCharacterSize(fontSize);
+	if (maxTextWidth < 0.001f)
+		return;
+	Text* text = (Text*)AddElement(new Text(font, "", shaderMgr->GetShader("FontShader")));
+	lines.push_back(text);
+	text->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	text->SetCharacterSize(fontSize);
 	unsigned int nbCharacter = 0;
-	while (itr.GetFloatRect().size.x < maxTextWidth && nbCharacter < mess.size()) {
-		itr.AddText(std::string(1, mess[nbCharacter]));
+	while (text->GetFloatRect().size.x < maxTextWidth && nbCharacter < mess.size()) {
+		text->AddText(std::string(1, mess[nbCharacter]));
 		nbCharacter++;
 	}
-	if (itr.GetFloatRect().size.x < maxTextWidth) {
+	if (text->GetFloatRect().size.x < maxTextWidth) {
 		SetLinesPosition();
 		return;
 	}
-	itr.RemoveText(1);
+	text->RemoveText(1);
 
 	int spaceInd = nbCharacter - 1;
 	for(; spaceInd >= 0 && mess[spaceInd] != ' '; spaceInd--){}
 	if (spaceInd == -1)
 		spaceInd = nbCharacter - 1;
 
-	itr.RemoveText(nbCharacter - spaceInd - 1);
+	text->RemoveText(nbCharacter - spaceInd - 1);
 
 	SetLinesPosition();
 	AddMessage(mess.substr(spaceInd + 1, mess.size() - spaceInd));
@@ -142,21 +121,16 @@ void TextField::AddMessage(const std::string& mess) {
 	textBox.SetSize(hb.size);*/
 }
 
-void TextField::Render(Window* win) {
-	win->DrawStatic(&textBox);
-	for (auto& mess : lines) {
-		win->DrawStatic(&mess);
-	}
-}
-
 void TextField::SetLinesPosition(){
-	while (lines.size() * lineSpacing > textBox.GetSize().y - 2 * padding.y)
+	while (lines.size() * lineSpacing > textBox->GetSize().y - 2 * padding.y) {
+		DeleteElement(*(lines.begin()));
 		lines.erase(lines.begin());
+	}
 
-	glm::vec2 posTextTopLeft(pos.x + padding.x, pos.y + backSize.y - padding.y);
+	glm::vec2 posTextTopLeft(padding.x, backSize.y - padding.y);
 	posTextTopLeft.y -= lineSpacing;
-	for (auto& line : lines) {
-		line.SetPos(posTextTopLeft);
+	for (auto& text : lines) {
+		text->SetPos(posTextTopLeft);
 		posTextTopLeft.y -= lineSpacing;
 	}
 }
@@ -166,61 +140,49 @@ void TextField::SetPadding(glm::vec2 l_padding) {
 	SetLinesPosition();
 }
 
-void TextField::SetPos(glm::vec2 l_pos) {
-	pos = l_pos;
-	SetLinesPosition();
-}
-
-/*PokemonMoveBar*/
+/*---------------PokemonMoveBar---------------*/
 
 PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
-	: panel(l_shaderMgr) {
-	pos = l_pos;
-	panel.SetPosition(pos);
+	: Panel(l_shaderMgr) {
 	move = nullptr;
 	size = glm::vec2(150, 50);
 	float charSize = 14.0f;
 	float margin = 5.0f;
 
-	ppText = (GUIText*)panel.AddWidget("ppText", new GUIText(l_font, "10/10", l_shaderMgr->GetShader("FontShader")));
-	ppText->GetText()->SetColor(glm::vec3(0.0f));
-	ppText->GetText()->SetCharacterSize(charSize);
+	ppText = (Text*)AddElement( new Text(l_font, "10/10", l_shaderMgr->GetShader("FontShader")));
+	ppText->SetColor(glm::vec3(0.0f));
+	ppText->SetCharacterSize(charSize);
 	ppText->SetPos(glm::vec2(size.x - 50, size.y - charSize - margin));
 
-	moveName = (GUIText*)panel.AddWidget("moveName", new GUIText(l_font, "Move", l_shaderMgr->GetShader("FontShader")));
-	moveName->GetText()->SetColor(glm::vec3(0.0f));
-	moveName->GetText()->SetCharacterSize(charSize);
+	moveName = (Text*)AddElement(new Text(l_font, "Move", l_shaderMgr->GetShader("FontShader")));
+	moveName->SetColor(glm::vec3(0.0f));
+	moveName->SetCharacterSize(charSize);
 	moveName->SetPos(glm::vec2(margin, size.y - charSize - margin));
 
-	powerText = (GUIText*)panel.AddWidget("powerText", new GUIText(l_font, "Power : 50", l_shaderMgr->GetShader("FontShader")));
-	powerText->GetText()->SetColor(glm::vec3(0.0f));
-	powerText->GetText()->SetCharacterSize(charSize);
+	powerText = (Text*)AddElement(new Text(l_font, "Power : 50", l_shaderMgr->GetShader("FontShader")));
+	powerText->SetColor(glm::vec3(0.0f));
+	powerText->SetCharacterSize(charSize);
 	powerText->SetPos(glm::vec2(margin, margin));
 
-	frame = (RectangleShape*)panel.AddShape("frame", new RectangleShape(size, l_shaderMgr->GetShader("SimpleShader")), -1);
+	frame = (RectangleShape*)AddElement(new RectangleShape(size, l_shaderMgr->GetShader("SimpleShader")), -1);
 	frame->SetColor(glm::vec4(1.0f));
 }
 PokemonMoveBar::~PokemonMoveBar() {
 
 }
 
-void PokemonMoveBar::Render(Window* win) {
-	if(move != nullptr)
-		panel.Render(win);
+void PokemonMoveBar::Draw(glm::mat4& cameraMatrix){
+	//if (move != nullptr)
+		Panel::Draw(cameraMatrix);
 }
 
 void PokemonMoveBar::SetPokemonMove(PokemonMove* l_move) {
 	move = l_move;
 	if (move == nullptr)
 		return;
-	moveName->GetText()->SetText(move->data->name);
-	ppText->GetText()->SetText(std::to_string(move->pp) + "/" + std::to_string(move->data->pp));
-	powerText->GetText()->SetText(std::to_string(move->data->power));
-}
-
-void PokemonMoveBar::SetPos(glm::vec2 l_pos) {
-	pos = l_pos;
-	panel.SetPosition(pos);
+	moveName->SetText(move->data->name);
+	ppText->SetText(std::to_string(move->pp) + "/" + std::to_string(move->data->pp));
+	powerText->SetText(std::to_string(move->data->power));
 }
 
 glm::vec2 PokemonMoveBar::GetSize() {
@@ -230,7 +192,7 @@ glm::vec2 PokemonMoveBar::GetSize() {
 /*---------------PokemonStatsBar---------------*/
 
 PokemonStatsBar::PokemonStatsBar(Pokemon* l_poke, Font* l_font, ShaderManager* shaderMgr)
-	: poke(l_poke), font(l_font), panel(shaderMgr)
+	: Panel(shaderMgr), poke(l_poke), font(l_font)
 {
 	size = glm::vec2(250.0f, 100.0f);
 	healthBarSize = glm::vec2(200.0f, 30.0f);
@@ -238,37 +200,37 @@ PokemonStatsBar::PokemonStatsBar(Pokemon* l_poke, Font* l_font, ShaderManager* s
 	glm::vec2 healthBarFrameOffset(3.0f, 3.0f);
 
 	//HealthBar
-	healthText = (GUIText*)panel.AddWidget("PokeHealth", new GUIText(font, "", shaderMgr->GetShader("FontShader")));
-	healthText->GetText()->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
-	healthText->GetText()->SetCharacterSize(15.0f);
+	healthText = (Text*) AddElement( new Text(font, "", shaderMgr->GetShader("FontShader")));
+	healthText->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
+	healthText->SetCharacterSize(15.0f);
 	healthText->SetPos(glm::vec2(10.0f, 50.0f));
 
-	healthBar = (RectangleShape*)panel.AddShape("HealthBar", new RectangleShape(healthBarSize, shaderMgr->GetShader("SimpleShader")), 3);
+	healthBar = (RectangleShape*)AddElement(new RectangleShape(healthBarSize, shaderMgr->GetShader("SimpleShader")), 3);
 	healthBar->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	healthBar->SetPos(healthBarPos);
 
-	healthBarBack = (RectangleShape*)panel.AddShape("HealthBarBack", new RectangleShape(healthBarSize, shaderMgr->GetShader("SimpleShader")), 2);
+	healthBarBack = (RectangleShape*)AddElement(new RectangleShape(healthBarSize, shaderMgr->GetShader("SimpleShader")), 2);
 	healthBarBack->SetColor(glm::vec4(1.0f));
 	healthBarBack->SetPos(healthBarPos);
 
-	healthBarFrame = (RectangleShape*)panel.AddShape("HealthBarFrame", new RectangleShape(healthBarSize + 2.0f*healthBarFrameOffset, shaderMgr->GetShader("SimpleShader")), 1);
+	healthBarFrame = (RectangleShape*)AddElement(
+		new RectangleShape(healthBarSize + 2.0f*healthBarFrameOffset, shaderMgr->GetShader("SimpleShader")), 1);
 	healthBarFrame->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
 	healthBarFrame->SetPos(healthBarPos - healthBarFrameOffset);
 
 	//Name
-	pokeName = (GUIText*) panel.AddWidget("PokeName", new GUIText(font, "", shaderMgr->GetShader("FontShader")));
-	pokeName->GetText()->SetCharacterSize(20.0f);
+	pokeName = (Text*)AddElement(new Text(font, "", shaderMgr->GetShader("FontShader")));
+	pokeName->SetCharacterSize(20.0f);
 	pokeName->SetPos(glm::vec2(10.0, size.y - 25.0f));
-	pokeName->GetText()->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
+	pokeName->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
 
-	RectangleShape* frame = (RectangleShape*)panel.AddShape("Frame", 
-		new RectangleShape(size, shaderMgr->GetShader("SimpleShader")), -1);
+	RectangleShape* frame = (RectangleShape*)AddElement(new RectangleShape(size, shaderMgr->GetShader("SimpleShader")), -1);
 	frame->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
 
 	if (poke != nullptr)
-		pokeName->GetText()->SetText(poke->GetName());
+		pokeName->SetText(poke->GetName());
 	else
-		pokeName->GetText()->SetText("None");
+		pokeName->SetText("None");
 	
 }
 PokemonStatsBar::~PokemonStatsBar() {
@@ -277,79 +239,42 @@ PokemonStatsBar::~PokemonStatsBar() {
 
 void PokemonStatsBar::Update(double dt) {
 	if (poke != nullptr) {
-		healthText->GetText()->SetText("PV : " + std::to_string((int)poke->GetHealth()));
+		healthText->SetText("PV : " + std::to_string((int)poke->GetHealth()));
 		healthBar->SetSize(glm::vec2((poke->GetHealth() / poke->GetMaxHealth()) * healthBarSize.x, healthBarSize.y));
 	}
 }
 
-void PokemonStatsBar::Render(Window* win) {
-	panel.Render(win);
+void PokemonStatsBar::Draw(glm::mat4& cameraMat) {
+	if (poke == nullptr)
+		return;
+	Panel::Draw(cameraMat);
 }
+
 
 void PokemonStatsBar::SetPokemon(Pokemon* l_poke) {
 	poke = l_poke;
 	if (poke == nullptr)
 		return;
-	pokeName->GetText()->SetText(poke->GetName());
-}
-
-void PokemonStatsBar::SetPos(glm::vec2 l_pos) {
-	pos = l_pos;
-	panel.SetPosition(pos);
+	pokeName->SetText(poke->GetName());
 }
 
 glm::vec2 PokemonStatsBar::GetSize() { return size; }
-glm::vec2 PokemonStatsBar::GetPos() { return pos; }
 Pokemon* PokemonStatsBar::GetPokemon() { return poke; }
 
-/*---------------GUI---------------*/
+/*---------------PokemonGUI---------------*/
 
-GUI::GUI(SharedContext* l_context)
-	: context(l_context), cursorModel("Resources\\Box\\box.obj"),
-	gameInfos(glm::vec2(175, 200), 14, glm::vec2(10,350), l_context->shaderManager),
-	rect(glm::vec2(100.0f, 100.0f), l_context->shaderManager->GetShader("SimpleShader")),
-	gameName(l_context->shaderManager),
-	font("Resources\\fonts\\arial.ttf", 40.0f),
-	hoverPokeBar(nullptr, &font, context->shaderManager),
-	selectedPokeInfos(context->shaderManager)
+PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, ShaderManager* shaderMgr)
+	: Panel(shaderMgr), poke(l_poke)
 {
-	context->gui = this;
+	statsBar = (PokemonStatsBar*)AddElement(new PokemonStatsBar(poke, l_font, shaderMgr));
 
-	//GameInfos
-	gameInfos.SetPadding(glm::vec2(10.0f, 4.0f));
-	
-	//Cursor
-	rect.SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	rect.SetSize(glm::vec2(10.0f, 10.0f));
-	rect.SetPos(glm::vec2(Constants::WIN_WIDTH / 2, Constants::WIN_HEIGHT / 2));
-	rect.SetOrigin(Location::Middle);
+	movesBar = (Panel*)AddElement(new Panel(shaderMgr));
 
-	//Game Name
-	GUIText* text = (GUIText*)gameName.AddWidget("GameName",
-		new GUIText(&font, "PokeTales", context->shaderManager->GetShader("FontShader")));
-	text->SetPos(glm::vec2(5.0f, 5.0f));
-	text->GetText()->SetCharacterSize(40.0f);
-
-	glm::vec2 gameNameSize = text->GetText()->GetFloatRect().size + glm::vec2(10.0f, 10.0f);
-	gameName.SetPosition(glm::vec2(0, Constants::WIN_HEIGHT - gameNameSize.y));
-
-	RectangleShape* frame = (RectangleShape*) gameName.AddShape("BackFrame", 
-		new RectangleShape(gameNameSize, context->shaderManager->GetShader("SimpleShader")));
-	frame->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
-
-	//Hove pokemons stats bar
-	hoverPokeBar.SetPos(glm::vec2(Constants::WIN_WIDTH - hoverPokeBar.GetSize().x, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
-
-	//Selected pokemon infos
-	selectedPokeBar = (PokemonStatsBar*)selectedPokeInfos.AddWidget("stats bar", new PokemonStatsBar(nullptr, &font, context->shaderManager));
-	selectedPokeBar->SetPos(glm::vec2(0, 0));
-
-	//Moves
 	glm::vec2 moveBarPadding(30.0f, 15.0f);
 	glm::vec2 moveBarFramePadding(20.0f, 20.0f);
-	glm::vec2 moveBarsPos(selectedPokeBar->GetSize().x + moveBarPadding.x + moveBarFramePadding.x, -100.0f);
+	glm::vec2 moveBarsPos(statsBar->GetSize().x + moveBarPadding.x + moveBarFramePadding.x, -100.0f);
 	for (int i = 0; i < 4; i++) {
-		moveBars[i] = (PokemonMoveBar*)selectedPokeInfos.AddWidget("moveBar" + std::to_string(i), new PokemonMoveBar(&font, context->shaderManager, glm::vec2(0, 0)));
+		moveBars[i] = (PokemonMoveBar*)movesBar->AddElement(new PokemonMoveBar(l_font, shaderMgr, glm::vec2(0, 0)));
 		glm::vec2 size = moveBars[i]->GetSize();
 		if (i == 0)
 			moveBars[i]->SetPos(moveBarsPos + glm::vec2(0, 0));
@@ -361,33 +286,94 @@ GUI::GUI(SharedContext* l_context)
 			moveBars[i]->SetPos(moveBarsPos + glm::vec2(size.x + moveBarPadding.x, size.y + moveBarPadding.y));
 	}
 
-	moveBarsFrame = (RectangleShape*)selectedPokeInfos.AddShape("moveBarsFrame",
+	RectangleShape* moveBarsFrame = (RectangleShape*)movesBar->AddElement(
 		new RectangleShape(glm::vec2(2*moveBarFramePadding.x + moveBars[0]->GetSize().x*2 + moveBarPadding.x,
 									2*moveBarFramePadding.y + moveBars[0]->GetSize().y*2 + moveBarPadding.y),
-			context->shaderManager->GetShader("SimpleShader")), -1);
+			shaderMgr->GetShader("SimpleShader")), -1);
 	moveBarsFrame->SetPos(moveBarsPos - moveBarFramePadding);
 	moveBarsFrame->SetColor(glm::vec4(glm::vec3(1.0f), 0.5f));
+}
+PokemonGUI::~PokemonGUI() {
 
-	selectedPokeInfos.SetPosition(glm::vec2(225.0f, Constants::WIN_HEIGHT - selectedPokeBar->GetSize().y));
+}
+
+void PokemonGUI::Update(double dt) {
+	statsBar->Update(dt);
+}
+
+void PokemonGUI::Draw(glm::mat4& cameraMatrix) {
+	if (poke == nullptr)
+		return;
+	Panel::Draw(cameraMatrix);
+}
+
+void PokemonGUI::SetPokemon(Pokemon* l_poke) {
+	poke = l_poke;
+	statsBar->SetPokemon(l_poke);
+}
+
+Pokemon* PokemonGUI::GetPokemon() {
+	return poke;
+}
+
+/*---------------GUI---------------*/
+
+GUI::GUI(SharedContext* l_context)
+	: context(l_context),
+	font("Resources\\fonts\\arial.ttf", 40.0f),
+	gameInfos(glm::vec2(175, 200), 14, glm::vec2(10,350), l_context->shaderManager),
+	gameName(l_context->shaderManager),
+	cursor(glm::vec2(100.0f, 100.0f), l_context->shaderManager->GetShader("SimpleShader")),
+	hoverPokeBar(nullptr, &font, context->shaderManager),
+	selectedPokeGUI(nullptr, &font, context->shaderManager)
+{
+	context->gui = this;
+
+	//GameInfos
+	gameInfos.SetPadding(glm::vec2(10.0f, 4.0f));
+	
+	//Cursor
+	cursor.SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	cursor.SetSize(glm::vec2(10.0f, 10.0f));
+	cursor.SetPos(glm::vec2(Constants::WIN_WIDTH / 2, Constants::WIN_HEIGHT / 2));
+	cursor.SetOrigin(Location::Middle);
+
+	//Game Name
+	Text* text = (Text*)gameName.AddElement(
+		new Text(&font, "PokeTales", context->shaderManager->GetShader("FontShader")));
+	text->SetPos(glm::vec2(5.0f, 5.0f));
+	text->SetCharacterSize(40.0f);
+
+	glm::vec2 gameNameSize = text->GetFloatRect().size + glm::vec2(10.0f, 10.0f);
+	gameName.SetPos(glm::vec2(0, Constants::WIN_HEIGHT - gameNameSize.y));
+
+	RectangleShape* frame = (RectangleShape*) gameName.AddElement(
+		new RectangleShape(gameNameSize, context->shaderManager->GetShader("SimpleShader")));
+	frame->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
+
+	//Hove pokemons stats bar
+	hoverPokeBar.SetPos(glm::vec2(Constants::WIN_WIDTH - hoverPokeBar.GetSize().x, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
+	
+	//Selected pokemon GUI
+	selectedPokeGUI.SetPos(glm::vec2(225.0f, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
+
 }
 
 void GUI::Update(double dt) {
-	selectedPokeBar->Update(dt);
+	selectedPokeGUI.Update(dt);
 	hoverPokeBar.Update(dt);
 }
 
 void GUI::Render() {
 	glDisable(GL_DEPTH_TEST);
 
-	context->win->DrawStatic(&rect);
-	gameInfos.Render(context->win);
-	gameName.Render(context->win);
-	if (selectedPokeBar->GetPokemon() != hoverPokeBar.GetPokemon() &&
-		hoverPokeBar.GetPokemon() != nullptr)
-		hoverPokeBar.Render(context->win);
-	if(selectedPokeBar->GetPokemon() != nullptr)
-		selectedPokeInfos.Render(context->win);
+	context->win->DrawStatic(&cursor);
+	context->win->DrawStatic(&gameInfos);
+	context->win->DrawStatic(&gameName);
 
+	if (selectedPokeGUI.GetPokemon() != hoverPokeBar.GetPokemon())
+		context->win->DrawStatic(&hoverPokeBar);
+	context->win->DrawStatic(&selectedPokeGUI);
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -399,14 +385,10 @@ void GUI::UnsetHoverPokemon() {
 }
 
 void GUI::SetSelectedPokemon(Pokemon* poke) {
-	selectedPokeBar->SetPokemon(poke);
-	for (int i = 0; i < 4; i++) {
-		if (PokemonMove* move = poke->GetMove(i))
-			moveBars[i]->SetPokemonMove(move);
-	}
+	selectedPokeGUI.SetPokemon(poke);
 }
 void GUI::UnsetSelectedPokemon() {
-	selectedPokeBar->SetPokemon(nullptr);
+	selectedPokeGUI.SetPokemon(nullptr);
 }
 
 TextField* GUI::GetGameInfosField() { return &gameInfos; }

@@ -38,6 +38,8 @@ Window::Window(int l_width, int l_height, const std::string& winName, SharedCont
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	context->win = this;
+
+	projectionMat = glm::ortho(0.0f, Constants::WIN_WIDTH, 0.0f, Constants::WIN_HEIGHT);
 }
 Window::~Window() {
 	glfwTerminate();
@@ -89,11 +91,15 @@ void Window::DrawStatic(Drawable* drawable) {
 }
 
 void Window::DrawStatic(Text* text) {
-	text->Draw();
+	text->Draw(projectionMat);
 }
 
-void Window::DrawStatic(Shape* shape) {
-	shape->Draw();
+void Window::DrawStatic(RectangleShape* shape) {
+	shape->Draw(projectionMat);
+}
+
+void Window:: DrawStatic(DrawableStatic* drawable) {
+	drawable->Draw(projectionMat);
 }
 
 void Window::DrawInstanced(DrawableInstanced* drawableInstanced) {
