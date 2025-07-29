@@ -167,6 +167,7 @@ private:
 class GUI {
 public:
 	GUI(SharedContext* l_context);
+	virtual ~GUI();
 
 	void Update(double dt);
 	void Render();
@@ -181,7 +182,7 @@ public:
 
 private:
 	SharedContext* context;
-	Font font;
+	Font* font;
 
 	Panel gameName;
 

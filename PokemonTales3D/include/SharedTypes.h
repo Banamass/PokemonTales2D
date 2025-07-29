@@ -12,6 +12,8 @@ class Window;
 class EventManager;
 class Camera;
 class ShaderManager;
+class ModelManager;
+class FontManager;
 class GameSystem;
 class GUI;
 class Board;
@@ -22,6 +24,8 @@ struct SharedContext {
 	EventManager* eventManager;
 	Camera* camera;
 	ShaderManager* shaderManager;
+	ModelManager* modelManager;
+	FontManager* fontManager;
 	GameSystem* gameSystem;
 	GUI* gui;
 	Board* board;

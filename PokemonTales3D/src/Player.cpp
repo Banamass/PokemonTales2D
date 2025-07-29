@@ -5,12 +5,17 @@
 /*-----------------------------Player-----------------------------*/
 
 Player::Player(SharedContext* l_context) 
-	: APlayer(l_context), state(nullptr), boxModel("Resources\\Box\\box.obj")
+	: APlayer(l_context), state(nullptr)
 {
+	if (!context->modelManager->RequireResource("Box")) {
+		std::cout << "Box model not found" << std::endl;
+	}
+	boxModel = context->modelManager->GetResource("Box");
+
 	Setup();
 }
 Player::~Player() {
-	
+	context->modelManager->ReleaseResource("Box");
 }
 
 void Player::Setup() {
@@ -212,7 +217,7 @@ void Player::PokeSelectedState::Attack(int moveId) {
 Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemon)
 	: State(l_player), selectedPokemon(l_selectedPokemon)
 	, moveArea(l_selectedPokemon, player->pokemonState[l_selectedPokemon].nbStepLeft),
-	moveBox(&player->boxModel, player->context->shaderManager->GetShader("ModelShader"))
+	moveBox(player->boxModel, player->context->shaderManager->GetShader("ModelShader"))
 {
 	type = StateType::PokeMove;
 

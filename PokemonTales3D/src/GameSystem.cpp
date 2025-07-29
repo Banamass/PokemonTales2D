@@ -8,14 +8,14 @@ GameSystem::GameSystem(SharedContext* l_context)
 	l_context->gameData = &dataManager;
 
 	playingPokemons.push_back(new Pokemon(dataManager.GetPokemonData(1)
-		, &player, context->shaderManager, glm::vec3(0.0f, 0.0f, 1.0f)));
+		, &player, context->modelManager, context->shaderManager, glm::vec3(0.0f, 0.0f, 1.0f)));
 	playingPokemons.push_back(new Pokemon(dataManager.GetPokemonData(1)
-		, &player, context->shaderManager, glm::vec3(1.0f, 0.0f, 0.0f)));
+		, &player, context->modelManager, context->shaderManager, glm::vec3(1.0f, 0.0f, 0.0f)));
 	player.AddPokemon(playingPokemons[0], { 0,0 });
 	player.AddPokemon(playingPokemons[1], { 2,2 });
 
 	playingPokemons.push_back(new Pokemon(dataManager.GetPokemonData(1)
-		, &opponent, context->shaderManager, glm::vec3(0.0f, 1.0f, 0.0f)));
+		, &opponent, context->modelManager, context->shaderManager, glm::vec3(0.0f, 1.0f, 0.0f)));
 	opponent.AddPokemon(playingPokemons[2], { 5,3 });
 
 	playingPlayer = &player;

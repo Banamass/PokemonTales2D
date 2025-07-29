@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <utility>
 #include "stb_image.h"
+#include "ResourceManager.h"
 
 class Transform;
 class DrawableInstanced;
@@ -77,6 +78,21 @@ private:
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat
 		, aiTextureType type, std::string typeName);
+};
+
+class ModelManager : public ResourceManager<ModelManager, Model> {
+public:
+	ModelManager(SharedContext* context) : ResourceManager("Resources/Models/models.cfg") {
+		context->modelManager = this;
+	}
+
+	Model* Load(const std::vector<std::string>* l_args)
+	{
+		if (l_args->size() < 1)
+			return nullptr;
+		Model* res = new Model(l_args->at(0).data());
+		return res;
+	}
 };
 
 class Cubemap {

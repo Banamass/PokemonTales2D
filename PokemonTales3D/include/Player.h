@@ -16,7 +16,7 @@ public:
 	void EndTurn();
 
 private:
-	Model boxModel;
+	Model* boxModel;
 
 	void KeyCallback(CallbackData data);
 	void MouseButtonCallback(CallbackData data);
@@ -26,7 +26,7 @@ private:
 	class State {
 	public:
 		State(Player* l_player) : player(l_player), type(StateType::None), 
-			cursorDrawable(&player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
+			cursorDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
 			cursor(glm::ivec2(1, 1)) {}
 		virtual ~State() {};
 

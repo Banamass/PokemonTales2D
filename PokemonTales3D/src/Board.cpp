@@ -20,8 +20,13 @@ void Box::Unselect() {
 
 Board::Board(glm::vec2 l_size, SharedContext* l_context)
 	: context(l_context), size(l_size), boxesDrawable(nullptr)
-	, boxDrawable(nullptr),boxModel("Resources\\Box\\box.obj")
+	, boxDrawable(nullptr)
 {
+	if (!context->modelManager->RequireResource("Box")) {
+		std::cout << "Box model not found" << std::endl;
+	}
+	boxModel = context->modelManager->GetResource("Box");
+
 	context->board = this;
 
 	instancedModelShader = context->shaderManager->GetShader("InstancedModelShader");
@@ -54,7 +59,7 @@ Board::Board(glm::vec2 l_size, SharedContext* l_context)
 	mat.specular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	mat.shininess = 32.0f;
 
-	boxDrawable = new Drawable(&boxModel, instancedModelShader);
+	boxDrawable = new Drawable(boxModel, instancedModelShader);
 	boxDrawable->SetMaterial(mat);
 	boxesDrawable = new DrawableInstanced(boxDrawable, boxesTransforms);
 }
@@ -64,6 +69,7 @@ Board::~Board() {
 	for (Transform* trans : boxesTransforms) {
 		delete trans;
 	}
+	context->modelManager->ReleaseResource("Box");
 }
 
 void Board::Update(double dt) {

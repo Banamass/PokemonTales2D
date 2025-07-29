@@ -6,6 +6,7 @@
 #include "GameSystem.h"
 #include "Light.h"
 #include "GUI.h"
+#include "ResourceManager.h"
 
 class Game {
 public:
@@ -23,6 +24,8 @@ private:
 
 	Window window;
 	ShaderManager shaderManager;
+	ModelManager modelManager;
+	FontManager fontManager;
 	EventManager eventManager;
 	Camera camera;
 

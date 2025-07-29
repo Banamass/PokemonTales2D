@@ -14,6 +14,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "SharedTypes.h"
+#include "ResourceManager.h"
 
 class Shader {
 public:
@@ -36,19 +37,24 @@ private:
 	unsigned int ID;
 };
 
-class ShaderManager {
+/* This resource manager doesn't unload functionality
+Thus it can be used without Require and Release resources methods but only with GetShader method */
+class ShaderManager : public ResourceManager<ShaderManager, Shader> {
 public:
 	ShaderManager(SharedContext* context);
-	~ShaderManager();
+	virtual ~ShaderManager();
+
+	Shader* Load(const std::vector<std::string>* l_args);
 
 	//Return false if the loading fails or the shader name already exists
-	bool LoadShader(const std::string& shaderName,
-		const char* vertexPath, const char* fragmentPath);
 	Shader* GetShader(const std::string& shaderName);
 
 	void SetLightPos(glm::vec3 pos);
 	void SetViewPos(glm::vec3 pos);
 
 private:
-	std::unordered_map<std::string, Shader> shaders;
+	Shader* LoadShader(const char* vertexPath, const char* fragmentPath);
+
+	glm::vec3 lightPos;
+	glm::vec3 viewPos;
 };

@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "SharedTypes.h"
 #include "Drawable.h"
+#include "ResourceManager.h"
 
 struct Character {
 	unsigned int textureID;
@@ -36,6 +37,33 @@ private:
 
 	FT_Library ft;
 	FT_Face face;
+};
+
+class FontManager : public ResourceManager<FontManager, Font> {
+public:
+	FontManager(SharedContext* context) : ResourceManager("Resources\\fonts\\fonts.cfg") {
+		context->fontManager = this;
+	}
+
+	Font* Load(const std::vector<std::string>* l_args)
+	{
+		if (l_args->size() < 1)
+			return nullptr;
+		Font* res = nullptr;
+		if (l_args->size() == 1) {
+			res = new Font(l_args->at(0).data());
+		}
+		else {
+			try {
+				res = new Font(l_args->at(0).data(), std::stoi(l_args->at(1)));
+			}
+			catch (std::invalid_argument e) {
+				std::cout << "In fontManager load method : " << e.what() << std::endl;
+				res = new Font(l_args->at(0).data());
+			}
+		}
+		return res;
+	}
 };
 
 class Text : public DrawableStatic {

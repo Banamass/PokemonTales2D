@@ -65,7 +65,7 @@ public:
 private:
 	SharedContext* context;
 
-	Model boxModel;
+	Model* boxModel;
 	Shader* instancedModelShader;
 	Shader* modelShader;
 

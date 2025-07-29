@@ -43,7 +43,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 	int InfoLogLength;
 
 	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", fragmentPath);
+	printf("Compiling shader : %s\n", vertexPath);
 	char const* VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
 	glCompileShader(VertexShaderID);
@@ -136,54 +136,54 @@ unsigned int Shader::GetID() { return ID; }
 
 /*---------------------ShaderManager---------------------*/
 
-ShaderManager::ShaderManager(SharedContext* context) {
+ShaderManager::ShaderManager(SharedContext* context) 
+	: ResourceManager("shaders\\shaders.cfg"),
+	lightPos(0.0f, 0.0f, 0.0f), viewPos(0.0f, 0.0f, 0.0f)
+{
 	context->shaderManager = this;
-
-	this->LoadShader("SimpleShader"
-		, "shaders\\SimpleVertexShader.glsl", "shaders\\SimpleFragmentShader.glsl");
-	this->LoadShader("ModelShader"
-		, "shaders\\ModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl");
-	this->LoadShader("InstancedModelShader"
-		, "shaders\\InstancedModelVertexShader.glsl", "shaders\\ModelFragmentShader.glsl");
-	this->LoadShader("CubemapShader"
-		, "shaders\\CubemapVertexShader.glsl", "shaders\\CubemapFragmentShader.glsl");
-	this->LoadShader("FontShader"
-		, "shaders\\FontVertexShader.glsl", "shaders\\FontFragmentShader.glsl");
 }
 ShaderManager::~ShaderManager() {
 
 }
 
-bool ShaderManager::LoadShader(const std::string& shaderName,
-	const char* vertexPath, const char* fragmentPath) {
-	if (shaders.find(shaderName) != shaders.end())
-		return false;
+Shader* ShaderManager::Load(const std::vector<std::string>* l_args) {
+	if (l_args->size() < 2)
+		return nullptr;
+	return LoadShader(l_args->at(0).data(), l_args->at(1).data());
+}
 
-	auto itr = shaders.emplace(std::piecewise_construct,
-		std::forward_as_tuple(shaderName),
-		std::forward_as_tuple(vertexPath, fragmentPath));
+Shader* ShaderManager::LoadShader(const char* vertexPath, const char* fragmentPath) {
+	Shader* shader = new Shader(vertexPath, fragmentPath);
 
-	return itr.second && itr.first->second.GetID() != 0;
+	shader->use();
+	shader->SetUniform("viewPos", viewPos);
+	shader->SetUniform("lightPos", lightPos);
+	shader->unuse();
+
+	return shader;
 }
 Shader* ShaderManager::GetShader(const std::string& shaderName) {
-	auto itr = shaders.find(shaderName);
-	if (itr == shaders.end())
+	if (!RequireResource(shaderName))
 		return nullptr;
-	return &itr->second;
+	return GetResource(shaderName);
 }
 
 void ShaderManager::SetLightPos(glm::vec3 pos) {
-	for (auto& itr : shaders) {
-		itr.second.use();
-		itr.second.SetUniform("lightPos", pos);
-		itr.second.unuse();
+	for (auto& res : m_resources) {
+		auto& shad = res.second.first;
+		shad->use();
+		shad->SetUniform("lightPos", pos);
+		shad->unuse();
 	}
+	lightPos = pos;
 }
 
 void ShaderManager::SetViewPos(glm::vec3 pos) {
-	for (auto& itr : shaders) {
-		itr.second.use();
-		itr.second.SetUniform("viewPos", pos);
-		itr.second.unuse();
+	for (auto& res : m_resources) {
+		auto& shad = res.second.first;
+		shad->use();
+		shad->SetUniform("viewPos", pos);
+		shad->unuse();
 	}
+	viewPos = pos;
 }

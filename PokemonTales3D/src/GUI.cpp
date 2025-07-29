@@ -436,12 +436,12 @@ int PokemonGUI::GetMoveClicked(glm::vec2 mousePos) {
 
 GUI::GUI(SharedContext* l_context)
 	: context(l_context),
-	font("Resources\\fonts\\arial.ttf", 40.0f),
+	font(context->fontManager->RequireGetResource("Arial")),
 	gameInfos(glm::vec2(175, 200), 14, glm::vec2(10,350), l_context->shaderManager),
 	gameName(l_context->shaderManager),
 	cursor(glm::vec2(100.0f, 100.0f), l_context->shaderManager->GetShader("SimpleShader")),
-	hoverPokeBar(nullptr, &font, context->shaderManager),
-	selectedPokeGUI(nullptr, &font, context)
+	hoverPokeBar(nullptr, font, context->shaderManager),
+	selectedPokeGUI(nullptr, font, context)
 {
 	context->gui = this;
 
@@ -456,7 +456,7 @@ GUI::GUI(SharedContext* l_context)
 
 	//Game Name
 	Text* text = (Text*)gameName.AddElement(
-		new Text(&font, "PokeTales", context->shaderManager->GetShader("FontShader")));
+		new Text(font, "PokeTales", context->shaderManager->GetShader("FontShader")));
 	text->SetPos(glm::vec2(5.0f, 5.0f));
 	text->SetCharacterSize(40.0f);
 
@@ -468,12 +468,15 @@ GUI::GUI(SharedContext* l_context)
 	frame->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
 
 	//Hove pokemons stats bar
-	//hoverPokeBar.SetPos(glm::vec2(Constants::WIN_WIDTH - hoverPokeBar.GetSize().x, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
 	hoverPokeBar.SetPos(glm::vec2(0.0f, 0.0f));
 
 	//Selected pokemon GUI
 	selectedPokeGUI.SetPos(glm::vec2(225.0f, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
 
+}
+
+GUI::~GUI() {
+	context->fontManager->ReleaseResource("Arial");
 }
 
 void GUI::Update(double dt) {

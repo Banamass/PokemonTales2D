@@ -143,6 +143,15 @@
     <None Include="Resources\GameData\Moves\Bubble.json">
       <Filter>Resources\Moves</Filter>
     </None>
+    <None Include="shaders\shaders.cfg">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="Resources\Models\models.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="Resources\fonts\fonts.cfg">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EventManager.h">
@@ -201,6 +210,9 @@
     </ClInclude>
     <ClInclude Include="include\GameData.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceManager.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

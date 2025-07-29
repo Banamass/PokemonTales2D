@@ -10,7 +10,9 @@ public:
 	void Draw(Window* win);
 
 private:
-	Model model;
+	SharedContext* context;
+
+	Model* model;
 	Shader* shader;
-	Drawable sprite;
+	Drawable* sprite;
 };

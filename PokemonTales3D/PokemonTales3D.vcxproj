@@ -41,11 +41,13 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\fonts\fonts.cfg" />
     <None Include="Resources\GameData\Moves\Bubble.json" />
     <None Include="Resources\GameData\Moves\Ember.json" />
     <None Include="Resources\GameData\Moves\Moves.json" />
     <None Include="Resources\GameData\Pokemons\Charmander.json" />
     <None Include="Resources\GameData\Pokemons\Pokemons.json" />
+    <None Include="Resources\Models\models.cfg" />
     <None Include="shaders\CubemapFragmentShader.glsl" />
     <None Include="shaders\CubemapVertexShader.glsl" />
     <None Include="shaders\FontFragmentShader.glsl" />
@@ -53,6 +55,7 @@
     <None Include="shaders\InstancedModelVertexShader.glsl" />
     <None Include="shaders\ModelFragmentShader.glsl" />
     <None Include="shaders\ModelVertexShader.glsl" />
+    <None Include="shaders\shaders.cfg" />
     <None Include="shaders\SimpleFragmentShader.glsl" />
     <None Include="shaders\SimpleVertexShader.glsl" />
   </ItemGroup>
@@ -72,6 +75,7 @@
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Pokemon.h" />
+    <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Shape.h" />
     <ClInclude Include="include\SharedTypes.h" />

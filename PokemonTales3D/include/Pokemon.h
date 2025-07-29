@@ -17,7 +17,7 @@ class APlayer;
 class Pokemon {
 public:
 	Pokemon(const PokemonData* data, APlayer* l_trainer,
-		ShaderManager* shaderMgr, glm::vec3 l_color);
+		ModelManager* modelMgr, ShaderManager* shaderMgr, glm::vec3 l_color);
 	virtual ~Pokemon();
 
 	void Render(Window* win, glm::ivec2 pos);
@@ -41,12 +41,14 @@ public:
 	void TakeDamages(float l_damages);
 
 private:
+	ModelManager* modelMgr;
+
 	glm::vec3 color;
 
-	Model model;
-	Drawable sprite;
+	Model* model;
+	Drawable* sprite;
 
-	Drawable OBB;
+	Drawable* OBB;
 
 	float health;
 	PokemonMove* movePool[4];
