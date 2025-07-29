@@ -8,6 +8,14 @@
 #include "Shape.h"
 #include "Pokemon.h"
 
+class Clickable {
+public:
+	Clickable() {};
+	virtual ~Clickable() {};
+
+	virtual bool IsClicked(glm::vec2 mousePos) = 0;
+};
+
 /* Warning : memory usage of objects contained in the panel is managed by the panel
 Usage of AddObj functions : AddObj("name", new Obj(param, ...))
 Position of objects are managed by the panel*/
@@ -60,12 +68,14 @@ protected:
 	std::vector<Text*> lines;
 };
 
-class PokemonMoveBar : public Panel {
+class PokemonMoveBar : public Panel, public Clickable {
 public:
 	PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
 	virtual ~PokemonMoveBar();
 
 	virtual void Draw(glm::mat4& cameraMatrix);
+
+	virtual bool IsClicked(glm::vec2 mousePos);
 
 	void SetPokemonMove(PokemonMove* l_move);
 	glm::vec2 GetSize();
@@ -135,6 +145,8 @@ public:
 	void SetSelectedMove(int i);
 	void SetAimedPoke(std::vector<Pokemon*>& aimedPoke, PokemonMove* move);
 	void SetNbStepsLeft(int l_nbStep);
+	//Return the id of the clicked move, -1 if no move is clicked
+	int GetMoveClicked(glm::vec2 mousePos);
 
 private:
 	void Reset();

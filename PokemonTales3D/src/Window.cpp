@@ -158,3 +158,9 @@ glm::vec2 Window::GetWindowSize() {
 GLFWwindow* Window::GetGLFWwindow() {
 	return window;
 }
+glm::vec2 Window::GetMousePos() {
+	double x;
+	double y;
+	glfwGetCursorPos(window, &x, &y);
+	return glm::vec2(x, y);
+}

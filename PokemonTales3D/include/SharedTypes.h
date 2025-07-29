@@ -45,12 +45,12 @@ struct IntRect {
 };
 
 struct FloatRect {
-	FloatRect() : pos(0, 0), size(0, 0) {}
-	FloatRect(glm::ivec2 l_pos, glm::ivec2 l_size)
+	FloatRect() : pos(0.0f, 0.0f), size(0.0f, 0.0f) {}
+	FloatRect(glm::vec2 l_pos, glm::vec2 l_size)
 		: pos(l_pos), size(l_size) {
 	}
 
-	bool Contains(glm::ivec2 v) const;
+	bool Contains(glm::vec2 v) const;
 	bool Intersects(IntRect rect) const;
 
 	glm::vec2 pos;

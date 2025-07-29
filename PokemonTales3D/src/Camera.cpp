@@ -88,6 +88,7 @@ void Camera::SetFoV(float newFoV) {
 void Camera::SetIsFollowingMouse(float b) {
 	isFollowingMouse = b;
 	context->win->SetCursorCapture(b);
+	firstMouse = true;
 }
 
 void Camera::MouseMouseCallback(CallbackData data) {

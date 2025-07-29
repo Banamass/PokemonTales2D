@@ -25,7 +25,7 @@ bool IntRect::Intersects(IntRect rect) const {
 		|| rect.pos.y >= pos.y + size.y);
 }
 
-bool FloatRect::Contains(glm::ivec2 v) const {
+bool FloatRect::Contains(glm::vec2 v) const {
 	return (v.x >= pos.x && v.x <= pos.x + size.x
 		&& v.y >= pos.y && v.y <= pos.y + size.y);
 }

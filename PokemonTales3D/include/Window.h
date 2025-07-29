@@ -30,6 +30,7 @@ public:
 	glm::vec2 GetWindowSize();
 	bool GetShouldClose();
 	GLFWwindow* GetGLFWwindow();
+	glm::vec2 GetMousePos();
 
 private:
 	void ProcessInput();

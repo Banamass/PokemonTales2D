@@ -191,6 +191,15 @@ void PokemonMoveBar::Draw(glm::mat4& cameraMatrix){
 		Panel::Draw(cameraMatrix);
 }
 
+bool PokemonMoveBar::IsClicked(glm::vec2 mousePos) {
+	if (move == nullptr)
+		return false;
+	glm::vec2 realMousePos = glm::vec2(mousePos.x , Constants::WIN_HEIGHT- mousePos.y);
+	glm::vec2 realPos = offset + pos;
+	FloatRect hitBox(realPos, size);
+	return hitBox.Contains(realMousePos);
+}
+
 void PokemonMoveBar::SetSelect(bool b) {
 	isSelected = b;
 	frame->SetColor(isSelected ? selectedColor : unselectedColor);
@@ -413,6 +422,14 @@ void PokemonGUI::SetAimedPoke(std::vector<Pokemon*>& aimedPoke, PokemonMove* mov
 	}
 	for (; i < MAX_AIMED_POKE; i++)
 		aimedPokeStatsBar[i]->SetPokemon(nullptr);
+}
+
+int PokemonGUI::GetMoveClicked(glm::vec2 mousePos) {
+	for (int i = 0; i < 4; i++) {
+		if (moveBars[i]->IsClicked(mousePos))
+			return i;
+	}
+	return -1;
 }
 
 /*---------------GUI---------------*/
