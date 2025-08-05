@@ -33,10 +33,12 @@ private:
 
 	glm::vec3 pos; //position of the camera
 	glm::vec3 front; //the front direction of the camera
-	glm::vec3 up; //the upward direction of the camera
+	glm::vec3 up; //the upward direction of the world
+	glm::vec3 upDir; //the upward direction of the camera
 
-	glm::vec3 frontMove; //the front direction of the camera
-	glm::vec3 rightMove; //the right direction of the camera
+	glm::vec3 frontMove; //the front move of the camera
+	glm::vec3 rightMove; //the right move of the camera
+	
 
 	bool firstMouse;
 	glm::vec2 lastMousPos;
@@ -47,5 +49,7 @@ private:
 	float sensitivity;
 
 	float FoV;
+	float FovX;
+	float FovY;
 	float zoomSensitivity;
 };

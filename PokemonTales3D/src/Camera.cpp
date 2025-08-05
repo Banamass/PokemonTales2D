@@ -10,8 +10,7 @@ Camera::Camera(SharedContext* l_context)
 
 	view = glm::lookAt(pos, pos + front, up);
 
-	FoV = 45.0;
-	projection = glm::perspective(glm::radians(45.0f), l_windowSize.x / l_windowSize.y, 0.1f, 100.0f);
+	SetFoV(45.0f);
 
 	transformMatrix = projection * view;
 
@@ -66,6 +65,8 @@ void Camera::SetFront(glm::vec3 newFront) {
 	frontMove = glm::vec3(front.x, 0.0f, front.z);
 	frontMove = glm::normalize(frontMove);
 	rightMove = glm::cross(frontMove, up);
+
+	upDir = -glm::cross(rightMove, front);
 }
 
 void Camera::SetPosition(glm::vec3 newPos) {
@@ -78,6 +79,9 @@ void Camera::SetPosition(glm::vec3 newPos) {
 
 void Camera::SetFoV(float newFoV) {
 	FoV = newFoV;
+	FovY = glm::radians(FoV);
+	float aspect = Constants::WIN_WIDTH / Constants::WIN_HEIGHT;
+	FovX = atan(tan(FovY / 2) * aspect) * 2;
 
 	glm::vec2 l_windowSize = window->GetWindowSize();
 	projection = glm::perspective(glm::radians(FoV), l_windowSize.x / l_windowSize.y, 0.1f, 100.0f);
@@ -142,7 +146,24 @@ glm::mat4 Camera::GetSkyboxTransformMatrix() {
 }
 
 glm::vec3 Camera::GetMouseDirection() {
-	return glm::normalize(front);
+	glm::vec3 mouseDir = glm::normalize(front);
+	if (isFollowingMouse) {
+		return mouseDir;	
+	}
+	glm::vec2 mousePos = window->GetMousePos();
+	mousePos.y = Constants::WIN_HEIGHT - mousePos.y;
+
+	glm::vec2 screenMiddle(Constants::WIN_WIDTH / 2.0f, Constants::WIN_HEIGHT / 2.0f);
+	glm::vec2 delta = mousePos - screenMiddle;	
+
+	glm::vec2 dAlpha = delta / screenMiddle * glm::vec2(FovX/2.0f, FovY/2.0f);
+
+	glm::mat4 mat(1.0f);
+	mat = glm::rotate(mat, dAlpha.y, rightMove);
+	mat = glm::rotate(mat, dAlpha.x, upDir);
+	mouseDir = glm::vec3(mat * glm::vec4(mouseDir, 1.0f));
+
+	return glm::normalize(mouseDir);
 }
 
 glm::vec3 Camera::GetPosition() {

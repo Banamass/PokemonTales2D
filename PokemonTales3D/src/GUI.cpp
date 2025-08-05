@@ -491,7 +491,7 @@ void GUI::Render() {
 	context->win->DrawStatic(&gameInfos);
 	context->win->DrawStatic(&gameName);
 
-	if (selectedPokeGUI.GetPokemon() != hoverPokeBar.GetPokemon())
+	//if (selectedPokeGUI.GetPokemon() != hoverPokeBar.GetPokemon())
 		context->win->DrawStatic(&hoverPokeBar);
 	context->win->DrawStatic(&selectedPokeGUI);
 	glEnable(GL_DEPTH_TEST);
