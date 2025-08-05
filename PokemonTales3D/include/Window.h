@@ -32,6 +32,8 @@ public:
 	GLFWwindow* GetGLFWwindow();
 	glm::vec2 GetMousePos();
 
+	void Close();
+
 private:
 	void ProcessInput();
 

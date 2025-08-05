@@ -22,13 +22,14 @@ Camera::Camera(SharedContext* l_context)
 
 	zoomSensitivity = 1.0f;
 
-	context->eventManager->AddCallback(EventType::MouseMove, &Camera::MouseMouseCallback, this);
-	context->eventManager->AddCallback(EventType::Scroll, &Camera::ScrollCallback, this);
+	context->eventManager->AddCallback("CameraMove", EventType::MouseMove, &Camera::MouseMouseCallback, this, StateType::Battle);
+	context->eventManager->AddCallback("CameraScroll", EventType::Scroll, &Camera::ScrollCallback, this, StateType::Battle);
 
 	context->camera = this;
 }
 Camera::~Camera(){
-	
+	context->eventManager->RemoveCallbacks("CameraMove");
+	context->eventManager->RemoveCallbacks("CameraScroll");
 }
 
 void Camera::Update(const double& dt) {

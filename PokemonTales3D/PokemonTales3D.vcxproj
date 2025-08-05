@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="include\GameData.cpp" />
     <ClCompile Include="src\APlayer.cpp" />
+    <ClCompile Include="src\BattleState.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Drawable.cpp" />
@@ -31,12 +32,14 @@
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MenuState.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\SharedTypes.cpp" />
+    <ClCompile Include="src\StateManager.cpp" />
     <ClCompile Include="src\std_image.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
@@ -61,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\APlayer.h" />
+    <ClInclude Include="include\BattleState.h" />
     <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Drawable.h" />
@@ -72,6 +76,7 @@
     <ClInclude Include="include\GUI.h" />
     <ClInclude Include="include\json.hpp" />
     <ClInclude Include="include\Light.h" />
+    <ClInclude Include="include\MenuState.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Pokemon.h" />
@@ -79,6 +84,7 @@
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Shape.h" />
     <ClInclude Include="include\SharedTypes.h" />
+    <ClInclude Include="include\StateManager.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>

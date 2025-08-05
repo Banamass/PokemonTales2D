@@ -2,4 +2,5 @@ A faire:
 - Pour les panels faire en sorte que les positions des élèments soient par rapport à la position du panel, sans changer la position à chaquey frame (OK)
 - Faire un resource manager (class abstraite) pour les font, model, etc (Ok)
 - Faire un state Manager
-- Ray tracing pour la sélection avec la souris lorqu'elle n'est pas au milieu de l'écran
+- Ray tracing pour la sélection avec la souris lorqu'elle n'est pas au milieu de l'écran (OK)
+- Renommer les states du game et les states des players

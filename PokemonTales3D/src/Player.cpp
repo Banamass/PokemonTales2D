@@ -16,11 +16,13 @@ Player::Player(SharedContext* l_context)
 }
 Player::~Player() {
 	context->modelManager->ReleaseResource("Box");
+	context->eventManager->RemoveCallbacks("PlayerKey");
+	context->eventManager->RemoveCallbacks("PlayerMouseButton");
 }
 
 void Player::Setup() {
-	context->eventManager->AddCallback(EventType::Key, &Player::KeyCallback, this);
-	context->eventManager->AddCallback(EventType::MouseButton, &Player::MouseButtonCallback, this);
+	context->eventManager->AddCallback("PlayerKey", EventType::Key, &Player::KeyCallback, this, StateType::Battle);
+	context->eventManager->AddCallback("PlayerMouseButton", EventType::MouseButton, &Player::MouseButtonCallback, this, StateType::Battle);
 }
 
 void Player::KeyCallback(CallbackData data) {
@@ -69,8 +71,8 @@ void Player::EndTurn() {
 void Player::SwitchState(State* newState) {
 	if (newState == nullptr)
 		return;
-	StateType type = newState->GetType();
-	if (type == StateType::None)
+	PType type = newState->GetType();
+	if (type == PType::None)
 		return;
 	if (state != nullptr) {
 		delete state;
@@ -101,7 +103,7 @@ void Player::State::RenderCursor() {
 Player::DefaultState::DefaultState(Player* l_player) 
 	: State(l_player)
 		{
-	type = StateType::Default;
+	type = PType::Default;
 
 	Drawable::Material mat;
 	mat.ambient = 0.3f * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -144,7 +146,7 @@ void Player::DefaultState::Select() {
 
 Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_selectedPokemon)
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
-	type = StateType::PokeSelected;
+	type = PType::PokeSelected;
 	player->context->gui->GetSelectedPokemonGUI()->SetNbStepsLeft(player->pokemonState[l_selectedPokemon].nbStepLeft);
 	player->context->camera->SetIsFollowingMouse(false);
 }
@@ -219,7 +221,7 @@ Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemo
 	, moveArea(l_selectedPokemon, player->pokemonState[l_selectedPokemon].nbStepLeft),
 	moveBox(player->boxModel, player->context->shaderManager->GetShader("ModelShader"))
 {
-	type = StateType::PokeMove;
+	type = PType::PokeMove;
 
 	Drawable::Material mat;
 	glm::vec4 color(0.0f, 1.0f, 0.0f, 1.0f);
@@ -290,7 +292,7 @@ void Player::PokeMoveState::Move() {
 /*-----------------------------PokeAttackState-----------------------------*/
 Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon, int moveId)
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
-	type = StateType::PokeAttack;
+	type = PType::PokeAttack;
 
 	Drawable::Material mat;
 	glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);

@@ -7,6 +7,8 @@
 #include "Light.h"
 #include "GUI.h"
 #include "ResourceManager.h"
+#include "BattleState.h"
+#include "MenuState.h"
 
 class Game {
 public:
@@ -17,9 +19,9 @@ public:
 	void Render();
 
 	bool IsOver();
+	void SwitchState(StateType type);
 
 private:
-
 	SharedContext context;
 
 	Window window;
@@ -27,12 +29,5 @@ private:
 	ModelManager modelManager;
 	FontManager fontManager;
 	EventManager eventManager;
-	Camera camera;
-
-	Light light;
-
-	Cubemap* skybox;
-
-	GameSystem gameSystem;
-	GUI gui;
+	StateManager stateManager;
 };

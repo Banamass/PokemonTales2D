@@ -8,6 +8,7 @@ namespace Constants{
 	constexpr float WIN_HEIGHT = 700.0f;
 }
 
+class Game;
 class Window;
 class EventManager;
 class Camera;
@@ -18,18 +19,21 @@ class GameSystem;
 class GUI;
 class Board;
 class DataManager;
+class StateManager;
 
 struct SharedContext {
+	Game* game;
 	Window* win;
 	EventManager* eventManager;
 	Camera* camera;
 	ShaderManager* shaderManager;
 	ModelManager* modelManager;
 	FontManager* fontManager;
+	StateManager* stateManager;
+	DataManager* gameData;
 	GameSystem* gameSystem;
 	GUI* gui;
 	Board* board;
-	DataManager* gameData;
 };
 
 enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };

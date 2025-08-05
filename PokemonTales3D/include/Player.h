@@ -2,6 +2,7 @@
 
 #include "APlayer.h"
 #include "EventManager.h"
+#include "StateManager.h"
 
 class Player : public APlayer {
 public:
@@ -21,11 +22,11 @@ private:
 	void KeyCallback(CallbackData data);
 	void MouseButtonCallback(CallbackData data);
 
-	enum StateType { None, Default, PokeSelected, PokeMove, PokeAttack };
+	enum PType { None, Default, PokeSelected, PokeMove, PokeAttack };
 
 	class State {
 	public:
-		State(Player* l_player) : player(l_player), type(StateType::None), 
+		State(Player* l_player) : player(l_player), type(PType::None),
 			cursorDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
 			cursor(glm::ivec2(1, 1)) {}
 		virtual ~State() {};
@@ -36,13 +37,13 @@ private:
 		virtual void Render() {};
 		virtual void Update(double dt){}
 
-		virtual StateType GetType() { return type; }
+		virtual PType GetType() { return type; }
 
 	protected:
 		virtual void UpdateCursor();
 		virtual void RenderCursor();
 
-		StateType type;
+		PType type;
 		Player* player;
 
 		Drawable cursorDrawable;

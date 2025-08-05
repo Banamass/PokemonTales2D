@@ -46,8 +46,12 @@ Window::~Window() {
 }
 
 void Window::ProcessInput() {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+	/*if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);*/
+}
+
+void Window::Close() {
+	glfwSetWindowShouldClose(window, true);
 }
 
 void Window::StartDraw() {
