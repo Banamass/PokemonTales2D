@@ -1,5 +1,6 @@
 #include "GameSystem.h"
 #include "Camera.h"
+#include "BattleState.h"
 
 GameSystem::GameSystem(SharedContext* l_context)
 	: context(l_context), board(glm::vec2(20, 20), l_context),

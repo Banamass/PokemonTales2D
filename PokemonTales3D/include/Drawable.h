@@ -130,6 +130,7 @@ public:
 
 	virtual void SetPos(glm::vec2 l_pos) { pos = l_pos; }
 	virtual glm::vec2 GetPos() { return pos; }
+	virtual glm::vec2 GetRealPos() { return pos + offset; }
 
 	virtual void SetOffset(glm::vec2 l_offset) { offset = l_offset; };
 	virtual glm::vec2 SetOffset() { return offset; }

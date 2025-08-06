@@ -1,6 +1,8 @@
 A faire:
 - Pour les panels faire en sorte que les positions des élèments soient par rapport à la position du panel, sans changer la position à chaquey frame (OK)
 - Faire un resource manager (class abstraite) pour les font, model, etc (Ok)
-- Faire un state Manager
+- Faire un state Manager (Ok)
 - Ray tracing pour la sélection avec la souris lorqu'elle n'est pas au milieu de l'écran (OK)
 - Renommer les states du game et les states des players
+- Implementer transparence et trascendence
+- Enable depth test, trouver une couche où l'enlever pour le gui

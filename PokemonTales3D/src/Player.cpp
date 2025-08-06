@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "GameSystem.h"
 #include "Camera.h"
+#include "BattleState.h"
 
 /*-----------------------------Player-----------------------------*/
 
@@ -13,6 +14,8 @@ Player::Player(SharedContext* l_context)
 	boxModel = context->modelManager->GetResource("Box");
 
 	Setup();
+
+	context->camera->SetIsFollowingMouse(false);
 }
 Player::~Player() {
 	context->modelManager->ReleaseResource("Box");
@@ -30,10 +33,13 @@ void Player::KeyCallback(CallbackData data) {
 		Key_Data kdata = std::get<Key_Data>(data.data);
 		if (kdata.key == GLFW_KEY_1 && kdata.action == GLFW_PRESS) {
 			context->gui->GetGameInfosField()->AddMessage("Fin de tour");
-			context->camera->SetIsFollowingMouse(true);
 			EndTurn();
 			return;
 		}
+		else if (kdata.key == GLFW_KEY_Q && kdata.action == GLFW_PRESS)
+			context->camera->SetIsFollowingMouse(true);
+		else if (kdata.key == GLFW_KEY_Q && kdata.action == GLFW_RELEASE)
+			context->camera->SetIsFollowingMouse(false);
 		if(state != nullptr)
 			state->KeyCallback(kdata);
 	}
@@ -148,7 +154,12 @@ Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_select
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
 	type = PType::PokeSelected;
 	player->context->gui->GetSelectedPokemonGUI()->SetNbStepsLeft(player->pokemonState[l_selectedPokemon].nbStepLeft);
-	player->context->camera->SetIsFollowingMouse(false);
+}
+
+void Player::PokeSelectedState::Update(double dt) {
+	int moveId = player->context->gui->GetSelectedPokemonGUI()->GetMoveClicked();
+	if (moveId != -1)
+		Attack(moveId);
 }
 
 void Player::PokeSelectedState::KeyCallback(Key_Data& data) {
@@ -164,20 +175,9 @@ void Player::PokeSelectedState::KeyCallback(Key_Data& data) {
 		Attack(2);
 	else if (data.key == GLFW_KEY_KP_4 && data.action == GLFW_RELEASE)
 		Attack(3);
-	else if (data.key == GLFW_KEY_Q && data.action == GLFW_PRESS)
-		player->context->camera->SetIsFollowingMouse(true);
-	else if (data.key == GLFW_KEY_Q && data.action == GLFW_RELEASE)
-		player->context->camera->SetIsFollowingMouse(false);
 }
 
 void Player::PokeSelectedState::MouseButtonCallback(MouseButton_Data& data) {
-	if (data.button == GLFW_MOUSE_BUTTON_LEFT && data.action == GLFW_RELEASE) {
-		glm::vec2 mousePos = player->context->win->GetMousePos();
-		int moveId = player->context->gui->GetSelectedPokemonGUI()->GetMoveClicked(mousePos);
-		if (moveId == -1)
-			return;
-		Attack(moveId);
-	}
 	if (data.button == GLFW_MOUSE_BUTTON_RIGHT && data.action == GLFW_RELEASE) {
 		Unselect();
 	}
@@ -190,7 +190,6 @@ void Player::PokeSelectedState::Unselect() {
 	}
 	player->context->gui->GetGameInfosField()->AddMessage("Unselect " + selectedPokemon->GetName());
 	player->context->gui->SetSelectedPokemon(nullptr);
-	player->context->camera->SetIsFollowingMouse(true);
 	player->SwitchState(new DefaultState(player));
 }
 
@@ -199,7 +198,6 @@ void Player::PokeSelectedState::Move() {
 		player->context->gui->GetGameInfosField()->AddMessage("No step left");
 		return;
 	}
-	player->context->camera->SetIsFollowingMouse(true);
 	player->SwitchState(new PokeMoveState(player, selectedPokemon));
 }
 
@@ -210,7 +208,6 @@ void Player::PokeSelectedState::Attack(int moveId) {
 	}
 	if (selectedPokemon->GetMove(moveId) == nullptr)
 		return;
-	player->context->camera->SetIsFollowingMouse(true);
 	player->SwitchState(new PokeAttackState(player, selectedPokemon, moveId));
 }
 
@@ -291,7 +288,8 @@ void Player::PokeMoveState::Move() {
 
 /*-----------------------------PokeAttackState-----------------------------*/
 Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon, int moveId)
-	: State(l_player), selectedPokemon(l_selectedPokemon) {
+	: State(l_player), selectedPokemon(l_selectedPokemon) 
+{
 	type = PType::PokeAttack;
 
 	Drawable::Material mat;

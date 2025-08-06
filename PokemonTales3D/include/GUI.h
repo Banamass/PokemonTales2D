@@ -10,15 +10,38 @@
 
 class Clickable {
 public:
-	Clickable() {};
+	Clickable();
 	virtual ~Clickable() {};
 
-	virtual bool IsClicked(glm::vec2 mousePos) = 0;
+	void Update(Window* win);
+
+	bool GetClick();
+	bool GetPress();
+	bool GetHover();
+
+protected:
+	virtual bool In(glm::vec2 mousePos) = 0;
+
+	virtual void Press() {}
+	virtual void Hover() {}
+	virtual void Click() {}
+
+	virtual void UnPress() {}
+	virtual void UnHover() {}
+	virtual void UnClick() {}
+
+	void SetPress(bool b);
+	void SetHover(bool b);
+	void SetClick(bool b);
+
+	bool click;
+	bool press;
+	bool hover;
 };
 
 /* Warning : memory usage of objects contained in the panel is managed by the panel
-Usage of AddObj functions : AddObj("name", new Obj(param, ...))
-Position of objects are managed by the panel*/
+Usage of AddElement function : AddElement(new DrawableStatic(param, ...), zindex)
+Offset of objects are managed by the panel*/
 class Panel : public DrawableStatic {
 public:
 	Panel(ShaderManager* l_shaderMgr);
@@ -40,7 +63,43 @@ protected:
 	ShaderManager* shaderMgr;
 
 	//Elements stored with their z index
-	std::map<int, std::vector<DrawableStatic*>> elements; 
+	std::map<int, std::vector<DrawableStatic*>> elements;
+};
+
+class Button : public Panel, public Clickable {
+public:
+	Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
+	virtual ~Button();
+
+	virtual void SetPos(glm::vec2 l_pos);
+	void SetOrigin(Location l_origin);
+	void SetSize(glm::vec2 l_size);
+	void SetCharacterSize(float l_charSize);
+	void SetText(std::string text);
+	void SetTextColor(glm::vec4 color);
+	void SetFrameColor(glm::vec4 color);
+	void SetFrameHoverColor(glm::vec4 color);
+	void SetFramePressColor(glm::vec4 color);
+
+	virtual void Hover();
+	virtual void UnHover();
+
+	virtual void Press();
+	virtual void UnPress();
+
+protected:
+	virtual bool In(glm::vec2 mousePos);
+
+	RectangleShape* frame;
+	Text* text;
+
+	float characterSize;
+	glm::vec2 size;
+	Location origin;
+
+	glm::vec4 color;
+	glm::vec4 hoverColor;
+	glm::vec4 pressColor;
 };
 
 class TextField : public Panel {
@@ -75,7 +134,7 @@ public:
 
 	virtual void Draw(glm::mat4& cameraMatrix);
 
-	virtual bool IsClicked(glm::vec2 mousePos);
+	virtual bool In(glm::vec2 mousePos);
 
 	void SetPokemonMove(PokemonMove* l_move);
 	glm::vec2 GetSize();
@@ -129,67 +188,4 @@ protected:
 	RectangleShape* healthBarBack;
 	RectangleShape* healthBarBackground;
 	float simulatedDamages;
-};
-
-class PokemonGUI : public Panel {
-public:
-	PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context);
-	virtual ~PokemonGUI();
-
-	void Update(double dt);
-	virtual void Draw(glm::mat4& cameraMatrix);
-
-	void SetPokemon(Pokemon* poke);
-	Pokemon* GetPokemon();
-	//With i outside [0,3], unselect all move
-	void SetSelectedMove(int i);
-	void SetAimedPoke(std::vector<Pokemon*>& aimedPoke, PokemonMove* move);
-	void SetNbStepsLeft(int l_nbStep);
-	//Return the id of the clicked move, -1 if no move is clicked
-	int GetMoveClicked(glm::vec2 mousePos);
-
-private:
-	void Reset();
-
-	Pokemon* poke;
-	SharedContext* context;
-
-	PokemonStatsBar* statsBar;
-	Panel* movesBar;
-	PokemonMoveBar* moveBars[4];
-	static const int MAX_AIMED_POKE = 10;
-	PokemonStatsBar* aimedPokeStatsBar[MAX_AIMED_POKE];
-	Panel* nbStepBar;
-	Text* nbStepText;
-	int nbStepLeft;
-};
-
-class GUI {
-public:
-	GUI(SharedContext* l_context);
-	virtual ~GUI();
-
-	void Update(double dt);
-	void Render();
-
-	TextField* GetGameInfosField();
-	PokemonGUI* GetSelectedPokemonGUI();
-
-	void SetHoverPokemon(Pokemon* poke);
-	void UnsetHoverPokemon();
-	void SetSelectedPokemon(Pokemon* poke);
-	void UnsetSelectedPokemon();
-
-private:
-	SharedContext* context;
-	Font* font;
-
-	Panel gameName;
-
-	PokemonStatsBar hoverPokeBar;
-
-	PokemonGUI selectedPokeGUI;
-
-	RectangleShape cursor;
-	TextField gameInfos;
 };

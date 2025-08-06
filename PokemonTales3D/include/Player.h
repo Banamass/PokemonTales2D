@@ -73,6 +73,8 @@ private:
 	public:
 		PokeSelectedState(Player* l_player, Pokemon* l_selectedPokemon);
 
+		virtual void Update(double dt);
+
 		virtual void KeyCallback(Key_Data& data);
 		virtual void MouseButtonCallback(MouseButton_Data& data);
 

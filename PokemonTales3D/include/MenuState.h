@@ -2,6 +2,7 @@
 
 #include "StateManager.h"
 #include "EventManager.h"
+#include "GUI.h"
 
 class MenuState : public State {
 public:
@@ -12,6 +13,12 @@ public:
 	virtual void Render();
 
 	void KeyCallback(CallbackData data);
+	void MouseButtonCallback(CallbackData data);
 
 private:
+	Panel panel;
+
+	Button* playButton;
+	Button* optionsButton;
+	Button* quitButton;
 };
