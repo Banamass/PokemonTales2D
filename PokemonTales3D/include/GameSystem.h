@@ -26,8 +26,6 @@ private:
 
 	SharedContext* context;
 
-	DataManager dataManager;
-
 	std::vector<Pokemon*> playingPokemons;
 	Pokemon* hoverPoke;
 

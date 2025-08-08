@@ -172,3 +172,7 @@ const PokemonData* DataManager::GetPokemonData(int id) {
 	}
 	return &pokemonsData[id - 1];
 }
+
+const std::vector<PokemonData>& DataManager::GetAllPokemonData() {
+	return pokemonsData;
+}

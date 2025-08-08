@@ -34,6 +34,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuState.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\OptionsState.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -48,8 +49,10 @@
     <None Include="Resources\GameData\Moves\Bubble.json" />
     <None Include="Resources\GameData\Moves\Ember.json" />
     <None Include="Resources\GameData\Moves\Moves.json" />
+    <None Include="Resources\GameData\Pokemons\Bulbasaur.json" />
     <None Include="Resources\GameData\Pokemons\Charmander.json" />
     <None Include="Resources\GameData\Pokemons\Pokemons.json" />
+    <None Include="Resources\GameData\Pokemons\Squirtle.json" />
     <None Include="Resources\Models\models.cfg" />
     <None Include="shaders\CubemapFragmentShader.glsl" />
     <None Include="shaders\CubemapVertexShader.glsl" />
@@ -78,6 +81,7 @@
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\MenuState.h" />
     <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\OptionsState.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Pokemon.h" />
     <ClInclude Include="include\ResourceManager.h" />

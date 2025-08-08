@@ -6,16 +6,16 @@ GameSystem::GameSystem(SharedContext* l_context)
 	: context(l_context), board(glm::vec2(20, 20), l_context),
 	player(context), opponent(context), hoverPoke(nullptr){
 	l_context->gameSystem = this;
-	l_context->gameData = &dataManager;
+	DataManager* dataManager = context->gameData;
 
-	playingPokemons.push_back(new Pokemon(dataManager.GetPokemonData(1)
+	playingPokemons.push_back(new Pokemon(dataManager->GetPokemonData(1)
 		, &player, context->modelManager, context->shaderManager, glm::vec3(0.0f, 0.0f, 1.0f)));
-	playingPokemons.push_back(new Pokemon(dataManager.GetPokemonData(1)
+	playingPokemons.push_back(new Pokemon(dataManager->GetPokemonData(1)
 		, &player, context->modelManager, context->shaderManager, glm::vec3(1.0f, 0.0f, 0.0f)));
 	player.AddPokemon(playingPokemons[0], { 0,0 });
 	player.AddPokemon(playingPokemons[1], { 2,2 });
 
-	playingPokemons.push_back(new Pokemon(dataManager.GetPokemonData(1)
+	playingPokemons.push_back(new Pokemon(dataManager->GetPokemonData(1)
 		, &opponent, context->modelManager, context->shaderManager, glm::vec3(0.0f, 1.0f, 0.0f)));
 	opponent.AddPokemon(playingPokemons[2], { 5,3 });
 

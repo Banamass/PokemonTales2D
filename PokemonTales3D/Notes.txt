@@ -6,3 +6,4 @@ A faire:
 - Renommer les states du game et les states des players
 - Implementer transparence et trascendence
 - Enable depth test, trouver une couche où l'enlever pour le gui
+- Rajouter une origine pour tous les drawables statics

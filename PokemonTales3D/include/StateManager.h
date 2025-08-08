@@ -3,7 +3,7 @@
 #include "SharedTypes.h"
 #include <vector>
 
-enum StateType { Menu, Battle, Pause, NoneState };
+enum StateType { Menu, Battle, Options, NoneState };
 
 class State {
 public:

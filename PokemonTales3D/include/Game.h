@@ -9,6 +9,7 @@
 #include "ResourceManager.h"
 #include "BattleState.h"
 #include "MenuState.h"
+#include "OptionsState.h"
 
 class Game {
 public:
@@ -30,4 +31,5 @@ private:
 	FontManager fontManager;
 	EventManager eventManager;
 	StateManager stateManager;
+	DataManager dataManager;
 };

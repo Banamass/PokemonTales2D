@@ -13,14 +13,15 @@ public:
 	Clickable();
 	virtual ~Clickable() {};
 
-	void Update(Window* win);
+	virtual void Update(Window* win);
 
 	bool GetClick();
 	bool GetPress();
 	bool GetHover();
 
-protected:
 	virtual bool In(glm::vec2 mousePos) = 0;
+
+protected:
 
 	virtual void Press() {}
 	virtual void Hover() {}
@@ -81,15 +82,17 @@ public:
 	void SetFrameHoverColor(glm::vec4 color);
 	void SetFramePressColor(glm::vec4 color);
 
+	std::string GetText();
+
 	virtual void Hover();
 	virtual void UnHover();
 
 	virtual void Press();
 	virtual void UnPress();
 
-protected:
 	virtual bool In(glm::vec2 mousePos);
 
+protected:
 	RectangleShape* frame;
 	Text* text;
 
@@ -125,6 +128,42 @@ protected:
 
 	RectangleShape* textBox;
 	std::vector<Text*> lines;
+};
+
+class SelectBox : public Panel, public Clickable{
+public:
+	SelectBox(Font* l_font, ShaderManager* l_shaderMgr, glm::vec2 size);
+	SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields, glm::vec2 size);
+	virtual ~SelectBox();
+
+	virtual void Update(Window* win);
+	virtual void Draw(glm::mat4& cameraMatrix);
+
+	virtual void AddField(const std::string& field);
+
+	virtual bool In(glm::vec2 mousePos);
+
+protected:
+	void Setup(const std::vector<std::string>& fields);
+
+	void SetSelectedBox(Button* box);
+
+	Font* font;
+	ShaderManager* shaderMgr;
+
+	glm::vec4 textColor;
+	glm::vec4 frameColor;
+	glm::vec2 bSize;
+	float charSize;
+
+	float reduc;
+	glm::vec2 panelPadding;
+	Button* mainBox;
+	Button* selectedBox;
+	bool isInSelection;
+	Panel* boxesPanel;
+	std::vector<Button*> boxes;
+	RectangleShape* panelFrame;
 };
 
 class PokemonMoveBar : public Panel, public Clickable {

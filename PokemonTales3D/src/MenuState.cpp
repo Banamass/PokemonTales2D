@@ -84,9 +84,9 @@ void MenuState::Update(double dt) {
 
 	if (playButton->GetClick())
 		context->game->SwitchState(StateType::Battle);
-	if (optionsButton->GetClick())
-		std::cout << "Options " << std::endl;
-	if (quitButton->GetClick())
+	else if (optionsButton->GetClick())
+		context->game->SwitchState(StateType::Options);
+	else if (quitButton->GetClick())
 		context->win->Close();
 }
 void MenuState::Render() {

@@ -62,6 +62,7 @@ public:
 
 	const MoveData* GetMoveData(int id);
 	const PokemonData* GetPokemonData(int id);
+	const std::vector<PokemonData>& GetAllPokemonData();
 
 private:
 	void LoadData();

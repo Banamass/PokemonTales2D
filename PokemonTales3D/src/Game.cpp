@@ -9,11 +9,13 @@ Game::Game()
 	stateManager(&context)
 {
 	context.game = this;
+	context.gameData = &dataManager;
 
 	window.SetCursorCapture(true);
 
 	stateManager.AddState(StateType::Battle, new BattleState(&context));
 	stateManager.AddState(StateType::Menu, new MenuState(&context));
+	stateManager.AddState(StateType::Options, new OptionsState(&context));
 
 	SwitchState(StateType::Menu);
 }

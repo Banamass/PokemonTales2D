@@ -37,6 +37,12 @@
     <Filter Include="Resources\Moves">
       <UniqueIdentifier>{6feca21c-5ad2-4af8-bd6f-a5df4809a088}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Game\Battle">
+      <UniqueIdentifier>{ee99829c-703a-42fc-a758-6ccffd725ac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Game\Battle">
+      <UniqueIdentifier>{ceef452e-6861-4112-a478-562f12fe3b6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -69,16 +75,7 @@
     <ClCompile Include="src\Drawable.cpp">
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\APlayer.cpp">
-      <Filter>Fichiers sources\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Board.cpp">
-      <Filter>Fichiers sources\Game</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game.cpp">
-      <Filter>Fichiers sources\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameSystem.cpp">
       <Filter>Fichiers sources\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Font.cpp">
@@ -90,22 +87,34 @@
     <ClCompile Include="src\Shape.cpp">
       <Filter>Fichiers sources\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Pokemon.cpp">
-      <Filter>Fichiers sources\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Player.cpp">
-      <Filter>Fichiers sources\Game</Filter>
-    </ClCompile>
     <ClCompile Include="include\GameData.cpp">
       <Filter>Fichiers sources\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\StateManager.cpp">
       <Filter>Fichiers sources\Game</Filter>
     </ClCompile>
-    <ClCompile Include="src\BattleState.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\MenuState.cpp">
+      <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\APlayer.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Board.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameSystem.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pokemon.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BattleState.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionsState.cpp">
       <Filter>Fichiers sources\Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,6 +170,12 @@
     <None Include="Resources\fonts\fonts.cfg">
       <Filter>Resources</Filter>
     </None>
+    <None Include="Resources\GameData\Pokemons\Bulbasaur.json">
+      <Filter>Resources\Pokemons</Filter>
+    </None>
+    <None Include="Resources\GameData\Pokemons\Squirtle.json">
+      <Filter>Resources\Pokemons</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EventManager.h">
@@ -193,26 +208,11 @@
     <ClInclude Include="include\Game.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
-    <ClInclude Include="include\APlayer.h">
-      <Filter>Fichiers d%27en-tête\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Board.h">
-      <Filter>Fichiers d%27en-tête\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameSystem.h">
-      <Filter>Fichiers d%27en-tête\Game</Filter>
-    </ClInclude>
     <ClInclude Include="include\Font.h">
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\Shape.h">
       <Filter>Fichiers d%27en-tête\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Pokemon.h">
-      <Filter>Fichiers d%27en-tête\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Player.h">
-      <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
     <ClInclude Include="include\json.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
@@ -226,10 +226,28 @@
     <ClInclude Include="include\StateManager.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
-    <ClInclude Include="include\BattleState.h">
+    <ClInclude Include="include\MenuState.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
-    <ClInclude Include="include\MenuState.h">
+    <ClInclude Include="include\APlayer.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BattleState.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Board.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameSystem.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Player.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Pokemon.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OptionsState.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
   </ItemGroup>

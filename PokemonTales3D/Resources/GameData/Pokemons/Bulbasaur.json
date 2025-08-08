@@ -1,0 +1,17 @@
+{
+  "ID": 1,
+  "Name": "Bulbasaur",
+  "Type": [ "Fire" ],
+  "Stats": {
+    "HP": 39,
+    "Attack": 52,
+    "Defense": 43,
+    "Sp.Atk": 60,
+    "Sp.Def": 50,
+    "Speed": 65,
+    "Move": 5
+  },
+  "Sprite": "Salameche.obj",
+  "Size": [1, 1],
+  "AttackPool": [ 1 ]
+}
