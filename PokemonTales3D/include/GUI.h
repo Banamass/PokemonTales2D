@@ -118,6 +118,8 @@ public:
 
 	void SetPadding(glm::vec2 l_padding);
 
+	void Reset();
+
 	void AddMessage(const std::string& mess);
 
 protected:

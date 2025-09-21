@@ -38,16 +38,18 @@ private:
 	int nbStepLeft;
 };
 
-class GUI {
+class BattleGUI {
 public:
-	GUI(SharedContext* l_context);
-	virtual ~GUI();
+	BattleGUI(SharedContext* l_context);
+	virtual ~BattleGUI();
 
 	void Update(double dt);
 	void Render();
 
 	TextField* GetGameInfosField();
 	PokemonGUI* GetSelectedPokemonGUI();
+
+	void Reset();
 
 	void SetHoverPokemon(Pokemon* poke);
 	void UnsetHoverPokemon();
@@ -96,7 +98,7 @@ private:
 	Cubemap* skybox;
 
 	GameSystem* gameSystem;
-	GUI gui;
+	BattleGUI gui;
 
 	bool inProgress;
 };

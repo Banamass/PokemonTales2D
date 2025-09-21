@@ -135,7 +135,7 @@ int PokemonGUI::GetMoveClicked() {
 
 /*---------------GUI---------------*/
 
-GUI::GUI(SharedContext* l_context)
+BattleGUI::BattleGUI(SharedContext* l_context)
 	: context(l_context),
 	font(context->fontManager->RequireGetResource("Arial")),
 	gameInfos(glm::vec2(175, 200), 14, glm::vec2(10, 350), l_context->shaderManager),
@@ -175,16 +175,16 @@ GUI::GUI(SharedContext* l_context)
 	selectedPokeGUI.SetPos(glm::vec2(225.0f, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
 }
 
-GUI::~GUI() {
+BattleGUI::~BattleGUI() {
 	context->fontManager->ReleaseResource("Arial");
 }
 
-void GUI::Update(double dt) {
+void BattleGUI::Update(double dt) {
 	selectedPokeGUI.Update(dt);
 	hoverPokeBar.Update(dt);
 }
 
-void GUI::Render() {
+void BattleGUI::Render() {
 	glDisable(GL_DEPTH_TEST);
 
 	context->win->DrawStatic(&cursor);
@@ -197,22 +197,28 @@ void GUI::Render() {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void GUI::SetHoverPokemon(Pokemon* poke) {
+void BattleGUI::Reset() {
+	UnsetHoverPokemon();
+	UnsetSelectedPokemon();
+	gameInfos.Reset();
+}
+
+void BattleGUI::SetHoverPokemon(Pokemon* poke) {
 	hoverPokeBar.SetPokemon(poke);
 }
-void GUI::UnsetHoverPokemon() {
+void BattleGUI::UnsetHoverPokemon() {
 	hoverPokeBar.SetPokemon(nullptr);
 }
 
-void GUI::SetSelectedPokemon(Pokemon* poke) {
+void BattleGUI::SetSelectedPokemon(Pokemon* poke) {
 	selectedPokeGUI.SetPokemon(poke);
 }
-void GUI::UnsetSelectedPokemon() {
+void BattleGUI::UnsetSelectedPokemon() {
 	selectedPokeGUI.SetPokemon(nullptr);
 }
 
-TextField* GUI::GetGameInfosField() { return &gameInfos; }
-PokemonGUI* GUI::GetSelectedPokemonGUI() { return &selectedPokeGUI; }
+TextField* BattleGUI::GetGameInfosField() { return &gameInfos; }
+PokemonGUI* BattleGUI::GetSelectedPokemonGUI() { return &selectedPokeGUI; }
 
 /*---------------BattleState---------------*/
 
@@ -284,6 +290,7 @@ void BattleState::Restart() {
 		delete gameSystem;
 	gameSystem = new GameSystem(context);
 	inProgress = false;
+	gui.Reset();
 }
 
 void BattleState::KeyCallback(CallbackData data) {

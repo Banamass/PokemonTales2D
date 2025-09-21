@@ -17,7 +17,7 @@ class ShaderManager;
 class ModelManager;
 class FontManager;
 class GameSystem;
-class GUI;
+class BattleGUI;
 class Board;
 class DataManager;
 class StateManager;
@@ -33,7 +33,7 @@ struct SharedContext {
 	StateManager* stateManager;
 	DataManager* gameData;
 	GameSystem* gameSystem;
-	GUI* gui;
+	BattleGUI* gui;
 	Board* board;
 };
 

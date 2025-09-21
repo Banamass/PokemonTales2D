@@ -232,6 +232,13 @@ TextField::~TextField() {
 	delete font;
 }
 
+void TextField::Reset() {
+	for (auto itr = lines.begin(); itr != lines.end(); itr++) {
+		DeleteElement(*(itr));
+	}
+	lines.clear();
+}
+
 void TextField::AddMessage(const std::string& mess) {
 	//Text& itr = messages.emplace_back(font, mess, shaderMgr->GetShader("FontShader"));
 	

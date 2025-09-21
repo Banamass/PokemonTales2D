@@ -22,25 +22,25 @@ void GameSystem::StartBattle() {
 	for (auto& poke : optData.pokeNamePlayer1) {
 		if (!poke)
 			continue;
-		std::cout << "Name : " << poke->name << ", id : " << poke->id << std::endl;
+		std::cout << "Name : " << poke->name << ", id : " << poke->id << " for player" <<  std::endl;
 		glm::vec3 color((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
 		addPoke = new Pokemon(poke, &player, context->modelManager
 			, context->shaderManager, color);
-		glm::ivec2 pos(rand() % board.GetSize().x, rand() % board.GetSize().y);
+		glm::ivec2 pos(rand() % (board.GetSize().x / 2), rand() % (board.GetSize().y / 2));
 		while (!player.AddPokemon(addPoke, pos)) {
-			pos = glm::ivec2(rand() % board.GetSize().x, rand() % board.GetSize().y);
+			pos = glm::ivec2(rand() % (board.GetSize().x / 2), rand() % (board.GetSize().y / 2));
 		}
 	}
 	for (auto& poke : optData.pokeNamePlayer2) {
 		if (!poke)
 			continue;
-		std::cout << "Name : " << poke->name << ", id : " << poke->id << std::endl;
+		std::cout << "Name : " << poke->name << ", id : " << poke->id  << " for opponent" << std::endl;
 		glm::vec3 color((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
-		addPoke = new Pokemon(poke, &player, context->modelManager
+		addPoke = new Pokemon(poke, &opponent, context->modelManager
 			, context->shaderManager, color);
-		glm::ivec2 pos(rand() % board.GetSize().x, rand() % board.GetSize().y);
+		glm::ivec2 pos(rand() % (board.GetSize().x / 2), rand() % (board.GetSize().y / 2));
 		while (!opponent.AddPokemon(addPoke, pos)) {
-			pos = glm::ivec2(rand() % board.GetSize().x, rand() % board.GetSize().y);
+			pos = glm::ivec2(rand() % (board.GetSize().x / 2), rand() % (board.GetSize().y / 2));
 		}
 	}
 
