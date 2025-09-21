@@ -4,7 +4,7 @@
 /*------------------------Window------------------------*/
 
 Window::Window(int l_width, int l_height, const std::string& winName, SharedContext* l_context)
-	: width(l_width), height(l_height), context(l_context){
+	: width(l_width), height(l_height), context(l_context), projectionMat(1.0f){
 	glewExperimental = true;
 
 	glfwInit();

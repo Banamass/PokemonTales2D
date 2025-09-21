@@ -68,6 +68,10 @@ private:
 	TextField gameInfos;
 };
 
+struct BattleData {
+	bool battleInProgress;
+};
+
 class BattleState : public State {
 public:
 	BattleState(SharedContext* l_context);
@@ -76,15 +80,23 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 
+	virtual void Activate();
+
 	void KeyCallback(CallbackData data);
 
+	void Restart();
+	BattleData GetBattleData();
+
 private:
+
 	Camera camera;
 
 	Light light;
 
 	Cubemap* skybox;
 
-	GameSystem gameSystem;
+	GameSystem* gameSystem;
 	GUI gui;
+
+	bool inProgress;
 };

@@ -1,4 +1,5 @@
 #include "Pokemon.h"
+#include "APlayer.h"
 
 Pokemon::Pokemon(const PokemonData* l_data, APlayer* l_trainer,
 	ModelManager* l_modelMgr, ShaderManager* shaderMgr, glm::vec3 l_color)
@@ -71,4 +72,7 @@ void Pokemon::SetMovePool(int i, const MoveData* l_data) { movePool[i] = new Pok
 void Pokemon::TakeDamages(float l_damages) { 
 	health -= l_damages; 
 	health = std::max(health, 0.0f);
+	if (IsKO()) {
+		trainer->PokemonKO(this);
+	}
 }

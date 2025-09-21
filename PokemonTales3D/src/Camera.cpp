@@ -99,6 +99,7 @@ void Camera::SetIsFollowingMouse(float b) {
 void Camera::MouseMouseCallback(CallbackData data) {
 	if (!isFollowingMouse)
 		return;
+	
 	MouseMove_Data* mdata = std::get_if<MouseMove_Data>(&data.data);
 	if (mdata == nullptr)
 		return;
@@ -128,14 +129,14 @@ void Camera::MouseMouseCallback(CallbackData data) {
 }
 
 void Camera::ScrollCallback(CallbackData data) {
-	Scroll_Data* mdata = std::get_if<Scroll_Data>(&data.data);
+	/*Scroll_Data* mdata = std::get_if<Scroll_Data>(&data.data);
 	if (mdata == nullptr)
 		return;
 
 	float newFoV = FoV - zoomSensitivity * mdata->yoffset;
 	newFoV = std::max(1.0f, newFoV);
 	newFoV = std::min(170.0f, newFoV);
-	SetFoV(newFoV);
+	SetFoV(newFoV);*/
 }
 
 const glm::mat4& Camera::GetTransformMatrix(){

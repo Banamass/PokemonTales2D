@@ -39,9 +39,6 @@ void GameSystem::Update() {
 			board.RemovePokemon(poke);
 		}
 	}
-	for (Pokemon* poke : player.GetPokemons()) {
-
-	}
 	board.Update();
 }
 void GameSystem::Render() {

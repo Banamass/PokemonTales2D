@@ -105,8 +105,8 @@ void DataManager::LoadMoveFromFile(const std::string& file){
 		return;
 	}
 
-	moveData.push_back({});
-	MoveData& d = *(moveData.end() - 1);
+	int id = j["ID"].get<int>();
+	MoveData& d = moveData.insert(std::make_pair(id, MoveData())).first->second;
 	d.id = j["ID"].get<int>();
 	d.name = j["Name"].get<std::string>();
 	d.type = GetPokeTypeFromString(j["Type"].get<std::string>());
@@ -136,8 +136,8 @@ void DataManager::LoadPokemonFromFile(const std::string& file){
 		return;
 	}
 
-	pokemonsData.push_back({});
-	PokemonData& d = *(pokemonsData.end() - 1);
+	int id = j["ID"].get<int>();
+	PokemonData& d = pokemonsData.insert(std::make_pair(id, PokemonData())).first->second;
 	d.id = j["ID"].get<int>();
 	d.name = j["Name"].get<std::string>();
 	d.types.first = GetPokeTypeFromString(j["Type"][0]);
@@ -159,20 +159,31 @@ void DataManager::LoadPokemonFromFile(const std::string& file){
 }
 
 const MoveData* DataManager::GetMoveData(int id) { 
-	if (id > moveData.size() || id <= 0) {
+	auto itr = moveData.find(id);
+	if (itr == moveData.end()) {
 		std::cout << "Move with id " << id << " doesn't exist" << std::endl;
 		return nullptr;
 	}
-	return &moveData[id-1]; 
+	return &itr->second; 
 }
 const PokemonData* DataManager::GetPokemonData(int id) {
-	if (id > pokemonsData.size() || id <= 0) {
+	auto itr = pokemonsData.find(id);
+	if (itr == pokemonsData.end()) {
 		std::cout << "Pokemon with id " << id << " doesn't exist" << std::endl;
 		return nullptr;
 	}
-	return &pokemonsData[id - 1];
+	return &itr->second;
 }
 
-const std::vector<PokemonData>& DataManager::GetAllPokemonData() {
+const PokemonData* DataManager::GetPokemonData(const std::string& name) {
+	for (auto& data : pokemonsData) {
+		if (data.second.name == name) {
+			return &data.second;
+		}
+	}
+	return nullptr;
+}
+
+const std::map<int, PokemonData>& DataManager::GetAllPokemonData() {
 	return pokemonsData;
 }

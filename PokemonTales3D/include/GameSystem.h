@@ -5,6 +5,10 @@
 #include "GUI.h"
 #include "Player.h"
 #include "GameData.h"
+#include "OptionsState.h"
+
+#include <cstdlib>
+#include "time.h"
 
 class GameSystem {
 public:
@@ -17,6 +21,8 @@ public:
 	void Attack(Pokemon* attacker, Pokemon* attacked, PokemonMove* move);
 	float ComputeDamages(Pokemon* attacker, Pokemon* attacked, PokemonMove* move);
 
+	void StartBattle();
+
 private:
 	void UpdatePlayingPlayer();
 	void UpdateHoverPokemon();
@@ -26,9 +32,9 @@ private:
 
 	SharedContext* context;
 
-	std::vector<Pokemon*> playingPokemons;
 	Pokemon* hoverPoke;
 
+	glm::ivec2 boardSize;
 	Board board;
 	Player player;
 	Player opponent;

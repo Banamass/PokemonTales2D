@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 #include <fstream>
+#include <map>
 
 #include "glm/glm.hpp"
 #include "json.hpp"
@@ -62,7 +63,8 @@ public:
 
 	const MoveData* GetMoveData(int id);
 	const PokemonData* GetPokemonData(int id);
-	const std::vector<PokemonData>& GetAllPokemonData();
+	const PokemonData* GetPokemonData(const std::string& name);
+	const std::map<int, PokemonData>& GetAllPokemonData();
 
 private:
 	void LoadData();
@@ -73,8 +75,8 @@ private:
 	void LoadMoveFromFile(const std::string& file);
 	void LoadPokemonFromFile(const std::string& file);
 
-	std::vector<MoveData> moveData;
-	std::vector<PokemonData> pokemonsData;
+	std::map<int, MoveData> moveData;
+	std::map<int, PokemonData> pokemonsData;
 
 	std::string movesDir;
 	std::string pokemonsDir;

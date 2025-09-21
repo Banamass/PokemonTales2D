@@ -9,7 +9,7 @@ public:
 	Player(SharedContext* l_context);
 	virtual ~Player();
 
-	void Setup();
+	virtual void Setup();
 	virtual void Render();
 	virtual void Update(double dt);
 

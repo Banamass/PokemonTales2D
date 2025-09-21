@@ -173,7 +173,6 @@ GUI::GUI(SharedContext* l_context)
 
 	//Selected pokemon GUI
 	selectedPokeGUI.SetPos(glm::vec2(225.0f, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
-
 }
 
 GUI::~GUI() {
@@ -220,10 +219,12 @@ PokemonGUI* GUI::GetSelectedPokemonGUI() { return &selectedPokeGUI; }
 BattleState::BattleState(SharedContext* l_context)
 	: State(l_context),
 	camera(context),
-	gameSystem(context),
 	light(glm::vec3(-70.0f, 50.0f, 10.0f), context),
-	gui(context)
+	gui(context),
+	inProgress(false)
 {
+	gameSystem = new GameSystem(context);
+
 	type = StateType::Battle;
 
 	camera.SetPosition(glm::vec3(-3.0f, 5.0f, -3.0f));
@@ -246,23 +247,53 @@ BattleState::BattleState(SharedContext* l_context)
 BattleState:: ~BattleState(){
 	context->eventManager->RemoveCallbacks("Battle");
 	delete skybox;
+	if (gameSystem)
+		delete gameSystem;
 }
 
 void BattleState::Update(double dt){
 	camera.Update(dt);
 	gui.Update(dt);
-	gameSystem.Update(dt);
+	gameSystem->Update(dt);
 }
 void BattleState::Render(){
 	context->win->Draw(skybox);
 
-	gameSystem.Render();
+	gameSystem->Render();
 	gui.Render();
 	light.Draw(context->win);
+}
+
+void BattleState::Activate() {
+	State::Activate();
+	if (!inProgress) {
+		std::cout << "Start a new game !" << std::endl;
+		gameSystem->StartBattle();
+		inProgress = true;
+	}
+}
+
+void BattleState::Restart() {
+	if (isActivated) {
+		std::cout << "Warning : cannot restart a battle while it's running" << std::endl;
+		return;
+	}
+	if (!inProgress)
+		return;
+	if (gameSystem)
+		delete gameSystem;
+	gameSystem = new GameSystem(context);
+	inProgress = false;
 }
 
 void BattleState::KeyCallback(CallbackData data) {
 	Key_Data kdata = std::get<Key_Data>(data.data);
 	if (kdata.key == GLFW_KEY_ESCAPE && kdata.action == GLFW_RELEASE)
 		context->game->SwitchState(StateType::Menu);
+}
+
+BattleData BattleState::GetBattleData() {
+	BattleData data;
+	data.battleInProgress = inProgress;
+	return data;
 }

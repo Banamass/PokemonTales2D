@@ -1,71 +1,206 @@
 #include "OptionsState.h"
 #include "Game.h"
 
+/*--------------PlayerOptionsGUI--------------*/
+
+PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context)
+	: Panel(shaderMgr), activated(true)
+{
+	defaultSelection = "Select a Pokemon";
+	noneField = "No Pokemon";
+
+	glm::vec2 selectSize(200.0f, 50.0f);
+	float space = 40.0f;
+
+	std::vector<std::string> selectionFields;
+	const std::map<int, PokemonData>& data = l_context->gameData->GetAllPokemonData();
+	for (auto& d : data) {
+		selectionFields.push_back(d.second.name);
+	}
+	selectionFields.push_back(noneField);
+
+	for (int i = 0; i < Constants::NB_POKEMON_BY_PLAYER; i++) {
+		pokeSelection.push_back((SelectBox*)AddElement(new SelectBox(
+			l_context->fontManager->GetResource("Arial"), l_context->shaderManager,
+			selectionFields, selectSize, defaultSelection
+		)));
+		pokeSelection[i]->SetPos(glm::vec2((selectSize.x + space) * i, 0));
+	}
+}
+PlayerOptionsGUI::~PlayerOptionsGUI() {
+
+}
+
+void PlayerOptionsGUI::Update(Window* win) {
+	if (!activated)
+		return;
+	for (auto& s : pokeSelection)
+		s->Update(win);
+}
+
+void PlayerOptionsGUI::SetActivated(bool b) {
+	activated = b;
+}
+
+void PlayerOptionsGUI::Reset() {
+	for (auto& s : pokeSelection) {
+		s->ResetSelectedField();
+	}
+}
+
+std::vector<std::string> PlayerOptionsGUI::GetSelectedPokemon() {
+	std::vector<std::string> res;
+	for (auto& s : pokeSelection) {
+		std::string select = s->GetSelectedField();
+		if (select != defaultSelection && select != noneField)
+			res.push_back(select);
+	}
+	return res;
+}
+
+/*--------------OptionsState--------------*/
+
 OptionsState::OptionsState(SharedContext* l_context)
-	: State(l_context)
+	: State(l_context), player1Options(l_context), player2Options(l_context),
+	generalButtons(l_context->shaderManager)
 {
 	type = StateType::Options;
 
 	context->eventManager->AddCallback("Options", EventType::Key, &OptionsState::KeyCallback, this, StateType::Options);
 
-	glm::vec2 selectSize(200.0f, 50.0f);
 	glm::vec2 select1Pos(10.0f, 100.0f);
-	glm::vec2 select2Pos(10.0f, 400.0f);
-	float space = 40.0f;
+	glm::vec2 select2Pos(10.0f, 450.0f);
 
-	std::vector<std::string> pokemonsName;
-	const std::vector<PokemonData>& data = context->gameData->GetAllPokemonData();
-	for (auto& d : data) {
-		pokemonsName.push_back(d.name);
-	}
+	player1Options.SetPos(select1Pos);
+	player2Options.SetPos(select2Pos);
 
-	for (int i = 0; i < Constants::NB_POKEMON_BY_PLAYER; i++) {
-		pokeSelectPlayer1.push_back(new SelectBox(
-			context->fontManager->GetResource("Arial"),
-			context->shaderManager, pokemonsName, selectSize
-		));
-		pokeSelectPlayer1[i]->SetPos(glm::vec2(
-			select1Pos.x + (selectSize.x + space) * i, select1Pos.y
-		));
+	battleState = new Text(context->fontManager->GetResource("Arial"), "No battle in progress"
+		, context->shaderManager->GetShader("FontShader"));
+	battleState->SetCharacterSize(20.0f);
+	battleState->SetColor(glm::vec4(1.0f));
+	battleState->SetPos(glm::vec2(Constants::WIN_WIDTH - 220.0f, Constants::WIN_HEIGHT - 40.0f));
 
-		pokeSelectPlayer2.push_back(new SelectBox(
-			context->fontManager->GetResource("Arial"),
-			context->shaderManager, pokemonsName, selectSize
-		));
-		pokeSelectPlayer2[i]->SetPos(glm::vec2(
-			select2Pos.x + (selectSize.x + space) * i, select2Pos.y
-		));
-	}
+	SetUpGeneralButtons();
 }
 OptionsState::~OptionsState(){
 	context->eventManager->RemoveCallbacks("Options");
 
-	for (auto& s : pokeSelectPlayer1)
-		delete s;
-	for (auto& s : pokeSelectPlayer2)
-		delete s;
+	delete battleState;
+}
+
+void OptionsState::SetUpGeneralButtons() {
+	generalButtons.SetPos(glm::ivec2(Constants::WIN_WIDTH - 125.0f, 25.0f));
+	
+	restartButton = (Button*)generalButtons.AddElement(new Button
+	(context->fontManager->GetResource("Arial"), context->shaderManager, glm::ivec2(0, 0)));
+	restartButton->SetText("Restart");
+	restartButton->SetSize(glm::ivec2(100.0f, 50.0f));
+	restartButton->SetPos(glm::ivec2(0.0f, 75.0f));
+	restartButton->SetCharacterSize(20.0f);
+	restartButton->SetTextColor(glm::vec4(glm::vec3(0.0f), 1.0f));
+
+	quitButton = (Button*)generalButtons.AddElement(new Button
+	(context->fontManager->GetResource("Arial"), context->shaderManager, glm::ivec2(0, 0)));
+	quitButton->SetText("Quit");
+	quitButton->SetSize(glm::ivec2(100.0f, 50.0f));
+	quitButton->SetPos(glm::ivec2(0.0f, 0.0f));
+	quitButton->SetCharacterSize(20.0f);
+	quitButton->SetTextColor(glm::vec4(glm::vec3(0.0f), 1.0f));
+
+	okButton = (Button*)generalButtons.AddElement(new Button
+	(context->fontManager->GetResource("Arial"), context->shaderManager, glm::ivec2(0, 0)));
+	okButton->SetText("Ok");
+	okButton->SetSize(glm::ivec2(100.0f, 50.0f));
+	okButton->SetPos(glm::ivec2(0.0f, 150.0f));
+	okButton->SetCharacterSize(20.0f);
+	okButton->SetTextColor(glm::vec4(glm::vec3(0.0f), 1.0f));
 }
 
 void OptionsState::Update(double dt){
-	for (auto& s : pokeSelectPlayer1)
-		s->Update(context->win);
-	for (auto& s : pokeSelectPlayer2)
-		s->Update(context->win);
+	player1Options.Update(context->win);
+	player2Options.Update(context->win);
+	restartButton->Update(context->win);
+	quitButton->Update(context->win);
+	okButton->Update(context->win);
+
+	if (restartButton->GetClick()) {
+		Restart();
+	}
+	if (quitButton->GetClick()) {
+		player1Options.Reset();
+		player2Options.Reset();
+		Quit();
+	}
+	if (okButton->GetClick()) {
+		Quit();
+	}
 }
 void OptionsState::Render(){
 	glDisable(GL_DEPTH_TEST);
 
-	for (auto& s : pokeSelectPlayer1)
-		context->win->DrawStatic(s);
-	for (auto& s : pokeSelectPlayer2)
-		context->win->DrawStatic(s);
+	context->win->DrawStatic(&player1Options);
+	context->win->DrawStatic(&player2Options);
+	context->win->DrawStatic(&generalButtons);
+	context->win->DrawStatic(battleState);
 
 	glEnable(GL_DEPTH_TEST);
+}
+
+void OptionsState::Activate() {
+	BattleData data = ((BattleState*)context->stateManager->GetState(StateType::Battle))->GetBattleData();
+	SetBattleState(data.battleInProgress);
+}
+
+void OptionsState::Quit() {
+	context->game->SwitchState(StateType::Menu);
+}
+
+void OptionsState::Restart() {
+	((BattleState*)context->stateManager->GetState(StateType::Battle))->Restart();
+	player1Options.Reset();
+	player2Options.Reset();
+	SetBattleState(false);
+}
+
+void OptionsState::SetBattleState(bool isInProgress) {
+	if (isInProgress) {
+		player1Options.SetActivated(false);
+		player2Options.SetActivated(false);
+		battleState->SetText("Battle In Progress");
+		battleState->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	else {
+		player1Options.SetActivated(true);
+		player2Options.SetActivated(true);
+		battleState->SetText("No Battle In Progress");
+		battleState->SetColor(glm::vec4(1.0f));
+	}
 }
 
 void OptionsState::KeyCallback(CallbackData data){
 	Key_Data kdata = std::get<Key_Data>(data.data);
 	if (kdata.key == GLFW_KEY_ESCAPE && kdata.action == GLFW_RELEASE)
-		context->game->SwitchState(StateType::Menu);
+		Quit();
 }
 void OptionsState::MouseButtonCallback(CallbackData data){}
+
+const OptionsData& OptionsState::GetOptionsData() {
+	std::vector<std::string> p1selection = player1Options.GetSelectedPokemon();
+	std::vector<std::string> p2selection = player2Options.GetSelectedPokemon();
+
+	data.pokeNamePlayer1.clear();
+	data.pokeNamePlayer2.clear();
+
+	for (auto& p : p1selection) {
+		const PokemonData* pokeData = context->gameData->GetPokemonData(p);
+		if (pokeData)
+			data.pokeNamePlayer1.push_back(pokeData);
+	}
+	for (auto& p : p2selection) {
+		const PokemonData* pokeData = context->gameData->GetPokemonData(p);
+		if (pokeData)
+			data.pokeNamePlayer2.push_back(pokeData);
+	}
+
+	return data;
+}

@@ -18,6 +18,9 @@ public:
 	bool GetClick();
 	bool GetPress();
 	bool GetHover();
+	
+	void SetActivated(bool b);
+	bool GetActivated();
 
 	virtual bool In(glm::vec2 mousePos) = 0;
 
@@ -38,6 +41,8 @@ protected:
 	bool click;
 	bool press;
 	bool hover;
+
+	bool activated;
 };
 
 /* Warning : memory usage of objects contained in the panel is managed by the panel
@@ -132,8 +137,10 @@ protected:
 
 class SelectBox : public Panel, public Clickable{
 public:
-	SelectBox(Font* l_font, ShaderManager* l_shaderMgr, glm::vec2 size);
-	SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields, glm::vec2 size);
+	SelectBox(Font* l_font, ShaderManager* l_shaderMgr
+		, glm::vec2 size, std::string defaultField = "");
+	SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields
+		, glm::vec2 size, std::string defaultField = "");
 	virtual ~SelectBox();
 
 	virtual void Update(Window* win);
@@ -143,9 +150,14 @@ public:
 
 	virtual bool In(glm::vec2 mousePos);
 
-protected:
-	void Setup(const std::vector<std::string>& fields);
+	void ResetSelectedField();
+	void SetSelectedField(const std::string& field);
+	std::string GetSelectedField();
 
+protected:
+	void Setup(const std::vector<std::string>& fields, std::string defaultField);
+
+	//Set the selected box to 'box', which can be equal to nullptr
 	void SetSelectedBox(Button* box);
 
 	Font* font;
@@ -155,11 +167,12 @@ protected:
 	glm::vec4 frameColor;
 	glm::vec2 bSize;
 	float charSize;
+	std::string defaultField;
 
 	float reduc;
 	glm::vec2 panelPadding;
-	Button* mainBox;
-	Button* selectedBox;
+	Button* mainBox; //The box representing the text of the selected box
+	Button* selectedBox; //Pointer to the selected box (part of boxes)
 	bool isInSelection;
 	Panel* boxesPanel;
 	std::vector<Button*> boxes;

@@ -1,5 +1,6 @@
 #include "APlayer.h"
 #include "Board.h"
+#include "BattleState.h"
 
 /*------------------------AbstractArea------------------------*/
 
@@ -138,15 +139,22 @@ APlayer::APlayer(SharedContext* l_context)
 
 }
 APlayer::~APlayer() {
-	
+	for (Pokemon* poke : pokemons) {
+		delete poke;
+	}
 }
 
-void APlayer::AddPokemon(Pokemon* poke, glm::ivec2 initialPos) {
+bool APlayer::AddPokemon(Pokemon* poke, glm::ivec2 initialPos) {
+	for (auto& p : pokemons)
+		if (p == poke)
+			return false;
+	if (!context->board->SetPokemonPos(poke, initialPos))
+		return false;
 	pokemons.push_back(poke);
 	pokemonState.emplace(poke, PokemonState());
 	poke->SetMovePool(0, context->gameData->GetMoveData(1));
 	poke->SetMovePool(1, context->gameData->GetMoveData(2));
-	context->board->SetPokemonPos(poke, initialPos);
+	return true;
 }
 
 void APlayer::Render() {
@@ -165,15 +173,22 @@ void APlayer::PlayTurn() {
 }
 
 void APlayer::PokemonKO(Pokemon* poke) {
+	bool b = false;
 	for (auto itr = pokemons.begin(); itr != pokemons.end(); itr++) {
 		if (*itr == poke) {
 			pokemons.erase(itr);
-			return;
+			b = true;
+			break;
 		}
 	}
 	auto itr = pokemonState.find(poke);
 	if (itr != pokemonState.end())
 		pokemonState.erase(itr);
+
+	if (b) {
+		context->gui->GetGameInfosField()->AddMessage(poke->GetName() + " is KO");
+		//context->board->RemovePokemon(poke);
+	}
 }
 
 bool APlayer::Playing() { return isPlaying; }

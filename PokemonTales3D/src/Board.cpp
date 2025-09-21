@@ -180,3 +180,7 @@ std::vector<Pokemon*> Board::GetPokemonCollision(IntRect hitbox) {
 void Board::RemovePokemon(Pokemon* poke) {
 	pokemonsPos.erase(pokemonsPos.find(poke));
 }
+
+void Board::ClearAllPokemons() {
+	pokemonsPos.clear();
+}

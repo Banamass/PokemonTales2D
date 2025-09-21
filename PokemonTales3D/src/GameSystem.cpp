@@ -1,31 +1,51 @@
 #include "GameSystem.h"
 #include "Camera.h"
 #include "BattleState.h"
+#include "OptionsState.h"
 
 GameSystem::GameSystem(SharedContext* l_context)
-	: context(l_context), board(glm::vec2(20, 20), l_context),
+	: context(l_context), boardSize(20, 20), board(boardSize, l_context),
 	player(context), opponent(context), hoverPoke(nullptr){
 	l_context->gameSystem = this;
+	playingPlayer = nullptr;
+}
+GameSystem::~GameSystem(){
+	
+}
+
+void GameSystem::StartBattle() {
 	DataManager* dataManager = context->gameData;
 
-	playingPokemons.push_back(new Pokemon(dataManager->GetPokemonData(1)
-		, &player, context->modelManager, context->shaderManager, glm::vec3(0.0f, 0.0f, 1.0f)));
-	playingPokemons.push_back(new Pokemon(dataManager->GetPokemonData(1)
-		, &player, context->modelManager, context->shaderManager, glm::vec3(1.0f, 0.0f, 0.0f)));
-	player.AddPokemon(playingPokemons[0], { 0,0 });
-	player.AddPokemon(playingPokemons[1], { 2,2 });
-
-	playingPokemons.push_back(new Pokemon(dataManager->GetPokemonData(1)
-		, &opponent, context->modelManager, context->shaderManager, glm::vec3(0.0f, 1.0f, 0.0f)));
-	opponent.AddPokemon(playingPokemons[2], { 5,3 });
+	OptionsState* optionsState = (OptionsState*)context->stateManager->GetState(StateType::Options);
+	OptionsData optData = optionsState->GetOptionsData();
+	Pokemon* addPoke = nullptr;
+	for (auto& poke : optData.pokeNamePlayer1) {
+		if (!poke)
+			continue;
+		std::cout << "Name : " << poke->name << ", id : " << poke->id << std::endl;
+		glm::vec3 color((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+		addPoke = new Pokemon(poke, &player, context->modelManager
+			, context->shaderManager, color);
+		glm::ivec2 pos(rand() % board.GetSize().x, rand() % board.GetSize().y);
+		while (!player.AddPokemon(addPoke, pos)) {
+			pos = glm::ivec2(rand() % board.GetSize().x, rand() % board.GetSize().y);
+		}
+	}
+	for (auto& poke : optData.pokeNamePlayer2) {
+		if (!poke)
+			continue;
+		std::cout << "Name : " << poke->name << ", id : " << poke->id << std::endl;
+		glm::vec3 color((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+		addPoke = new Pokemon(poke, &player, context->modelManager
+			, context->shaderManager, color);
+		glm::ivec2 pos(rand() % board.GetSize().x, rand() % board.GetSize().y);
+		while (!opponent.AddPokemon(addPoke, pos)) {
+			pos = glm::ivec2(rand() % board.GetSize().x, rand() % board.GetSize().y);
+		}
+	}
 
 	playingPlayer = &player;
 	player.PlayTurn();
-}
-GameSystem::~GameSystem(){
-	for (auto& poke : playingPokemons) {
-		delete poke;
-	}
 }
 
 void GameSystem::UpdatePlayingPlayer() {
@@ -40,20 +60,6 @@ void GameSystem::UpdatePlayingPlayer() {
 		}
 		playingPlayer->PlayTurn();
 	}
-	for (Pokemon* poke : player.GetPokemons()) {
-		if (poke->IsKO()) {
-			context->gui->GetGameInfosField()->AddMessage(poke->GetName() + " is KO");
-			player.PokemonKO(poke);
-			board.RemovePokemon(poke);
-		}
-	}
-	for (Pokemon* poke : opponent.GetPokemons()) {
-		if (poke->IsKO()) {
-			context->gui->GetGameInfosField()->AddMessage(poke->GetName() + " is KO");
-			opponent.PokemonKO(poke);
-			board.RemovePokemon(poke);
-		}
-	}
 }
 void GameSystem::UpdateHoverPokemon() {
 	glm::vec3 mouseDir = context->camera->GetMouseDirection();
@@ -61,16 +67,27 @@ void GameSystem::UpdateHoverPokemon() {
 
 	bool hover = false;
 	float d = 100000000000.0f;
-	for (auto*& poke : playingPokemons) {
+	Pokemon* p = nullptr;
+	for (auto*& poke : player.GetPokemons()) {
 		float temp = d;
-		if (poke->TestRayIntersection(camPos, mouseDir, d)) {
-			if (d < temp){
-				if (poke != hoverPoke) {
-					HoverPokemon(poke);
-				}
-				hover = true;
+		if (poke->TestRayIntersection(camPos, mouseDir, d) && d < temp) {
+			if (poke != hoverPoke) {
+				p = poke;
 			}
+			hover = true;
 		}
+	}
+	for (auto*& poke : opponent.GetPokemons()) {
+		float temp = d;
+		if (poke->TestRayIntersection(camPos, mouseDir, d) && d < temp) {
+			if (poke != hoverPoke) {
+				p = poke;
+			}
+			hover = true;
+		}
+	}
+	if (hover && p != nullptr) {
+		HoverPokemon(p);
 	}
 	if (!hover) {
 		UnHoverPokemon();

@@ -61,7 +61,9 @@ public:
 	Rq : If there two pokemons that match, then return any of them*/
 	Pokemon* GetPokemonFromPos(glm::ivec2 pos);
 
+	/*Remove pokemon from the board*/
 	void RemovePokemon(Pokemon* poke);
+	void ClearAllPokemons();
 private:
 	SharedContext* context;
 

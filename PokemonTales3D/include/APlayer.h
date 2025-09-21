@@ -87,10 +87,12 @@ public:
 	APlayer(SharedContext* l_context);
 	virtual ~APlayer();
 
-	void AddPokemon(Pokemon* poke, glm::ivec2 initialPos);
+	//Add a new pokemon and return if the adding is performed
+	bool AddPokemon(Pokemon* poke, glm::ivec2 initialPos);
 
 	virtual void Setup() = 0;
 	virtual void PlayTurn();
+	virtual void Update(double dt) {}
 
 	virtual void Render();
 
@@ -104,7 +106,6 @@ protected:
 
 	bool isPlaying;
 	std::vector<Pokemon*> pokemons;
-
 
 	struct PokemonState {
 		int nbStepLeft;

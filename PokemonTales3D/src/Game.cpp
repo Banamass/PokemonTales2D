@@ -8,6 +8,8 @@ Game::Game()
 	fontManager(&context),
 	stateManager(&context)
 {
+	srand(time(0));
+
 	context.game = this;
 	context.gameData = &dataManager;
 

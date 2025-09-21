@@ -11,6 +11,7 @@ void State::SetIsTranscendent(bool b) { isTranscendent = b; }
 
 bool State::GetIsTransparent() { return isTransparent; }
 bool State::GetIsTranscendent() { return isTranscendent; }
+bool State::GetIsActivated() { return isActivated; }
 
 StateType State::GetType() { return type; }
 
@@ -52,7 +53,10 @@ bool StateManager::ActivateState(StateType type) {
 	auto itr = GetStateItr(type);
 	if (itr == states.end())
 		return false;
+	if (!states.empty())
+		states[states.size() - 1]->Desactivate();
 	State* s = *itr;
+	s->Activate();
 	states.erase(itr);
 	states.push_back(s);
 	return true;

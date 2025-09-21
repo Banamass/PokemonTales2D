@@ -59,6 +59,7 @@ void Player::PlayTurn() {
 }
 
 void Player::Update(double dt) {
+	APlayer::Update(dt);
 	if(state != nullptr)
 		state->Update(dt);
 }
@@ -141,7 +142,7 @@ void Player::DefaultState::Render()
 
 void Player::DefaultState::Select() {
 	Pokemon* poke = player->context->board->GetPokemonFromPos(cursor.GetIntRect().pos);
-	if (poke == nullptr || poke->GetTrainer() != player)
+	if (poke == nullptr || poke->IsKO() || poke->GetTrainer() != player)
 		return;
 	player->context->gui->GetGameInfosField()->AddMessage("Select " + poke->GetName());
 	player->context->gui->SetSelectedPokemon(poke);
@@ -157,6 +158,11 @@ Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_select
 }
 
 void Player::PokeSelectedState::Update(double dt) {
+	if (selectedPokemon->IsKO()) {
+		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
+		player->EndTurn();
+		return;
+	}
 	int moveId = player->context->gui->GetSelectedPokemonGUI()->GetMoveClicked();
 	if (moveId != -1)
 		Attack(moveId);
@@ -263,6 +269,11 @@ void Player::PokeMoveState::Render() {
 	RenderCursor();
 }
 void Player::PokeMoveState::Update(double dt) {
+	if (selectedPokemon->IsKO()) {
+		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
+		player->EndTurn();
+		return;
+	}
 	UpdateCursor();
 }
 
@@ -336,6 +347,12 @@ void Player::PokeAttackState::MouseButtonCallback(MouseButton_Data& data) {
 }
 
 void Player::PokeAttackState::Update(double dt) {
+	if (selectedPokemon->IsKO()) {
+		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
+		player->EndTurn();
+		return;
+	}
+
 	SharedContext* context = player->context;
 	std::vector<Pokemon*> attackedPokemon = context->board->GetPokemonCollision(cursor.GetIntRect());
 	context->gui->GetSelectedPokemonGUI()->SetAimedPoke(attackedPokemon, move);

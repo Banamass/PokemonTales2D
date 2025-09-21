@@ -13,11 +13,15 @@ public:
 	virtual void Update(double dt) = 0;
 	virtual void Render() = 0;
 
+	virtual void Activate() { isActivated = true; }
+	virtual void Desactivate() { isActivated = false; }
+
 	void SetIsTransparent(bool b);
 	void SetIsTranscendent(bool b);
 
 	bool GetIsTransparent();
 	bool GetIsTranscendent();
+	bool GetIsActivated();
 
 	StateType GetType();
 
@@ -28,6 +32,7 @@ protected:
 
 	bool isTransparent;
 	bool isTranscendent;
+	bool isActivated;
 };
 
 class StateManager {

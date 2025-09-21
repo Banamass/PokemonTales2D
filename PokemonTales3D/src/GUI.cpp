@@ -3,11 +3,13 @@
 
 /*---------------Clickable---------------*/
 
-Clickable::Clickable() 
-	: press(false), click(false), hover(false)
+Clickable::Clickable()
+	: press(false), click(false), hover(false), activated(true)
 {}
 
 void Clickable::Update(Window* win) {
+	if (!activated)
+		return;
 	SetClick(false);
 
 	glm::vec2 mousePos = win->GetMousePos();
@@ -59,6 +61,18 @@ void Clickable::SetClick(bool b) {
 bool Clickable::GetClick() { return click; }
 bool Clickable::GetPress() { return press; }
 bool Clickable::GetHover() { return hover; }
+
+void Clickable::SetActivated(bool b) {
+	activated = b;
+	if (!b) {
+		SetHover(false);
+		SetClick(false);
+		SetPress(false);
+	}
+}
+bool Clickable::GetActivated() {
+	return activated;
+}
 
 /*---------------Panel---------------*/
 
@@ -125,7 +139,7 @@ void Panel::SetOffset(glm::vec2 l_offset) {
 	UpdateElementsOffset();
 }
 
-/*---------------Panel---------------*/
+/*---------------Button---------------*/
 
 Button::Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
 	: Panel(l_shaderMgr, l_pos), Clickable(), origin(Location::BottomLeft), size(0, 0), characterSize(10.0f)
@@ -277,7 +291,9 @@ void TextField::SetPadding(glm::vec2 l_padding) {
 
 /*---------------SelectBox---------------*/
 
-void SelectBox::Setup(const std::vector<std::string>& fields) {
+void SelectBox::Setup(const std::vector<std::string>& fields, std::string l_defaultField) {
+	defaultField = l_defaultField;
+	
 	textColor = glm::vec4(glm::vec3(0.0f), 1.0f);
 	frameColor = glm::vec4(glm::vec3(0.7f), 1.0f);
 	charSize = bSize.y * 0.3f;
@@ -286,7 +302,7 @@ void SelectBox::Setup(const std::vector<std::string>& fields) {
 	mainBox->SetSize(bSize);
 	mainBox->SetTextColor(textColor);
 	mainBox->SetCharacterSize(charSize);
-	mainBox->SetText("Select a Pokemon");
+	mainBox->SetText(defaultField);
 
 	reduc = 0.9f;
 	panelPadding = glm::vec2(5.0f, 10.0f);
@@ -304,16 +320,18 @@ void SelectBox::Setup(const std::vector<std::string>& fields) {
 	isInSelection = false;
 	selectedBox = nullptr;
 }
-SelectBox::SelectBox(Font* l_font, ShaderManager* l_shaderMgr, glm::vec2 size)
+SelectBox::SelectBox(Font* l_font, ShaderManager* l_shaderMgr
+	, glm::vec2 size, std::string l_defaultField)
 	: Panel(l_shaderMgr), Clickable(), font(l_font), shaderMgr(l_shaderMgr), bSize(size)
 {
 	std::vector<std::string> fields;
-	Setup(fields);
+	Setup(fields, l_defaultField);
 }
-SelectBox::SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields, glm::vec2 size)
+SelectBox::SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields
+	, glm::vec2 size, std::string l_defaultField)
 	: Panel(l_shaderMgr), Clickable(), font(l_font), shaderMgr(l_shaderMgr), bSize(size)
 {
-	Setup(fields);
+	Setup(fields, l_defaultField);
 }
 SelectBox::~SelectBox(){}
 
@@ -353,9 +371,17 @@ void SelectBox::SetSelectedBox(Button* box) {
 	if (selectedBox != nullptr) {
 		selectedBox->SetTextColor(textColor);
 	}
+	else {
+		mainBox->SetTextColor(textColor);
+	}
 	selectedBox = box;
-	selectedBox->SetTextColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	mainBox->SetText(box->GetText());
+	if (selectedBox != nullptr) {
+		selectedBox->SetTextColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		mainBox->SetText(selectedBox->GetText());
+	}
+	else {
+		mainBox->SetText(defaultField);
+	}
 }
 
 void SelectBox::AddField(const std::string& field) {
@@ -379,6 +405,20 @@ void SelectBox::AddField(const std::string& field) {
 bool SelectBox::In(glm::vec2 mousePos) {
 	FloatRect hitBox = FloatRect(panelFrame->GetRealPos(), panelFrame->GetSize());
 	return hitBox.Contains(mousePos) || mainBox->In(mousePos);
+}
+
+void SelectBox::ResetSelectedField() {
+	SetSelectedBox(nullptr);
+}
+void SelectBox::SetSelectedField(const std::string& field) {
+	for (auto b : boxes) {
+		if (field == b->GetText()) {
+			SetSelectedBox(b);
+		}
+	}
+}
+std::string SelectBox::GetSelectedField() {
+	return mainBox->GetText();
 }
 
 /*---------------PokemonMoveBar---------------*/

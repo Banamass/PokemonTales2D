@@ -7,3 +7,4 @@ A faire:
 - Implementer transparence et trascendence
 - Enable depth test, trouver une couche où l'enlever pour le gui
 - Rajouter une origine pour tous les drawables statics
+- Utiliser unique_ptr
