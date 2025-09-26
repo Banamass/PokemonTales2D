@@ -17,17 +17,26 @@
 
 class Window;
 
+/* This structure represent all transformations apply to an 3d object.
+It contains the translation, the scaling and the rotation.
+Useful for model matrix computation */
 struct Transform {
 public:
 	Transform();
-
+	
+	//Move the transform
 	void Move(glm::vec3 move);
+	//Scale the transform
 	void Scale(glm::vec3 scale);
+	//Rotate the transform
 	void Rotate(glm::vec3 rotation);
 
+	//Set the position of the transform
 	void SetPosition(glm::vec3 pos);
 
+	//Get the matrix associated to the transformations applied to this object
 	glm::mat4 GetTransform();
+	//Get the scaling of this object
 	glm::vec3 GetScaling();
 
 private:
@@ -42,11 +51,21 @@ private:
 	friend class Window;
 };
 
+/* Oriented bounding box, useful for ray tracing of object 
+AABBMin and AABBMax correspond to min and max coords value in the tree dimensions of the OBB */
 class OBB {
 public:
 	OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax);
 	~OBB() {}
 
+	/* Test if a ray go through the obb, transformed by the matrix ModelMatrix
+	Params:
+	- ray_origin : the origin of the considered ray
+	- ray_direction : the oriented direction of the ray
+	- ModelMatrix : the transformation apply to OBB before testing
+	- intersection_distance& : this param is used to store the value of the distance between the ray and the OBB
+	- scaling : the scaling apply to this model matrix
+	*/
 	bool TestRayOBBIntersection(
 		glm::vec3 ray_origin,
 		glm::vec3 ray_direction,
@@ -59,8 +78,10 @@ private:
 	glm::vec3 AABBMax;
 };
 
+/* Class representing a 3D objet that can be drawn on the window */
 class Drawable {
 public:
+	/* Structure storing the behavior of an 3D object in the face of light */
 	struct Material {
 		glm::vec3 ambient;
 		glm::vec3 diffuse;
@@ -73,6 +94,12 @@ public:
 	Drawable(Model* model, Shader* shader, Material l_material);
 	~Drawable();
 
+	/* Test if a ray go through the 3D object
+	Params:
+	- ray_origin : the origin of the considered ray
+	- ray_direction : the oriented direction of the ray
+	- intersection_distance& : this param is used to store the value of the distance between the ray and the object
+	*/
 	bool TestRayIntersection(
 		const glm::vec3& ray_origin,
 		const glm::vec3& ray_direction,
@@ -86,6 +113,7 @@ public:
 
 	void SetMaterial(const Material& l_material);
 
+	//Get the transform representing all the transformations applied to the original model
 	Transform* GetTransform() { return &transform; }
 
 private:
@@ -99,14 +127,20 @@ private:
 	friend class Window;
 };
 
+/* Class representing a set of 3D object with the same aspect representing with an unique Drawable.
+Each of these objects have their own Transform. Thus, the Transform of the unique Drawable isn't used */
 class DrawableInstanced {
 public:
 	DrawableInstanced(Drawable* drawable, std::vector<Transform*>& instanceMatrix);
 	virtual ~DrawableInstanced(){}
 
+	//Get the number of instance drawn
 	unsigned int GetNbInstance();
+	//Getting the VBO that stores all different model matrix
 	unsigned int GetInstanceVBO();
+	//Get if the VAO of the model as to be setup
 	bool IsVAOSetup();
+	//Indicate that the vao of the model is setup
 	void VAOSetup();
 
 private:
@@ -120,20 +154,28 @@ private:
 	friend class Window;
 };
 
+/* Class representing a 2D object, that can be drawn on the window, with screen coords */
 class DrawableStatic {
 public:
 	DrawableStatic() : pos(0.0f, 0.0f), offset(0.0f, 0.0f) {}
 	DrawableStatic(glm::vec2 l_pos) : pos(l_pos), offset(0.0f, 0.0f) {}
 	virtual ~DrawableStatic() {}
 
+	//Draw the object according with the camera matrix provided
 	virtual void Draw(glm::mat4& cameraMatrix) = 0;
 
+	//Set the position of the object
 	virtual void SetPos(glm::vec2 l_pos) { pos = l_pos; }
+	//Get the position of the object
 	virtual glm::vec2 GetPos() { return pos; }
-	virtual glm::vec2 GetRealPos() { return pos + offset; }
 
+	//Set the offset of the object, representing the origin of the pos coords
 	virtual void SetOffset(glm::vec2 l_offset) { offset = l_offset; };
-	virtual glm::vec2 SetOffset() { return offset; }
+	//Get the offset of the object, representing the origin of the pos coords
+	virtual glm::vec2 GetOffset() { return offset; }
+
+	//Get the position according to the global origin of the screen(bottom right corner)
+	virtual glm::vec2 GetRealPos() { return pos + offset; }
 
 protected:
 	glm::vec2 pos;

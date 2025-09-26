@@ -5,7 +5,7 @@
 unsigned int RectangleShape::indices[6] = { 0, 1, 3, 1, 2, 3 };
 
 RectangleShape::RectangleShape(Shader* l_shader) 
-	: DrawableStatic(), shader(l_shader) {
+	: shader(l_shader) {
 	size = glm::vec2(0, 0);
 	pos = glm::vec2(0, 0);
 	origin = glm::vec2(0, 0);

@@ -18,6 +18,7 @@
 #include "Window.h"
 #include "StateManager.h"
 
+//Struct for hashing enum object
 struct EnumHash {
 	template <typename T>
     std::size_t operator()(T t) const
@@ -26,6 +27,7 @@ struct EnumHash {
     }
 };
 
+//Enumeration listing all the supported event type
 enum class EventType {
 	Key,
 	MouseButton,
@@ -33,6 +35,7 @@ enum class EventType {
 	Scroll
 };
 
+//Structure storing Data relative to a Key event
 struct Key_Data {
 	int key;
 	int scancode;
@@ -40,22 +43,26 @@ struct Key_Data {
 	int mods;
 };
 
+//Structure storing Data relative to a MouseButton event
 struct MouseButton_Data {
 	int button;
 	int action;
 	int	mods;
 };
 
+//Structure storing Data relative to a MouseMove event
 struct MouseMove_Data {
 	double xpos;
 	double ypos;
 };
 
+//Structure storing Data relative to a Scroll event
 struct Scroll_Data {
 	double xoffset;
 	double yoffset;
 };
 
+//Structure storing Data relative to any kind of callback, associated to an event
 struct CallbackData {
 	GLFWwindow* window;
 	std::variant<
@@ -71,11 +78,20 @@ using CallbackVector = std::vector<Callback>;
 using StateCallbackContainer = std::unordered_map<EventType, CallbackVector, EnumHash>;
 using CallbackContainer = std::unordered_map<StateType, StateCallbackContainer, EnumHash>;
 
+/* Class which handle the event occuring during the game, and call callbacks when it's needed*/
 class EventManager {
 public:
 	EventManager(SharedContext* l_context);
 	~EventManager();
 
+	/*Add a callback bind to a event type, the callback is a method from an instance of T
+	Params:
+	- name : name of the callback
+	- etype : type of event bind
+	- l_fun : pointer to a method from an instance of T, which have a CallbackData argument
+	- l_instance : the instance of T on which the method will be call from
+	- stype : the state where the callback is activated, NoneState is for all state
+	*/
 	template <class T>
 	void AddCallback(std::string name, EventType etype, void(T::* l_fun)(CallbackData)
 		, T* l_instance, StateType stype = StateType::NoneState) {
@@ -91,8 +107,13 @@ public:
 		itr->second.push_back(callback);
 	}
 
-	/*Give a instance and delete all callbacks bound to this instance*/
+	/*Remove all callbacks named 'name'*/
 	void RemoveCallbacks(std::string name);
+
+	/*Set the state of the event manager*/
+	void SetState(StateType stype);
+
+	/*These methods are internal to the event manager process, and shall not be used outside*/
 
 	static void _MouseMoveCallback(GLFWwindow* l_window, double xpos, double ypos);
 	void MouseMoveCallback(double xpos, double ypos);
@@ -105,8 +126,6 @@ public:
 
 	static void _KeyCallback(GLFWwindow* l_window, int key, int scancode, int action, int mods);
 	void KeyCallback(int key, int scancode, int action, int mods);
-
-	void SetState(StateType stype);
 
 private:
 	GLFWwindow* window;

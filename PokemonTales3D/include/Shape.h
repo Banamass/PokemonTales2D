@@ -17,6 +17,7 @@ protected:
 	glm::vec2 pos;
 };
 
+//This class is a drawable static which represents a rectangle
 class RectangleShape : public DrawableStatic {
 public:
 	RectangleShape(Shader* l_shader);

@@ -166,5 +166,6 @@ glm::vec2 Window::GetMousePos() {
 	double x;
 	double y;
 	glfwGetCursorPos(window, &x, &y);
+	std::cout << x << y << std::endl;
 	return glm::vec2(x, y);
 }

@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 
+//Constants of the game
 namespace Constants{
 	constexpr float BOX_SIZE = 2.0f;
 	constexpr float WIN_WIDTH = 1200.0f;
@@ -22,6 +23,7 @@ class Board;
 class DataManager;
 class StateManager;
 
+//Structure containing all the main objects of the game, which are shared across the code
 struct SharedContext {
 	Game* game;
 	Window* win;
@@ -37,10 +39,13 @@ struct SharedContext {
 	Board* board;
 };
 
+// Enumeration of all supported location
 enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };
 
+//For an object with a size 'size', compute the coords of the point at the location loc
 glm::vec2 LocationToPosition(glm::vec2 size, Location loc);
 
+//Structure representing a rectangle with int coords
 struct IntRect {
 	IntRect() : pos(0,0), size(0,0){}
 	IntRect(glm::ivec2 l_pos, glm::ivec2 l_size)
@@ -53,6 +58,7 @@ struct IntRect {
 	glm::ivec2 size;
 };
 
+//Structure representing a rectangle with floating coords
 struct FloatRect {
 	FloatRect() : pos(0.0f, 0.0f), size(0.0f, 0.0f) {}
 	FloatRect(glm::vec2 l_pos, glm::vec2 l_size)

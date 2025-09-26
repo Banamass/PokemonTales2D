@@ -26,9 +26,7 @@ private:
 
 	class State {
 	public:
-		State(Player* l_player) : player(l_player), type(PType::None),
-			cursorDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
-			cursor(glm::ivec2(1, 1)) {}
+		State(Player* l_player);
 		virtual ~State() {};
 
 		virtual void KeyCallback(Key_Data& data) {};
@@ -42,12 +40,15 @@ private:
 	protected:
 		virtual void UpdateCursor();
 		virtual void RenderCursor();
+		// Set the selected pokemon area to poke, if poke is nullptr then remove the selected pokemon area
+		virtual void UpdateSelectedPokeArea(Pokemon* poke);
 
 		PType type;
 		Player* player;
 
 		Drawable cursorDrawable;
 		SquareArea cursor;
+		SquareArea selectedPokeArea;
 	};
 
 	void SwitchState(State* newState);

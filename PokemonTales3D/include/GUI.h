@@ -8,20 +8,28 @@
 #include "Shape.h"
 #include "Pokemon.h"
 
+//Pure virtual class representing an objet that can be clickable
 class Clickable {
 public:
 	Clickable();
 	virtual ~Clickable() {};
 
+	//Update the state of the clickable object
 	virtual void Update(Window* win);
 
+	//Get if the object is clicked
 	bool GetClick();
+	//Get if the object is pressed
 	bool GetPress();
+	//Get if the object is hovered
 	bool GetHover();
 	
+	//Set the activation of the clickable object
 	void SetActivated(bool b);
+	//Get if the clickable object is activated
 	bool GetActivated();
 
+	//Get either the mouse pos is in the clickable object
 	virtual bool In(glm::vec2 mousePos) = 0;
 
 protected:
@@ -54,13 +62,17 @@ public:
 	Panel(ShaderManager* l_shaderMgr, glm::vec2 l_pos);
 	virtual ~Panel();
 
+	//Draw the panel and its composants
 	virtual void Draw(glm::mat4& cameraMatrix);
 
 	/*Add a new element in the panel, return this element*/
 	DrawableStatic* AddElement(DrawableStatic* elem, int zindex = 0);
+	//Delete an element from the panel
 	void DeleteElement(DrawableStatic* elem);
 
+	//Set the position of the panel
 	virtual void SetPos(glm::vec2 l_pos);
+	//Set the offset of the panel
 	virtual void SetOffset(glm::vec2 l_offset);
 
 protected:
@@ -83,8 +95,11 @@ public:
 	void SetCharacterSize(float l_charSize);
 	void SetText(std::string text);
 	void SetTextColor(glm::vec4 color);
+	//Set the color of the frame by default
 	void SetFrameColor(glm::vec4 color);
+	//Set the color of the frame when it's hovered
 	void SetFrameHoverColor(glm::vec4 color);
+	//Set the color of the frame when it's pressed
 	void SetFramePressColor(glm::vec4 color);
 
 	std::string GetText();
@@ -116,10 +131,13 @@ public:
 		, glm::vec2 l_pos, ShaderManager* l_shaderMgr);
 	virtual ~TextField();
 
+	//Set the padding between the frame and the text
 	void SetPadding(glm::vec2 l_padding);
 
+	//Clear all messages
 	void Reset();
 
+	//Add a message in the text field
 	void AddMessage(const std::string& mess);
 
 protected:
@@ -145,15 +163,20 @@ public:
 		, glm::vec2 size, std::string defaultField = "");
 	virtual ~SelectBox();
 
+	//Update the state of the selectBox
 	virtual void Update(Window* win);
 	virtual void Draw(glm::mat4& cameraMatrix);
 
+	//Add a new field to the select box
 	virtual void AddField(const std::string& field);
 
 	virtual bool In(glm::vec2 mousePos);
 
+	//Reset the value of the selected field to the default field
 	void ResetSelectedField();
+	//Set the value of the selected field to a given field, do nothing if that field doesn't exists
 	void SetSelectedField(const std::string& field);
+	//Get the current selected field
 	std::string GetSelectedField();
 
 protected:
@@ -186,6 +209,7 @@ public:
 	PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
 	virtual ~PokemonMoveBar();
 
+	//Draw the move bar
 	virtual void Draw(glm::mat4& cameraMatrix);
 
 	virtual bool In(glm::vec2 mousePos);

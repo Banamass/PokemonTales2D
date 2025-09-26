@@ -21,8 +21,12 @@ public:
 	Shader(const char* vertexPath, const char* fragmentPath);
 	~Shader();
 
+	//Use this shader (Set the OpenGL context shader to that shader)
 	void use();
+	//Use this shader (Set the OpenGL context shader to no shader)
 	void unuse();
+
+	//Method for setting uniforms of the shader
 
 	void SetUniform(const std::string& name, bool value) const;
 	void SetUniform(const std::string& name, int value) const;
@@ -46,7 +50,7 @@ public:
 
 	Shader* Load(const std::vector<std::string>* l_args);
 
-	//Return false if the loading fails or the shader name already exists
+	//Return nullptr if the loading fails
 	Shader* GetShader(const std::string& shaderName);
 
 	void SetLightPos(glm::vec3 pos);

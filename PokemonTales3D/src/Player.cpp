@@ -89,6 +89,15 @@ void Player::SwitchState(State* newState) {
 
 /*-----------------------------State-----------------------------*/
 
+Player::State::State(Player* l_player) : 
+	player(l_player), type(PType::None),
+	cursorDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
+	cursor(glm::ivec2(1, 1)),
+	selectedPokeArea(glm::ivec2(0,0))
+{
+	
+}
+
 void Player::State::UpdateCursor() {
 	Board* board = player->context->board;
 	cursor.Update(board, board->GetMousePos());
@@ -104,6 +113,15 @@ void Player::State::RenderCursor() {
 		player->context->win->Draw(cursorDrawable);
 	}
 }
+void Player::State::UpdateSelectedPokeArea(Pokemon* poke) {
+	if (poke == nullptr) {
+		selectedPokeArea.SetSize(glm::ivec2(0, 0));
+		return;
+	}
+	selectedPokeArea.SetSize(poke->GetSize());
+	Board* board = player->context->board;
+	selectedPokeArea.Update(board, board->GetPokemonPosition(poke));
+}
 
 /*-----------------------------DefaultState-----------------------------*/
 
@@ -118,6 +136,8 @@ Player::DefaultState::DefaultState(Player* l_player)
 	mat.specular = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	mat.shininess = 32.0f;
 	cursorDrawable.SetMaterial(mat);
+
+	UpdateSelectedPokeArea(nullptr);
 }
 
 void Player::DefaultState::KeyCallback(Key_Data& data) {
@@ -155,6 +175,7 @@ Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_select
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
 	type = PType::PokeSelected;
 	player->context->gui->GetSelectedPokemonGUI()->SetNbStepsLeft(player->pokemonState[l_selectedPokemon].nbStepLeft);
+	UpdateSelectedPokeArea(selectedPokemon);
 }
 
 void Player::PokeSelectedState::Update(double dt) {

@@ -11,46 +11,23 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* Upper class of a resource manager. 
+This class manages the memory usage of different resources, and provides methods to manage
+these resources (load, access, require, release, etc).
+For a given class T, define a class TManager which inherits from ResourceManager<TManager, T>
+Call the ResourceManager constructor with the name of the config file.
+Redefine the Load method which construct a object from class T, with a vector of arguments, 
+readed from the config file. Each line of the config file shall correspond to one resource,
+starting with the name and then the arguments
+*/
 template<typename Derived, typename T>
 class ResourceManager {
 public:
-
 	ResourceManager(const std::string& l_argumentsFile){
 		LoadArguments(l_argumentsFile);
 	}
 	virtual ~ResourceManager() { 
 		PurgeResources(); 
-	}
-
-	/*Load arguments from a file*/
-	void LoadArguments(const std::string& l_argumentsFile) {
-		std::ifstream paths;
-		paths.open(l_argumentsFile);
-		if (paths.is_open()) {
-			std::string line;
-			while (std::getline(paths, line)) {
-				std::stringstream keystream(line);
-				std::string name;
-				std::string argument;
-				keystream >> name;
-				auto itr = m_arguments.emplace(name, std::vector<std::string>());
-				while (keystream >> argument) {
-					itr.first->second.push_back(argument);
-				}
-			}
-			paths.close();
-			return;
-		}
-		std::cout << "Failed loading the arguments file " << l_argumentsFile << std::endl;
-	}
-
-	/*Purge all the resources in the manager*/
-	void PurgeResources() {
-		while (m_resources.begin() != m_resources.end()) {
-			std::cout << "Purge : " << m_resources.begin()->first << std::endl;
-			delete m_resources.begin()->second.first;
-			m_resources.erase(m_resources.begin());
-		}
 	}
 
 	/* Get the reference of a resource */
@@ -98,7 +75,7 @@ public:
 		return true;
 	}
 
-	/* Load the data of a resource */
+	/* Load the data of a given resource */
 	T* Load(const std::vector<std::string>* l_args) {
 		return static_cast<Derived*>(this)->Load(l_args);
 	}
@@ -109,6 +86,38 @@ protected:
 		return (itr != m_resources.end()) ? &itr->second : nullptr;
 	}
 
+	/*Load arguments from a file*/
+	void LoadArguments(const std::string& l_argumentsFile) {
+		std::ifstream paths;
+		paths.open(l_argumentsFile);
+		if (paths.is_open()) {
+			std::string line;
+			while (std::getline(paths, line)) {
+				std::stringstream keystream(line);
+				std::string name;
+				std::string argument;
+				keystream >> name;
+				auto itr = m_arguments.emplace(name, std::vector<std::string>());
+				while (keystream >> argument) {
+					itr.first->second.push_back(argument);
+				}
+			}
+			paths.close();
+			return;
+		}
+		std::cout << "Failed loading the arguments file " << l_argumentsFile << std::endl;
+	}
+
+	/*Purge all the resources in the manager*/
+	void PurgeResources() {
+		while (m_resources.begin() != m_resources.end()) {
+			std::cout << "Purge : " << m_resources.begin()->first << std::endl;
+			delete m_resources.begin()->second.first;
+			m_resources.erase(m_resources.begin());
+		}
+	}
+
+	/* Unload the data of the given resource */
 	bool Unload(const std::string& l_id) {
 		auto itr = m_resources.find(l_id);
 		if (itr == m_resources.end())

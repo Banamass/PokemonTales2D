@@ -7,20 +7,29 @@ public:
 	Camera(SharedContext* l_context);
 	~Camera();
 
+	//Update the camera state
 	void Update(const double& dt);
 
+	//Get the transform matrix associated to the view and the projection for 3D world object rendering 
 	const glm::mat4& GetTransformMatrix();
+	//Get the transform matrix associated to the view and the projection for 3D world cubemap rendering 
 	glm::mat4 GetSkyboxTransformMatrix();
 
 	void MouseMouseCallback(CallbackData data);
 	void ScrollCallback(CallbackData data);
 
+	//Set the front vector of the camera
 	void SetFront(glm::vec3 newFront);
+	//Set the position of the camera
 	void SetPosition(glm::vec3 newPos);
+	//Set the field of view of the camera (in degree)
 	void SetFoV(float newFoV);
+	//Set if the camerais following the mouse pos
 	void SetIsFollowingMouse(float b);
 
+	//Getting the direction where the mouse is currently pointing to
 	glm::vec3 GetMouseDirection();
+	//Get the position of the camera
 	glm::vec3 GetPosition();
 
 private:
