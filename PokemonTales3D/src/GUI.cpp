@@ -90,6 +90,11 @@ Panel::~Panel() {
 }
 
 void Panel::Draw(glm::mat4& cameraMatrix) {
+	if (compute) {
+		UpdateElementsOffset();
+		compute = false;
+	}
+
 	for (auto& itr : elements) {
 		for (auto& elem : itr.second) {
 			elem->Draw(cameraMatrix);
@@ -104,7 +109,7 @@ DrawableStatic* Panel::AddElement(DrawableStatic* elem, int zindex) {
 	else {
 		elements[zindex].push_back(elem);
 	}
-	elem->SetOffset(pos + offset);
+	elem->SetOffset(GetRealPos());
 	return elem;
 }
 
@@ -122,21 +127,27 @@ void Panel::DeleteElement(DrawableStatic* elem) {
 void Panel::UpdateElementsOffset() {
 	for (auto& layer : elements) 
 		for(auto& elem : layer.second)
-			elem->SetOffset(pos + offset);
+			elem->SetOffset(GetRealPos());
 }
 
-void Panel::SetPos(glm::vec2 l_pos) {
-	if (pos == l_pos)
-		return;
-	pos = l_pos;
-	UpdateElementsOffset();
-}
-
-void Panel::SetOffset(glm::vec2 l_offset) {
-	if (offset == l_offset)
-		return;
-	offset = l_offset;
-	UpdateElementsOffset();
+FloatRect Panel::GetFloatRect() {
+	if (compute) {
+		UpdateElementsOffset();
+		compute = false;
+	}
+	FloatRect rect(glm::vec2(Constants::WIN_WIDTH*10, Constants::WIN_HEIGHT*10), glm::vec2(-1000,-1000));
+	for (auto& layer : elements) {
+		for (DrawableStatic* elem : layer.second) {
+			FloatRect elemRect = elem->GetFloatRect();
+			rect.pos.x = std::min(elemRect.pos.x, rect.pos.x);
+			rect.pos.y = std::min(elemRect.pos.y, rect.pos.y);
+			glm::vec2 tr = elemRect.pos + elemRect.size;
+			rect.size.x = std::max(tr.x, rect.size.x);
+			rect.size.y = std::max(tr.y, rect.size.y);
+		}
+	}
+	rect.size -= rect.pos;
+	return rect;
 }
 
 /*---------------Button---------------*/
@@ -370,6 +381,8 @@ void SelectBox::Draw(glm::mat4& cameraMatrix) {
 		Panel::Draw(cameraMatrix);
 	}
 	else {
+		if (compute)
+			UpdateElementsOffset();
 		mainBox->Draw(cameraMatrix);
 	}
 }

@@ -95,7 +95,7 @@ void Text::ComputeCharacterDatas(int l_offset) {
 	if (textData.size() == 0)
 		return;
 
-	glm::vec2 realPos = offset + pos;
+	glm::vec2 realPos = GetRealPos();
 
 	float x = realPos.x;
 	float minypos = Constants::WIN_HEIGHT * 2;
@@ -133,13 +133,17 @@ void Text::ComputeCharacterDatas(int l_offset) {
 		minypos = std::min(ypos, minypos);
 		maxh = std::max(h, maxh);
 	}
-	hitbox.size.x = x - realPos.x;
-	hitbox.size.y = std::max(maxh, hitbox.size.y);
-	hitbox.pos.x = realPos.x;
-	hitbox.pos.y = minypos;
+	floatRect.size.x = x - realPos.x;
+	floatRect.size.y = std::max(maxh, floatRect.size.y);
+	floatRect.pos.x = realPos.x;
+	floatRect.pos.y = minypos;
 }
 
 void Text::Draw(glm::mat4& cameraMatrix) {
+	if (compute) {
+		ComputeCharacterDatas(0);
+		compute = false;
+	}
 	shader->use();
 	shader->SetUniform("projection", glm::value_ptr(cameraMatrix));
 	shader->SetUniform("textColor", color);
@@ -206,25 +210,20 @@ void Text::RemoveText(unsigned int nbCh) {
 		maxh = std::max(h, maxh);
 	}
 
-	hitbox.size.x = x - pos.x;
-	hitbox.size.y = maxh;
-	hitbox.pos.y = minypos;
+	floatRect.size.x = x - pos.x;
+	floatRect.size.x = maxh;
+	floatRect.pos.y = minypos;
 }
 
-FloatRect Text::GetFloatRect() { return hitbox; }
 std::string Text::GetText() { return text; }
 
-void Text::SetPos(glm::vec2 l_pos) { 
-	if (pos == l_pos)
-		return;
-	pos = l_pos;
-	ComputeCharacterDatas(0); 
+FloatRect Text::GetFloatRect() {
+	if (compute) {
+		ComputeCharacterDatas(0);
+		compute = false;
+	}
+	return floatRect; 
 }
-void Text::SetOffset(glm::vec2 l_offset) {
-	if (offset == l_offset)
-		return;
-	offset = l_offset;
-	ComputeCharacterDatas(0);
-}
+
 void Text::SetCharacterSize(float l_size) { scale = l_size / font->GetGlyphSize(); ComputeCharacterDatas(0); }
 void Text::SetColor(glm::vec3 l_color) { color = l_color; }

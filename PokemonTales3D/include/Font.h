@@ -85,17 +85,15 @@ public:
 	//Remove nbCh from the text
 	void RemoveText(unsigned int nbCh);
 
-	virtual void SetPos(glm::vec2 l_pos);
-	virtual void SetOffset(glm::vec2 l_offset);
 	//Set the character size of the text, in pixel
 	void SetCharacterSize(float l_size);
 	//Set the color of the text
 	void SetColor(glm::vec3 l_color);
 
-	//Get the floating rectangle corresponding to the hitbox of the text
-	FloatRect GetFloatRect();
 	//Get the string represented by the text
 	std::string GetText();
+
+	virtual FloatRect GetFloatRect();
 
 private:
 	struct CharacterData {
@@ -116,7 +114,7 @@ private:
 	std::string text;
 	float scale;
 	glm::vec3 color;
-	FloatRect hitbox;
+	FloatRect floatRect;
 
 	std::vector<CharacterData> textData;
 };

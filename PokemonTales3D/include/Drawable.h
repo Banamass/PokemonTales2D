@@ -55,25 +55,24 @@ private:
 AABBMin and AABBMax correspond to min and max coords value in the tree dimensions of the OBB */
 class OBB {
 public:
-	OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax);
+	OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform);
 	~OBB() {}
 
 	/* Test if a ray go through the obb, transformed by the matrix ModelMatrix
 	Params:
 	- ray_origin : the origin of the considered ray
 	- ray_direction : the oriented direction of the ray
-	- ModelMatrix : the transformation apply to OBB before testing
 	- intersection_distance& : this param is used to store the value of the distance between the ray and the OBB
 	- scaling : the scaling apply to this model matrix
 	*/
 	bool TestRayOBBIntersection(
 		glm::vec3 ray_origin,
 		glm::vec3 ray_direction,
-		glm::mat4 ModelMatrix,
-		float& interstion_distance,
-		glm::vec3 scaling = glm::vec3(1.0f));
+		float& interstion_distance);
 
 private:
+	Transform* modelTransform;
+
 	glm::vec3 AABBMin;
 	glm::vec3 AABBMax;
 };
@@ -109,10 +108,16 @@ public:
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 
-	void SetPosition(glm::vec3 pos);
+	void SetPosition(glm::vec3 l_pos);
+	void SetOffset(glm::vec3 l_offset);
+	void SetOrigin(glm::vec3 l_origin);
 
 	void SetMaterial(const Material& l_material);
 
+	glm::vec3 GetPosition();
+	glm::vec3 GetOffset();
+	glm::vec3 GetOrigin();
+	glm::vec3 GetRealPosition();
 	//Get the transform representing all the transformations applied to the original model
 	Transform* GetTransform() { return &transform; }
 
@@ -123,6 +128,10 @@ private:
 	Shader* shader;
 	Transform transform;
 	OBB obb;
+
+	glm::vec3 pos;
+	glm::vec3 origin;
+	glm::vec3 offset;
 
 	friend class Window;
 };
@@ -157,27 +166,43 @@ private:
 /* Class representing a 2D object, that can be drawn on the window, with screen coords */
 class DrawableStatic {
 public:
-	DrawableStatic() : pos(0.0f, 0.0f), offset(0.0f, 0.0f) {}
-	DrawableStatic(glm::vec2 l_pos) : pos(l_pos), offset(0.0f, 0.0f) {}
+	DrawableStatic() 
+		: pos(0.0f), offset(0.0f), origin(0.0f), compute(true) {}
+	DrawableStatic(glm::vec2 l_pos) 
+		: pos(l_pos), offset(0.0f), origin(0.0f), compute(true) {}
 	virtual ~DrawableStatic() {}
 
 	//Draw the object according with the camera matrix provided
 	virtual void Draw(glm::mat4& cameraMatrix) = 0;
 
 	//Set the position of the object
-	virtual void SetPos(glm::vec2 l_pos) { pos = l_pos; }
+	void SetPos(glm::vec2 l_pos);
 	//Get the position of the object
-	virtual glm::vec2 GetPos() { return pos; }
+	glm::vec2 GetPos();
 
 	//Set the offset of the object, representing the origin of the pos coords
-	virtual void SetOffset(glm::vec2 l_offset) { offset = l_offset; };
+	virtual void SetOffset(glm::vec2 l_offset);
 	//Get the offset of the object, representing the origin of the pos coords
-	virtual glm::vec2 GetOffset() { return offset; }
+	virtual glm::vec2 GetOffset();
+
+	//Set the origin of the object, in its local coords
+	virtual void SetOrigin(glm::vec2 l_origin);
+	/*Set the offset of the object, with a giving location in the hitbox
+	Warning : this origin doesn't adapt if the size of the object is changed, another call to this method is needed*/
+	virtual void SetOrigin(Location location);
+	//Get the origin of the object
+	glm::vec2 GetOrigin();
 
 	//Get the position according to the global origin of the screen(bottom right corner)
-	virtual glm::vec2 GetRealPos() { return pos + offset; }
+	glm::vec2 GetRealPos();
+
+	//Get the rectangle box of the drawable static, warning : depending on the object, can have a high complexity
+	virtual FloatRect GetFloatRect() = 0;
 
 protected:
 	glm::vec2 pos;
 	glm::vec2 offset;
+	glm::vec2 origin;
+
+	bool compute; //This attribut store if the object has been modified this frame
 };

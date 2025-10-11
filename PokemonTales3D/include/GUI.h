@@ -70,10 +70,7 @@ public:
 	//Delete an element from the panel
 	void DeleteElement(DrawableStatic* elem);
 
-	//Set the position of the panel
-	virtual void SetPos(glm::vec2 l_pos);
-	//Set the offset of the panel
-	virtual void SetOffset(glm::vec2 l_offset);
+	virtual FloatRect GetFloatRect();
 
 protected:
 	void UpdateElementsOffset();

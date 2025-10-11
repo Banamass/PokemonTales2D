@@ -9,8 +9,7 @@ MenuState::MenuState(SharedContext* l_context)
 	context->eventManager->AddCallback("Menu", EventType::Key, &MenuState::KeyCallback, this, StateType::Menu);
 	context->eventManager->AddCallback("Menu", EventType::MouseButton, &MenuState::MouseButtonCallback, this, StateType::Menu);
 
-	glm::vec2 pos(Constants::WIN_WIDTH / 2.0f, Constants::WIN_HEIGHT - 100.0f);
-	panel.SetPos(glm::vec2(pos));
+	glm::vec2 pos(Constants::WIN_WIDTH / 2.0f, Constants::WIN_HEIGHT / 2.0f);
 
 	glm::vec2 tSize(400.0f, 120.0f);
 	float charSize = 70.0f;
@@ -19,7 +18,7 @@ MenuState::MenuState(SharedContext* l_context)
 		new Text(context->fontManager->GetResource("Arial"), "PokeTales", context->shaderManager->GetShader("FontShader")));
 	t->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	t->SetCharacterSize(charSize);
-	t->SetPos(-t->GetFloatRect().size / 2.0f);
+	t->SetOrigin(Location::Middle);
 
 	RectangleShape* tFrame = (RectangleShape*)panel.AddElement(
 		new RectangleShape(tSize, context->shaderManager->GetShader("SimpleShader")), -1);
@@ -72,6 +71,9 @@ MenuState::MenuState(SharedContext* l_context)
 	quitButton->SetTextColor(tbColor);
 	quitButton->SetCharacterSize(charSize);
 	quitButton->SetOrigin(Location::Middle);
+
+	panel.SetPos(glm::vec2(pos));
+	panel.SetOrigin(Location::Middle);
 }
 MenuState:: ~MenuState() {
 	context->eventManager->RemoveCallbacks("Menu");

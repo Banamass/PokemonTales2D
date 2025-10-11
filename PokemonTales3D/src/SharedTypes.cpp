@@ -13,6 +13,10 @@ glm::vec2 LocationToPosition(glm::vec2 size, Location loc) {
 		 return glm::vec2(size.x / 2, size.y / 2);
 }
 
+glm::vec2 LocationToPosition(FloatRect rect, Location loc) {
+	return rect.pos + LocationToPosition(rect.size, loc);
+}
+
 bool IntRect::Contains(glm::ivec2 v) const {
 	return (v.x >= pos.x && v.x < pos.x + size.x
 		&& v.y >= pos.y && v.y < pos.y + size.y);

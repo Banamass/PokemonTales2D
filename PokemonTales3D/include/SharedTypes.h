@@ -42,14 +42,12 @@ struct SharedContext {
 // Enumeration of all supported location
 enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };
 
-//For an object with a size 'size', compute the coords of the point at the location loc
-glm::vec2 LocationToPosition(glm::vec2 size, Location loc);
-
 //Structure representing a rectangle with int coords
 struct IntRect {
-	IntRect() : pos(0,0), size(0,0){}
+	IntRect() : pos(0, 0), size(0, 0) {}
 	IntRect(glm::ivec2 l_pos, glm::ivec2 l_size)
-		: pos(l_pos), size(l_size){}
+		: pos(l_pos), size(l_size) {
+	}
 
 	bool Contains(glm::ivec2 v) const;
 	bool Intersects(IntRect rect) const;
@@ -71,3 +69,9 @@ struct FloatRect {
 	glm::vec2 pos;
 	glm::vec2 size;
 };
+
+//For an object with a size 'size', compute the coords of the point at the location loc
+glm::vec2 LocationToPosition(glm::vec2 size, Location loc);
+
+//For an object with a float rect, compute the global coords of the point at the location loc
+glm::vec2 LocationToPosition(FloatRect rect, Location loc);

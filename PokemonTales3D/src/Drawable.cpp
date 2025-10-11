@@ -54,7 +54,8 @@ glm::vec3 Transform::GetScaling() {
 
 /*------------------------OBB------------------------*/
 
-OBB::OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax) {
+OBB::OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform) {
+	modelTransform = l_modelTransform;
 	AABBMax = l_AABBMinMax.second;
 	AABBMin = l_AABBMinMax.first;
 }
@@ -62,16 +63,15 @@ OBB::OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax) {
 bool OBB::TestRayOBBIntersection(
 	glm::vec3 ray_origin,
 	glm::vec3 ray_direction,
-	glm::mat4 ModelMatrix,
-	float& interstion_distance,
-	glm::vec3 scaling)
+	float& interstion_distance)
 {
-	
+	glm::vec3 scaling = modelTransform->GetScaling();
+
 	glm::mat3 scale = glm::mat3(glm::scale(glm::mat4(1.0f), scaling));
 	glm::vec3 aabb_min = scale * AABBMin;
 	glm::vec3 aabb_max = scale * AABBMax;
 
-	ModelMatrix = glm::scale(ModelMatrix, 1.0f/scaling);
+	glm::mat4 ModelMatrix = glm::scale(modelTransform->GetTransform(), 1.0f / scaling);
 
 	float tMin = 0.0f;
 	float tMax = 10000000.0f;
@@ -165,14 +165,17 @@ bool OBB::TestRayOBBIntersection(
 /*------------------------Drawable------------------------*/
 
 Drawable::Drawable(Model * l_model, Shader * l_shader)
-	: model(l_model), shader(l_shader), obb(model->GetAABBMinMax()) {
+	: model(l_model), shader(l_shader), obb(model->GetAABBMinMax(), &transform),
+	pos(0.0f), origin(0.0f), offset(0.0f)
+{
 	material.ambient = glm::vec3(1.0f, 1.0f, 1.0f);
 	material.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
 	material.specular = glm::vec3(0.0f, 0.0f, 0.0f);
 	material.shininess = 1.0f;
 }
 Drawable::Drawable(Model* l_model, Shader* l_shader, Material l_material)
-	: model(l_model), shader(l_shader), material(l_material), obb(model->GetAABBMinMax()){
+	: model(l_model), shader(l_shader), material(l_material), obb(model->GetAABBMinMax(), &transform),
+	pos(0.0f), origin(0.0f), offset(0.0f) {
 
 }
 Drawable::~Drawable() {}
@@ -186,28 +189,43 @@ bool Drawable::TestRayIntersection(
 	const glm::vec3& ray_direction,
 	float& interstion_distance)
 {
-	glm::vec3 scaling = transform.GetScaling();
 	return obb.TestRayOBBIntersection(ray_origin,
 		ray_direction,
-		transform.GetTransform(), 
-		interstion_distance, scaling);
+		interstion_distance);
 }
 
 void Drawable::Move(glm::vec3 move) {
+	pos += move;
 	transform.Move(move);
 }
 
 void Drawable::Scale(glm::vec3 scale) {
 	transform.Scale(scale);
+	transform.SetPosition(GetRealPosition());
 }
 
 void Drawable::Rotate(glm::vec3 l_rotation) {
 	transform.Rotate(l_rotation);
 }
 
-void Drawable::SetPosition(glm::vec3 pos) {
-	transform.SetPosition(pos);
+void Drawable::SetPosition(glm::vec3 l_pos) {
+	pos = l_pos;
+	transform.SetPosition(GetRealPosition());
 }
+
+void Drawable::SetOffset(glm::vec3 l_offset) { 
+	offset = l_offset;
+	transform.SetPosition(GetRealPosition());
+}
+void Drawable::SetOrigin(glm::vec3 l_origin) {
+	origin = l_origin;
+	transform.SetPosition(GetRealPosition());
+}
+
+glm::vec3 Drawable::GetPosition() { return pos; }
+glm::vec3 Drawable::GetOffset() { return offset; }
+glm::vec3 Drawable::GetOrigin() { return origin; }
+glm::vec3 Drawable::GetRealPosition() { return pos + offset - origin*transform.GetScaling(); }
 
 /*------------------------DrawableInstanced------------------------*/
 
@@ -242,3 +260,36 @@ bool DrawableInstanced::IsVAOSetup() {
 void DrawableInstanced::VAOSetup() {
 	isVAOSetup = true;
 }
+
+/*------------------------DrawableStatic------------------------*/
+
+void DrawableStatic::SetPos(glm::vec2 l_pos) {
+	if (pos == l_pos)
+		return;
+	pos = l_pos;
+	compute = true;
+}
+glm::vec2 DrawableStatic::GetPos() { return pos; }
+
+void DrawableStatic::SetOffset(glm::vec2 l_offset) {
+	if (offset == l_offset)
+		return;
+	offset = l_offset;
+	compute = true;
+}
+glm::vec2 DrawableStatic::GetOffset() { return offset; }
+
+void DrawableStatic::SetOrigin(glm::vec2 l_origin) {
+	if (origin == l_origin)
+		return;
+	origin = l_origin;
+	compute = true;
+}
+void DrawableStatic::SetOrigin(Location location) { 
+	FloatRect rect = GetFloatRect();
+	glm::vec2 globalOrigin = LocationToPosition(rect, location);
+	SetOrigin(globalOrigin - GetRealPos());
+};
+glm::vec2 DrawableStatic::GetOrigin() { return origin; }
+
+glm::vec2 DrawableStatic::GetRealPos() { return pos + offset - origin; }

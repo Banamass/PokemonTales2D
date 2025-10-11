@@ -102,7 +102,7 @@ void Window::DrawStatic(RectangleShape* shape) {
 	shape->Draw(projectionMat);
 }
 
-void Window:: DrawStatic(DrawableStatic* drawable) {
+void Window::DrawStatic(DrawableStatic* drawable) {
 	drawable->Draw(projectionMat);
 }
 
@@ -166,6 +166,5 @@ glm::vec2 Window::GetMousePos() {
 	double x;
 	double y;
 	glfwGetCursorPos(window, &x, &y);
-	std::cout << x << y << std::endl;
 	return glm::vec2(x, y);
 }

@@ -26,8 +26,10 @@ RectangleShape::RectangleShape(glm::vec2 l_size, Shader* l_shader)
 RectangleShape::~RectangleShape() {}
 
 void RectangleShape::Draw(glm::mat4& cameraMatrix) {
-	if (compute)
+	if (compute) {
 		ComputeVertices();
+		compute = false;
+	}
 	shader->use();
 	shader->SetUniform("color", color);
 	shader->SetUniform("transform", glm::value_ptr(cameraMatrix));
@@ -58,9 +60,8 @@ void RectangleShape::SetupGraphics() {
 	compute = true;
 }
 
-
 void RectangleShape::ComputeVertices() {
-	glm::vec2 realPos = pos - origin + offset;
+	glm::vec2 realPos = GetRealPos();
 	vertices[0] = glm::vec3(realPos.x, realPos.y, z);
 	vertices[1] = glm::vec3(realPos.x, realPos.y + size.y, z);
 	vertices[2] = glm::vec3(realPos.x + size.x, realPos.y + size.y, z);
@@ -81,29 +82,16 @@ void RectangleShape::SetZ(float l_z) {
 	z = l_z;
 	compute = true;
 }
-void RectangleShape::SetOrigin(Location location) { SetOrigin(LocationToPosition(size, location)); }
+
 void RectangleShape::SetSize(glm::vec2 l_size) { 
 	if (l_size == size)
 		return;
 	size = l_size; 
 	compute = true;
 }
-void RectangleShape::SetPos(glm::vec2 l_pos) { 
-	if (l_pos == pos)
-		return;
-	pos = l_pos;
-	compute = true;
-}
-void RectangleShape::SetOffset(glm::vec2 l_offset) {
-	if (l_offset == offset)
-		return;
-	offset = l_offset;
-	compute = true;
-}
-void RectangleShape::SetOrigin(glm::vec2 l_origin) {
-	if (l_origin == origin)
-		return;
-	origin = l_origin;
-	compute = true;
-}
+
+glm::vec2 RectangleShape::GetSize() { return size; }
+
+FloatRect RectangleShape::GetFloatRect() { return FloatRect(GetRealPos(), size); }
+
 void RectangleShape::SetColor(glm::vec4 l_color) { color = l_color; }
