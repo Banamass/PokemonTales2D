@@ -153,7 +153,6 @@ glm::vec3 Camera::GetMouseDirection() {
 		return mouseDir;	
 	}
 	glm::vec2 mousePos = window->GetMousePos();
-	mousePos.y = Constants::WIN_HEIGHT - mousePos.y;
 
 	glm::vec2 screenMiddle(Constants::WIN_WIDTH / 2.0f, Constants::WIN_HEIGHT / 2.0f);
 	glm::vec2 delta = mousePos - screenMiddle;	

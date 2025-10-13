@@ -22,7 +22,7 @@ PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context)
 	for (int i = 0; i < Constants::NB_POKEMON_BY_PLAYER; i++) {
 		pokeSelection.push_back((SelectBox*)AddElement(new SelectBox(
 			l_context->fontManager->GetResource("Arial"), l_context->shaderManager,
-			selectionFields, selectSize, defaultSelection
+			selectionFields, selectSize, 3, defaultSelection
 		)));
 		pokeSelection[i]->SetPos(glm::vec2((selectSize.x + space) * i, 0));
 	}
@@ -36,6 +36,13 @@ void PlayerOptionsGUI::Update(Window* win) {
 		return;
 	for (auto& s : pokeSelection)
 		s->Update(win);
+}
+
+void PlayerOptionsGUI::Scroll(int xoffset, int yoffset) {
+	for (auto& box : pokeSelection) {
+		if(box->GetIsInSelection())
+			box->Scroll(xoffset, yoffset);
+	}
 }
 
 void PlayerOptionsGUI::SetActivated(bool b) {
@@ -66,7 +73,8 @@ OptionsState::OptionsState(SharedContext* l_context)
 {
 	type = StateType::Options;
 
-	context->eventManager->AddCallback("Options", EventType::Key, &OptionsState::KeyCallback, this, StateType::Options);
+	context->eventManager->AddCallback("OptionsKey", EventType::Key, &OptionsState::KeyCallback, this, StateType::Options);
+	context->eventManager->AddCallback("OptionsScroll", EventType::Scroll, &OptionsState::ScrollCallback, this, StateType::Options);
 
 	glm::vec2 select1Pos(10.0f, 100.0f);
 	glm::vec2 select2Pos(10.0f, 450.0f);
@@ -83,7 +91,8 @@ OptionsState::OptionsState(SharedContext* l_context)
 	SetUpGeneralButtons();
 }
 OptionsState::~OptionsState(){
-	context->eventManager->RemoveCallbacks("Options");
+	context->eventManager->RemoveCallbacks("OptionsKey");
+	context->eventManager->RemoveCallbacks("OptionsScroll");
 
 	delete battleState;
 }
@@ -183,6 +192,11 @@ void OptionsState::KeyCallback(CallbackData data){
 		Quit();
 }
 void OptionsState::MouseButtonCallback(CallbackData data){}
+void OptionsState::ScrollCallback(CallbackData data) {
+	Scroll_Data sdata = std::get<Scroll_Data>(data.data);
+	player1Options.Scroll(sdata.xoffset, sdata.yoffset);
+	player2Options.Scroll(sdata.xoffset, sdata.yoffset);
+}
 
 const OptionsData& OptionsState::GetOptionsData() {
 	std::vector<std::string> p1selection = player1Options.GetSelectedPokemon();

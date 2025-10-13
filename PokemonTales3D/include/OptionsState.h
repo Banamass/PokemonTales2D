@@ -16,6 +16,7 @@ public:
 	virtual ~PlayerOptionsGUI();
 
 	void Update(Window* win);
+	void Scroll(int xoffset, int yoffset);
 
 	void SetActivated(bool b);
 
@@ -44,6 +45,7 @@ public:
 
 	void KeyCallback(CallbackData data);
 	void MouseButtonCallback(CallbackData data);
+	void ScrollCallback(CallbackData data);
 
 	const OptionsData& GetOptionsData();
 

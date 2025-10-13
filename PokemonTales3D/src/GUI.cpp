@@ -13,7 +13,6 @@ void Clickable::Update(Window* win) {
 	SetClick(false);
 
 	glm::vec2 mousePos = win->GetMousePos();
-	mousePos = glm::vec2(mousePos.x, Constants::WIN_HEIGHT - mousePos.y);
 
 	bool in = In(mousePos);
 	
@@ -74,6 +73,20 @@ bool Clickable::GetActivated() {
 	return activated;
 }
 
+/*---------------Scrollable---------------*/
+
+Scrollable::Scrollable() 
+	: scrollXPos(0), scrollYPos(0), prevScrollXPos(0), prevScrollYPos(0) {}
+Scrollable::~Scrollable(){}
+
+void Scrollable::UpdateScrollPos(int xoffset, int yoffset) {
+	prevScrollXPos = scrollXPos;
+	prevScrollYPos = scrollYPos;
+
+	scrollXPos += xoffset;
+	scrollYPos += yoffset;
+}
+
 /*---------------Panel---------------*/
 
 Panel::Panel(ShaderManager* l_shaderMgr)
@@ -86,7 +99,7 @@ Panel::Panel(ShaderManager* l_shaderMgr, glm::vec2 l_pos)
 Panel::~Panel() {
 	for (auto& layer : elements)
 		for (auto& elem : layer.second)
-			delete elem;
+			delete elem.drawable;
 }
 
 void Panel::Draw(glm::mat4& cameraMatrix) {
@@ -97,18 +110,18 @@ void Panel::Draw(glm::mat4& cameraMatrix) {
 
 	for (auto& itr : elements) {
 		for (auto& elem : itr.second) {
-			elem->Draw(cameraMatrix);
+			if(elem.activated)
+				elem.drawable->Draw(cameraMatrix);
 		}
 	}
 }
 
 DrawableStatic* Panel::AddElement(DrawableStatic* elem, int zindex) {
-	if (elements.find(zindex) == elements.end()) {
-		elements.emplace(zindex, std::vector<DrawableStatic*>({ elem }));
+	auto itr = elements.find(zindex);
+	if (itr == elements.end()) {
+		itr = elements.emplace(zindex, std::vector<PanelElement>()).first;
 	}
-	else {
-		elements[zindex].push_back(elem);
-	}
+	itr->second.emplace_back(elem, true);
 	elem->SetOffset(GetRealPos());
 	return elem;
 }
@@ -116,7 +129,7 @@ DrawableStatic* Panel::AddElement(DrawableStatic* elem, int zindex) {
 void Panel::DeleteElement(DrawableStatic* elem) {
 	for (auto& layer : elements) {
 		for (auto itr = layer.second.begin(); itr != layer.second.end(); itr++) {
-			if (elem == *itr) {
+			if (elem == itr->drawable) {
 				layer.second.erase(itr);
 				return;
 			}
@@ -127,7 +140,7 @@ void Panel::DeleteElement(DrawableStatic* elem) {
 void Panel::UpdateElementsOffset() {
 	for (auto& layer : elements) 
 		for(auto& elem : layer.second)
-			elem->SetOffset(GetRealPos());
+			elem.drawable->SetOffset(GetRealPos());
 }
 
 FloatRect Panel::GetFloatRect() {
@@ -137,7 +150,10 @@ FloatRect Panel::GetFloatRect() {
 	}
 	FloatRect rect(glm::vec2(Constants::WIN_WIDTH*10, Constants::WIN_HEIGHT*10), glm::vec2(-1000,-1000));
 	for (auto& layer : elements) {
-		for (DrawableStatic* elem : layer.second) {
+		for (PanelElement& pelem : layer.second) {
+			if (!pelem.activated)
+				continue;
+			DrawableStatic* elem = pelem.drawable;
 			FloatRect elemRect = elem->GetFloatRect();
 			rect.pos.x = std::min(elemRect.pos.x, rect.pos.x);
 			rect.pos.y = std::min(elemRect.pos.y, rect.pos.y);
@@ -148,6 +164,29 @@ FloatRect Panel::GetFloatRect() {
 	}
 	rect.size -= rect.pos;
 	return rect;
+}
+
+Panel::PanelElement* Panel::GetPanelElem(DrawableStatic* elem) {
+	for (auto& layer : elements) {
+		for (auto& pelem : layer.second) {
+			if (pelem.drawable == elem)
+				return &pelem;
+		}
+	}
+	return nullptr;
+}
+
+void Panel::SetActivatedElement(DrawableStatic* elem, bool b) {
+	PanelElement* pelem = GetPanelElem(elem);
+	if (pelem == nullptr)
+		return;
+	pelem->activated = b;
+}
+bool Panel::GetActivatedElement(DrawableStatic* elem) {
+	PanelElement* pelem = GetPanelElem(elem);
+	if (pelem == nullptr)
+		return false;
+	return pelem->activated;
 }
 
 /*---------------Button---------------*/
@@ -310,6 +349,9 @@ void TextField::SetPadding(glm::vec2 l_padding) {
 /*---------------SelectBox---------------*/
 
 void SelectBox::Setup(const std::vector<std::string>& fields, std::string l_defaultField) {
+	activButtonsInt.first = boxes.begin();
+	activButtonsInt.first = boxes.end();
+	
 	defaultField = l_defaultField;
 	
 	textColor = glm::vec4(glm::vec3(0.0f), 1.0f);
@@ -331,23 +373,31 @@ void SelectBox::Setup(const std::vector<std::string>& fields, std::string l_defa
 	panelFrame = (RectangleShape*)boxesPanel->AddElement(new RectangleShape(shaderMgr->GetShader("SimpleShader")), -1);
 	panelFrame->SetColor(frameColor);
 	panelFrame->SetPos(glm::vec2(0.0f, -panelPadding.y));
+	panelFrame->SetSize(glm::vec2(
+		panelPadding.x * 2 + bSize.x * reduc,
+		(bSize.y * reduc + panelPadding.y) * listSize + panelPadding.y
+	));
 
 	for (auto& field : fields)
 		AddField(field);
 
-	isInSelection = false;
+	SetActButtonsInt(0, listSize);
+
+	SetInSelection(false);
 	selectedBox = nullptr;
 }
 SelectBox::SelectBox(Font* l_font, ShaderManager* l_shaderMgr
-	, glm::vec2 size, std::string l_defaultField)
-	: Panel(l_shaderMgr), Clickable(), font(l_font), shaderMgr(l_shaderMgr), bSize(size)
+	, glm::vec2 size, int l_listSize, std::string l_defaultField)
+	: Panel(l_shaderMgr), Clickable(), Scrollable()
+	,font(l_font), shaderMgr(l_shaderMgr), bSize(size), listSize(l_listSize)
 {
 	std::vector<std::string> fields;
 	Setup(fields, l_defaultField);
 }
 SelectBox::SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields
-	, glm::vec2 size, std::string l_defaultField)
-	: Panel(l_shaderMgr), Clickable(), font(l_font), shaderMgr(l_shaderMgr), bSize(size)
+	, glm::vec2 size, int l_listSize, std::string l_defaultField)
+	: Panel(l_shaderMgr), Clickable(), Scrollable()
+	, font(l_font), shaderMgr(l_shaderMgr), bSize(size), listSize(l_listSize)
 {
 	Setup(fields, l_defaultField);
 }
@@ -360,31 +410,29 @@ void SelectBox::Update(Window* win) {
 		for (auto& b : boxes)
 			b->Update(win);
 		if (!GetHover()) {
-			isInSelection = false;
+			SetInSelection(false);
 		}
 		else {
 			for (auto& b : boxes) {
 				if (b->GetClick() && b != selectedBox) {
 					SetSelectedBox(b);
-					isInSelection = false;
+					SetInSelection(false);
 					break;
 				}
 			}
 		}
 	}
 	if (mainBox->GetClick()) {
-		isInSelection = true;
+		SetInSelection(true);
 	}
 }
 void SelectBox::Draw(glm::mat4& cameraMatrix) {
-	if (isInSelection) {
-		Panel::Draw(cameraMatrix);
-	}
-	else {
-		if (compute)
-			UpdateElementsOffset();
-		mainBox->Draw(cameraMatrix);
-	}
+	Panel::Draw(cameraMatrix);
+}
+void SelectBox::Scroll(int xoffset, int yoffset) {
+	UpdateScrollPos(xoffset, yoffset);
+	
+	ShiftActButtonsInt(yoffset > 0 ? Direction::Up : Direction::Down);
 }
 
 void SelectBox::SetSelectedBox(Button* box) {
@@ -405,7 +453,7 @@ void SelectBox::SetSelectedBox(Button* box) {
 }
 
 void SelectBox::AddField(const std::string& field) {
-	glm::vec2 bpos = glm::vec2(panelPadding.x, (bSize.y * reduc + panelPadding.y) * boxes.size());
+	glm::vec2 bpos = glm::vec2(0.0f, 0.0f);
 
 	boxes.push_back(((Button*)boxesPanel->AddElement(
 		new Button(font, shaderMgr, bpos)
@@ -415,16 +463,81 @@ void SelectBox::AddField(const std::string& field) {
 	newB->SetTextColor(textColor);
 	newB->SetCharacterSize(charSize * reduc);
 	newB->SetText(field);
-
-	panelFrame->SetSize(glm::vec2(
-		panelPadding.x * 2 + bSize.x * reduc,
-		(bSize.y * reduc + panelPadding.y) * boxes.size() + panelPadding.y
-	));
+	boxesPanel->SetActivatedElement(newB, false);
 }
 
 bool SelectBox::In(glm::vec2 mousePos) {
 	FloatRect hitBox = FloatRect(panelFrame->GetRealPos(), panelFrame->GetSize());
 	return hitBox.Contains(mousePos) || mainBox->In(mousePos);
+}
+
+void SelectBox::SetInSelection(bool b) {
+	isInSelection = b;
+	for (auto itr = activButtonsInt.first; itr != activButtonsInt.second; itr++)
+		boxesPanel->SetActivatedElement(*itr, b);
+	boxesPanel->SetActivatedElement(panelFrame, b);
+}
+
+void SelectBox::UpdateButtonsScroll() {
+	glm::vec2 bpos = glm::vec2(panelPadding.x, 0.0f);
+
+	auto itr = boxes.begin();
+	for (; itr != activButtonsInt.first; itr++) {
+		boxesPanel->SetActivatedElement(*itr, false);
+	}
+	for (; itr != activButtonsInt.second; itr++) {
+		(*itr)->SetPos(bpos);
+		boxesPanel->SetActivatedElement(*itr, isInSelection);
+		bpos.y += bSize.y * reduc + panelPadding.y;
+	}
+	for (; itr != boxes.end(); itr++) {
+		boxesPanel->SetActivatedElement(*itr, false);
+	}
+}
+
+bool SelectBox::SetActButtonsInt(int first, int last) {
+	if (first < 0)
+		return false;
+	int i = 0;
+	activButtonsInt.first = boxes.begin();
+	while (i != first) {
+		if (activButtonsInt.first == boxes.end())
+			return false;
+		activButtonsInt.first++;
+		i++;
+	}
+	activButtonsInt.second = activButtonsInt.first;
+	if (last < first)
+		return false;
+	while (i != last) {
+		if (activButtonsInt.second == boxes.end())
+			return false;
+		activButtonsInt.second++;
+		i++;
+	}
+	UpdateButtonsScroll();
+	return true;
+}
+/*bool SelectBox::ShiftActButtonsInt(int shift) {
+	return false;
+}*/
+bool SelectBox::ShiftActButtonsInt(Direction dir) {
+	if (dir == Direction::Up) {
+		if (activButtonsInt.second == boxes.end())
+			return false;
+		activButtonsInt.first++;
+		activButtonsInt.second++;
+	}
+	else if (dir == Direction::Down) {
+		if (activButtonsInt.first == boxes.begin())
+			return false;
+		activButtonsInt.first--;
+		activButtonsInt.second--;
+	}
+	else
+		return false;
+	UpdateButtonsScroll();
+	return true;
 }
 
 void SelectBox::ResetSelectedField() {
@@ -440,6 +553,7 @@ void SelectBox::SetSelectedField(const std::string& field) {
 std::string SelectBox::GetSelectedField() {
 	return mainBox->GetText();
 }
+bool SelectBox::GetIsInSelection() { return isInSelection; }
 
 /*---------------PokemonMoveBar---------------*/
 

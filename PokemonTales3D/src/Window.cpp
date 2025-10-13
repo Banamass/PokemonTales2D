@@ -166,5 +166,5 @@ glm::vec2 Window::GetMousePos() {
 	double x;
 	double y;
 	glfwGetCursorPos(window, &x, &y);
-	return glm::vec2(x, y);
+	return glm::vec2(x, height -  y);
 }

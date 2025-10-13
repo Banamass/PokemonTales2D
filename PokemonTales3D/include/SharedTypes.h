@@ -42,6 +42,9 @@ struct SharedContext {
 // Enumeration of all supported location
 enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };
 
+// Enumeration of Direction
+enum Direction { Up, Down, Left, Right };
+
 //Structure representing a rectangle with int coords
 struct IntRect {
 	IntRect() : pos(0, 0), size(0, 0) {}

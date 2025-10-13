@@ -53,6 +53,24 @@ protected:
 	bool activated;
 };
 
+class Scrollable {
+public:
+	Scrollable();
+	virtual ~Scrollable();
+
+	//Scroll the object
+	virtual void Scroll(int xoffset, int yoffset) = 0;
+
+protected:
+	void UpdateScrollPos(int xoffset, int yoffset);
+
+	int prevScrollXPos;
+	int scrollXPos;
+
+	int prevScrollYPos;
+	int scrollYPos;
+};
+
 /* Warning : memory usage of objects contained in the panel is managed by the panel
 Usage of AddElement function : AddElement(new DrawableStatic(param, ...), zindex)
 Offset of objects are managed by the panel*/
@@ -70,15 +88,30 @@ public:
 	//Delete an element from the panel
 	void DeleteElement(DrawableStatic* elem);
 
+	//Set if an element is activated or not
+	void SetActivatedElement(DrawableStatic* elem, bool b);
+	//Get if an element is activated or not
+	bool GetActivatedElement(DrawableStatic* elem);
+
+	//Calculate the float rect of the panel, do not include unactivated elements
 	virtual FloatRect GetFloatRect();
 
 protected:
+	struct PanelElement {
+		PanelElement(DrawableStatic* d, bool a) 
+			: drawable(d), activated(a){}
+		DrawableStatic* drawable;
+		bool activated;
+	};
+
+	PanelElement* GetPanelElem(DrawableStatic* elem);
+
 	void UpdateElementsOffset();
 
 	ShaderManager* shaderMgr;
 
 	//Elements stored with their z index
-	std::map<int, std::vector<DrawableStatic*>> elements;
+	std::map<int, std::vector<PanelElement>> elements;
 };
 
 class Button : public Panel, public Clickable {
@@ -152,17 +185,19 @@ protected:
 	std::vector<Text*> lines;
 };
 
-class SelectBox : public Panel, public Clickable{
+class SelectBox : public Panel, public Clickable, public Scrollable{
 public:
 	SelectBox(Font* l_font, ShaderManager* l_shaderMgr
-		, glm::vec2 size, std::string defaultField = "");
+		, glm::vec2 size, int l_listSize, std::string defaultField = "");
 	SelectBox(Font* l_font, ShaderManager* l_shaderMgr, const std::vector<std::string>& fields
-		, glm::vec2 size, std::string defaultField = "");
+		, glm::vec2 size, int l_listSize, std::string defaultField = "");
 	virtual ~SelectBox();
 
 	//Update the state of the selectBox
 	virtual void Update(Window* win);
 	virtual void Draw(glm::mat4& cameraMatrix);
+	
+	virtual void Scroll(int xoffset, int yoffset);
 
 	//Add a new field to the select box
 	virtual void AddField(const std::string& field);
@@ -175,12 +210,30 @@ public:
 	void SetSelectedField(const std::string& field);
 	//Get the current selected field
 	std::string GetSelectedField();
+	//Get if the select box is in selection
+	bool GetIsInSelection();
 
 protected:
 	void Setup(const std::vector<std::string>& fields, std::string defaultField);
 
 	//Set the selected box to 'box', which can be equal to nullptr
 	void SetSelectedBox(Button* box);
+	
+	//Set the selection state of the box
+	void SetInSelection(bool b);
+
+	/*Set the interval of activated button, [first, last[
+	Return if the operation succeeded*/
+	bool SetActButtonsInt(int first, int last);
+	/*Modify the interval of activated button, shifting it by shift
+	Rq : doing as much shift as possible
+	Return if the operation succeeded*/
+	//bool ShiftActButtonsInt(int shift);
+	/*Modify the interval of activated button, shifting it by 1 in the provided direction
+	Return if the operation succeeded*/
+	bool ShiftActButtonsInt(Direction dir);
+	/*Update the buttons state when a scroll occured*/
+	void UpdateButtonsScroll();
 
 	Font* font;
 	ShaderManager* shaderMgr;
@@ -188,15 +241,20 @@ protected:
 	glm::vec4 textColor;
 	glm::vec4 frameColor;
 	glm::vec2 bSize;
+	int listSize;
 	float charSize;
 	std::string defaultField;
 
 	float reduc;
 	glm::vec2 panelPadding;
-	Button* mainBox; //The box representing the text of the selected box
-	Button* selectedBox; //Pointer to the selected box (part of boxes)
 	bool isInSelection;
+
+	Button* selectedBox; //Pointer to the selected box (part of boxes)
+	//An interval of boxes attribut [first, second[ representing activated buttons
+	std::pair<std::vector<Button*>::iterator, std::vector<Button*>::iterator> activButtonsInt;
+
 	Panel* boxesPanel;
+	Button* mainBox; //The box representing the text of the selected box
 	std::vector<Button*> boxes;
 	RectangleShape* panelFrame;
 };

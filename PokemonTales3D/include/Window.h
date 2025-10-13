@@ -47,7 +47,7 @@ public:
 	bool GetShouldClose();
 	//Get the glfw window object associated to that window interface
 	GLFWwindow* GetGLFWwindow();
-	//Get the mouse pos, with a top left origin
+	//Get the mouse pos, with a bottom left origin
 	glm::vec2 GetMousePos();
 
 	//Close the window
