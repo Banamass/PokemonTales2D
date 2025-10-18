@@ -99,7 +99,7 @@ void Text::ComputeCharacterDatas(int l_offset) {
 
 	float x = realPos.x;
 	float minypos = Constants::WIN_HEIGHT * 2;
-	float maxh = -1;
+	float maxbearingy = -1;
 
 	auto cData = textData.begin();
 	for (; cData != textData.begin() + l_offset && cData != textData.end(); cData++) {
@@ -107,6 +107,7 @@ void Text::ComputeCharacterDatas(int l_offset) {
 		x += (advance >> 6) * scale; //bitshift by 6
 		float ypos = realPos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
 		minypos = std::min(ypos, minypos);
+		maxbearingy = std::max(maxbearingy, cData->cInfos->bearing.y * scale);
 	}
 	for (; cData != textData.end(); cData++) {
 		float xpos = x + cData->cInfos->bearing.x * scale;
@@ -131,10 +132,10 @@ void Text::ComputeCharacterDatas(int l_offset) {
 		x += (advance >> 6) * scale; //bitshift by 6
 
 		minypos = std::min(ypos, minypos);
-		maxh = std::max(h, maxh);
+		maxbearingy = std::max(maxbearingy, cData->cInfos->bearing.y * scale);
 	}
 	floatRect.size.x = x - realPos.x;
-	floatRect.size.y = std::max(maxh, floatRect.size.y);
+	floatRect.size.y = maxbearingy - (minypos - realPos.y);
 	floatRect.pos.x = realPos.x;
 	floatRect.pos.y = minypos;
 }
@@ -197,7 +198,7 @@ void Text::RemoveText(unsigned int nbCh) {
 		text.pop_back();
 	}
 	float minypos = Constants::WIN_HEIGHT * 2;
-	float maxh = -1;
+	float maxbearingy = -1;
 	float x = 0;
 
 	auto cData = textData.begin();
@@ -207,11 +208,11 @@ void Text::RemoveText(unsigned int nbCh) {
 		float ypos = pos.y - (cData->cInfos->size.y - cData->cInfos->bearing.y) * scale;
 		minypos = std::min(ypos, minypos);
 		float h = cData->cInfos->size.y * scale;
-		maxh = std::max(h, maxh);
+		maxbearingy = std::max(cData->cInfos->bearing.y * scale, maxbearingy);
 	}
 
 	floatRect.size.x = x - pos.x;
-	floatRect.size.x = maxh;
+	floatRect.size.y = maxbearingy - minypos;
 	floatRect.pos.y = minypos;
 }
 

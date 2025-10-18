@@ -3,14 +3,22 @@
 
 /*--------------PlayerOptionsGUI--------------*/
 
-PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context)
-	: Panel(shaderMgr), activated(true)
+PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context, std::string l_playerTag)
+	: Panel(shaderMgr), activated(true), playerTag(l_playerTag)
 {
 	defaultSelection = "Select a Pokemon";
 	noneField = "No Pokemon";
 
+	Font* font = l_context->fontManager->GetResource("Arial");
+
+	playerTagText = (Text*)AddElement(
+		new Text(font, playerTag + " :", l_context->shaderManager->GetShader("FontShader")));
+	playerTagText->SetCharacterSize(20.0f);
+	playerTagText->SetColor(glm::vec3(1.0f));
+
 	glm::vec2 selectSize(200.0f, 50.0f);
 	float space = 40.0f;
+	float yPos = selectSize.y * -2;
 
 	std::vector<std::string> selectionFields;
 	const std::map<int, PokemonData>& data = l_context->gameData->GetAllPokemonData();
@@ -21,10 +29,10 @@ PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context)
 
 	for (int i = 0; i < Constants::NB_POKEMON_BY_PLAYER; i++) {
 		pokeSelection.push_back((SelectBox*)AddElement(new SelectBox(
-			l_context->fontManager->GetResource("Arial"), l_context->shaderManager,
+			font, l_context->shaderManager,
 			selectionFields, selectSize, 3, defaultSelection
 		)));
-		pokeSelection[i]->SetPos(glm::vec2((selectSize.x + space) * i, 0));
+		pokeSelection[i]->SetPos(glm::vec2((selectSize.x + space) * i, yPos));
 	}
 }
 PlayerOptionsGUI::~PlayerOptionsGUI() {
@@ -68,7 +76,7 @@ std::vector<std::string> PlayerOptionsGUI::GetSelectedPokemon() {
 /*--------------OptionsState--------------*/
 
 OptionsState::OptionsState(SharedContext* l_context)
-	: State(l_context), player1Options(l_context), player2Options(l_context),
+	: State(l_context), player1Options(l_context, "Player1"), player2Options(l_context, "Player2"),
 	generalButtons(l_context->shaderManager)
 {
 	type = StateType::Options;
@@ -76,8 +84,11 @@ OptionsState::OptionsState(SharedContext* l_context)
 	context->eventManager->AddCallback("OptionsKey", EventType::Key, &OptionsState::KeyCallback, this, StateType::Options);
 	context->eventManager->AddCallback("OptionsScroll", EventType::Scroll, &OptionsState::ScrollCallback, this, StateType::Options);
 
-	glm::vec2 select1Pos(10.0f, 100.0f);
-	glm::vec2 select2Pos(10.0f, 450.0f);
+	glm::vec2 select1Pos(10.0f, 400.0f);
+	glm::vec2 select2Pos(10.0f, 100.0f);
+
+	player1Options.SetOrigin(Location::BottomLeft);
+	player2Options.SetOrigin(Location::BottomLeft);
 
 	player1Options.SetPos(select1Pos);
 	player2Options.SetPos(select2Pos);

@@ -3,7 +3,7 @@
 /*-----------------State-----------------*/
 
 State::State(SharedContext* l_context)
-	: type(StateType::NoneState), context(l_context), isTranscendent(false), isTransparent(false)
+	: type(StateType::NoneState), isActivated(false), context(l_context), isTranscendent(false), isTransparent(false)
 {}
 
 void State::SetIsTransparent(bool b) { isTransparent = b; }
@@ -20,6 +20,7 @@ StateType State::GetType() { return type; }
 StateManager::StateManager(SharedContext* l_context)
 	: context(l_context)
 {
+	stateToActivate = StateType::NoneState;
 	context->stateManager = this;
 }
 StateManager::~StateManager(){
@@ -28,10 +29,23 @@ StateManager::~StateManager(){
 }
 
 void StateManager::Update(double dt) {
-	states[states.size() - 1]->Update(dt);
+	if (states.size() == 0)
+		return;
+	auto itr = states.end();
+	do {
+		itr--;
+		(*itr)->Update(dt);
+	} while (itr != states.begin() && (*itr)->GetIsTranscendent());
+	UpdateStateToActivate();
 }
 void StateManager::Render() {
-	states[states.size() - 1]->Render();
+	if (states.size() == 0)
+		return;
+	auto itr = states.end();
+	do {
+		itr--;
+		(*itr)->Render();
+	} while (itr != states.begin() && (*itr)->GetIsTransparent());
 }
 
 bool StateManager::AddState(StateType type, State* state) {
@@ -49,17 +63,22 @@ bool StateManager::RemoveState(StateType type) {
 	states.erase(itr);
 	return true;
 }
-bool StateManager::ActivateState(StateType type) {
-	auto itr = GetStateItr(type);
+void StateManager::ActivateState(StateType type) {
+	stateToActivate = type;
+}
+void StateManager::UpdateStateToActivate() {
+	if (stateToActivate == StateType::NoneState)
+		return ;
+	auto itr = GetStateItr(stateToActivate);
 	if (itr == states.end())
-		return false;
+		return ;
 	if (!states.empty())
 		states[states.size() - 1]->Desactivate();
 	State* s = *itr;
 	s->Activate();
 	states.erase(itr);
 	states.push_back(s);
-	return true;
+	stateToActivate = StateType::NoneState;
 }
 
 State* StateManager::GetState(StateType type) {

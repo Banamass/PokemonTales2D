@@ -199,8 +199,10 @@ Button::Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
 	hoverColor = color * glm::vec4(glm::vec3(0.5f), 1.0f);
 
 	frame = (RectangleShape*)AddElement(new RectangleShape(shaderMgr->GetShader("SimpleShader")), -1);
+	frame->SetOrigin(Location::Middle);
 
 	text = (Text*)AddElement(new Text(l_font, "", shaderMgr->GetShader("FontShader")));
+	text->SetOrigin(Location::Middle);
 
 	SetCharacterSize(characterSize);
 	SetPos(l_pos);
@@ -238,16 +240,16 @@ void Button::SetOrigin(Location l_origin) {
 void Button::SetSize(glm::vec2 l_size) {
 	size = l_size;
 	frame->SetSize(l_size);
-	text->SetPos(size / 2.0f - (text->GetFloatRect().size / 2.0f));
+	text->SetPos(l_size / 2.0f);
 }
 void Button::SetCharacterSize(float l_charSize) {
 	characterSize = l_charSize;
 	text->SetCharacterSize(characterSize);
-	text->SetPos(size / 2.0f - (text->GetFloatRect().size / 2.0f));
+	text->SetOrigin(Location::Middle);
 }
 void Button::SetText(std::string l_text) {
 	text->SetText(l_text);
-	text->SetPos(size / 2.0f - (text->GetFloatRect().size / 2.0f));
+	text->SetOrigin(Location::Middle);
 }
 void Button::SetTextColor(glm::vec4 color) {
 	text->SetColor(color);
