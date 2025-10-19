@@ -117,6 +117,9 @@
     <ClCompile Include="src\OptionsState.cpp">
       <Filter>Fichiers sources\Game</Filter>
     </ClCompile>
+    <ClCompile Include="src\Areas.cpp">
+      <Filter>Fichiers sources\Game\Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
@@ -249,6 +252,9 @@
     </ClInclude>
     <ClInclude Include="include\OptionsState.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Areas.h">
+      <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

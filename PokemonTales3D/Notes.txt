@@ -4,7 +4,8 @@ A faire:
 - Faire un state Manager (Ok)
 - Ray tracing pour la sélection avec la souris lorqu'elle n'est pas au milieu de l'écran (OK)
 - Renommer les states du game et les states des players
-- Implementer transparence et trascendence
+- Implementer transparence et trascendence (Ok)
 - Enable depth test, trouver une couche où l'enlever pour le gui
-- Rajouter une origine pour tous les drawables statics
+- Rajouter une origine pour tous les drawables statics (Ok)
 - Utiliser unique_ptr
+- 

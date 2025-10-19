@@ -6,7 +6,7 @@
 #include "SharedTypes.h"
 #include "Window.h"
 #include "Model.h"
-#include "APlayer.h"
+#include "Pokemon.h"
 
 class Box {
 public:
@@ -63,7 +63,9 @@ public:
 
 	/*Remove pokemon from the board*/
 	void RemovePokemon(Pokemon* poke);
+	/*Remove all pokemons from the board*/
 	void ClearAllPokemons();
+
 private:
 	SharedContext* context;
 

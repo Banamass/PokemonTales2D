@@ -82,6 +82,10 @@ class Drawable {
 public:
 	/* Structure storing the behavior of an 3D object in the face of light */
 	struct Material {
+		Material()
+			: ambient(1.0f), diffuse(1.0f), specular(1.0f), shininess(32.0f)
+		{}
+
 		glm::vec3 ambient;
 		glm::vec3 diffuse;
 		glm::vec3 specular;

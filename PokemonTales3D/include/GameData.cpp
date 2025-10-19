@@ -6,7 +6,7 @@ PokeType GetPokeTypeFromString(const std::string& type){
 	if (type == "Water")
 		return PokeType::Water;
 	else
-		return PokeType::None;
+		return PokeType::NonePokeType;
 }
 std::string GetStringFromPokeType(PokeType type) {
 	if (type == PokeType::Fire)
@@ -32,7 +32,7 @@ CatType GetCatTypeFromString(const std::string& type) {
 	else if (type == "Phy")
 		return CatType::Phy;
 	else
-		return CatType::Phy;
+		return CatType::NoneCatType;
 }
 
 DataManager::DataManager(){
@@ -141,7 +141,7 @@ void DataManager::LoadPokemonFromFile(const std::string& file){
 	d.id = j["ID"].get<int>();
 	d.name = j["Name"].get<std::string>();
 	d.types.first = GetPokeTypeFromString(j["Type"][0]);
-	d.types.second = j["Type"].size() < 2 ? PokeType::None : GetPokeTypeFromString(j["Type"][1]);
+	d.types.second = j["Type"].size() < 2 ? PokeType ::NonePokeType : GetPokeTypeFromString(j["Type"][1]);
 	d.stats.hp = j["Stats"]["HP"].get<int>();
 	d.stats.atk = j["Stats"]["Attack"].get<int>();
 	d.stats.def = j["Stats"]["Defense"].get<int>();

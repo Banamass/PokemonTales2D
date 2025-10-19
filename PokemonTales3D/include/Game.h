@@ -11,6 +11,7 @@
 #include "MenuState.h"
 #include "OptionsState.h"
 
+//The main class of the game
 class Game {
 public:
 	Game();

@@ -71,7 +71,7 @@ void Player::Render() {
 }
 
 void Player::EndTurn() { 
-	isPlaying = false; 
+	APlayer::EndTurn();
 	context->gui->SetSelectedPokemon(nullptr);
 }
 
@@ -92,10 +92,20 @@ void Player::SwitchState(State* newState) {
 Player::State::State(Player* l_player) : 
 	player(l_player), type(PType::None),
 	cursorDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
+	selectedPokeAreaDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
 	cursor(glm::ivec2(1, 1)),
 	selectedPokeArea(glm::ivec2(0,0))
 {
-	
+	Drawable::Material mat;
+
+	glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 0.7f);
+	mat.ambient = 0.3f * color;
+	mat.diffuse = color;
+	selectedPokeAreaDrawable.SetMaterial(mat);
+}
+
+void Player::State::Render() {
+	RenderSelectedPokeArea();
 }
 
 void Player::State::UpdateCursor() {
@@ -121,6 +131,17 @@ void Player::State::UpdateSelectedPokeArea(Pokemon* poke) {
 	selectedPokeArea.SetSize(poke->GetSize());
 	Board* board = player->context->board;
 	selectedPokeArea.Update(board, board->GetPokemonPosition(poke));
+}
+void Player::State::RenderSelectedPokeArea() {
+	for (Box* box : selectedPokeArea.GetBoxes()) {
+		glm::ivec2 pos = box->GetPos();
+		selectedPokeAreaDrawable.SetPosition(glm::ivec3(
+			pos.x * Constants::BOX_SIZE,
+			0.0f,
+			pos.y * Constants::BOX_SIZE
+		));
+		player->context->win->Draw(selectedPokeAreaDrawable);
+	}
 }
 
 /*-----------------------------DefaultState-----------------------------*/
@@ -152,11 +173,12 @@ void Player::DefaultState::MouseButtonCallback(MouseButton_Data& data) {
 }
 
 void Player::DefaultState::Update(double dt) {
+	State::Update(dt);
 	UpdateCursor();
 }
 
-void Player::DefaultState::Render()
-{
+void Player::DefaultState::Render(){
+	State::Render();
 	RenderCursor();
 }
 
@@ -165,7 +187,6 @@ void Player::DefaultState::Select() {
 	if (poke == nullptr || poke->IsKO() || poke->GetTrainer() != player)
 		return;
 	player->context->gui->GetGameInfosField()->AddMessage("Select " + poke->GetName());
-	player->context->gui->SetSelectedPokemon(poke);
 	player->SwitchState(new PokeSelectedState(player, poke));
 }
 
@@ -174,11 +195,13 @@ void Player::DefaultState::Select() {
 Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_selectedPokemon)
 	: State(l_player), selectedPokemon(l_selectedPokemon) {
 	type = PType::PokeSelected;
+	player->context->gui->SetSelectedPokemon(selectedPokemon);
 	player->context->gui->GetSelectedPokemonGUI()->SetNbStepsLeft(player->pokemonState[l_selectedPokemon].nbStepLeft);
 	UpdateSelectedPokeArea(selectedPokemon);
 }
 
 void Player::PokeSelectedState::Update(double dt) {
+	State::Update(dt);
 	if (selectedPokemon->IsKO()) {
 		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
 		player->EndTurn();
@@ -263,6 +286,8 @@ Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemo
 	moveBox.Scale(glm::vec3(scale, scale, scale));
 
 	moveArea.Update(player->context->board, player->context->board->GetPokemonPosition(selectedPokemon));
+	
+	UpdateSelectedPokeArea(selectedPokemon);
 }
 
 void Player::PokeMoveState::KeyCallback(Key_Data& data) {
@@ -278,6 +303,7 @@ void Player::PokeMoveState::MouseButtonCallback(MouseButton_Data& data) {
 }
 
 void Player::PokeMoveState::Render() {
+	State::Render();
 	for (Box*& box : moveArea.GetBoxes()) {
 		glm::ivec2 pos = box->GetPos();
 		moveBox.SetPosition(glm::ivec3(
@@ -290,6 +316,7 @@ void Player::PokeMoveState::Render() {
 	RenderCursor();
 }
 void Player::PokeMoveState::Update(double dt) {
+	State::Update(dt);
 	if (selectedPokemon->IsKO()) {
 		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
 		player->EndTurn();
@@ -333,6 +360,8 @@ Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPo
 	cursorDrawable.SetMaterial(mat);
 	
 	SetMove(moveId);
+
+	UpdateSelectedPokeArea(selectedPokemon);
 }
 
 void Player::PokeAttackState::SetMove(int id) {
@@ -368,6 +397,7 @@ void Player::PokeAttackState::MouseButtonCallback(MouseButton_Data& data) {
 }
 
 void Player::PokeAttackState::Update(double dt) {
+	State::Update(dt);
 	if (selectedPokemon->IsKO()) {
 		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
 		player->EndTurn();
@@ -381,8 +411,8 @@ void Player::PokeAttackState::Update(double dt) {
 	UpdateCursor();
 }
 
-void Player::PokeAttackState::Render()
-{
+void Player::PokeAttackState::Render(){
+	State::Render();
 	RenderCursor();
 }
 

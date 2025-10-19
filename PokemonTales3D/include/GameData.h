@@ -12,16 +12,23 @@
 
 using json = nlohmann::json;
 
+//Enum representing all supported poke type
 enum PokeType {
-	Fire, Water, None
+	Fire, Water, NonePokeType
 };
+//Convert a string into a PokeType, if the string is unknown, return PokeType::NonePokeType
 PokeType GetPokeTypeFromString(const std::string& type);
+//Convert a PokeType into a string
 std::string GetStringFromPokeType(PokeType type);
+//Getting the color associated to the poke type (hard coded)
 glm::vec4 GetColorFromPokeType(PokeType type);
 
-enum CatType{Spe, Phy};
+//Enum representing the two move category type
+enum CatType{Spe, Phy, NoneCatType};
+//Convert a string into a CatType, if the string is unknown, return CatType::NoneCatType
 CatType GetCatTypeFromString(const std::string& type);
 
+//Store the stats of a pokemon
 struct PokemonStats {
 	int hp;
 	int atk;
@@ -32,6 +39,7 @@ struct PokemonStats {
 	int move;
 };
 
+//Store the data relative to a move
 struct MoveData {
 	int id;
 	std::string name;
@@ -46,6 +54,7 @@ struct MoveData {
 	int range;
 };
 
+//Store the data relative to a pokemon
 struct PokemonData {
 	int id;
 	std::string name;
@@ -56,14 +65,19 @@ struct PokemonData {
 	std::vector<const MoveData*> movePool;
 };
 
+//This class holds all the data relative to the game
 class DataManager {
 public:
 	DataManager();
 	~DataManager();
 
+	//Get a const reference to a move data, according to its id
 	const MoveData* GetMoveData(int id);
+	//Get a const reference to a pokemon data, according to its id
 	const PokemonData* GetPokemonData(int id);
+	//Get a const reference to a pokemon data, according to its name
 	const PokemonData* GetPokemonData(const std::string& name);
+	//Get the const reference to the map of all the stored pokemon
 	const std::map<int, PokemonData>& GetAllPokemonData();
 
 private:

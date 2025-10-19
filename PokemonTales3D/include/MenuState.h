@@ -4,6 +4,7 @@
 #include "EventManager.h"
 #include "GUI.h"
 
+//This class implement State for the options state 
 class MenuState : public State {
 public:
 	MenuState(SharedContext* l_context);
@@ -11,6 +12,8 @@ public:
 
 	virtual void Update(double dt);
 	virtual void Render();
+
+	//Callbacks
 
 	void KeyCallback(CallbackData data);
 	void MouseButtonCallback(CallbackData data);
