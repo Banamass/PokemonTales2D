@@ -54,10 +54,12 @@ glm::vec3 Transform::GetScaling() {
 
 /*------------------------OBB------------------------*/
 
+OBB::OBB() {
+	Setup(std::make_pair(glm::vec3(0.0f), glm::vec3(0.0f)), nullptr);
+}
+
 OBB::OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform) {
-	modelTransform = l_modelTransform;
-	AABBMax = l_AABBMinMax.second;
-	AABBMin = l_AABBMinMax.first;
+	Setup(l_AABBMinMax, l_modelTransform);
 }
 
 bool OBB::TestRayOBBIntersection(
@@ -162,26 +164,67 @@ bool OBB::TestRayOBBIntersection(
 	return true;
 }
 
+void OBB::Setup(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform) {
+	modelTransform = l_modelTransform;
+	AABBMax = l_AABBMinMax.second;
+	AABBMin = l_AABBMinMax.first;
+}
+
 /*------------------------Drawable------------------------*/
 
+/*__________Material__________*/
+void Drawable::Material::SetPlainColor(glm::vec3 color) {
+	SetLightningColor(color, 1.0f);
+}
+void Drawable::Material::SetLightningColor(glm::vec3 color, float ambientFact, float specularFact) {
+	diffuse = color;
+	ambient = color * ambientFact;
+	specular = color * specularFact;
+}
+/*____________________________*/
+
+Drawable::Drawable() {
+	Material mat;
+	mat.ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+	mat.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
+	mat.specular = glm::vec3(0.0f, 0.0f, 0.0f);
+	mat.shininess = 1.0f;
+	Setup(nullptr, nullptr, mat);
+}
 Drawable::Drawable(Model * l_model, Shader * l_shader)
-	: model(l_model), shader(l_shader), obb(model->GetAABBMinMax(), &transform),
-	pos(0.0f), origin(0.0f), offset(0.0f)
+	: pos(0.0f), origin(0.0f), offset(0.0f)
 {
-	material.ambient = glm::vec3(1.0f, 1.0f, 1.0f);
-	material.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
-	material.specular = glm::vec3(0.0f, 0.0f, 0.0f);
-	material.shininess = 1.0f;
+	Material mat;
+	mat.ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+	mat.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
+	mat.specular = glm::vec3(0.0f, 0.0f, 0.0f);
+	mat.shininess = 1.0f;
+	Setup(l_model, l_shader, mat);
 }
 Drawable::Drawable(Model* l_model, Shader* l_shader, Material l_material)
-	: model(l_model), shader(l_shader), material(l_material), obb(model->GetAABBMinMax(), &transform),
-	pos(0.0f), origin(0.0f), offset(0.0f) {
-
+	: pos(0.0f), origin(0.0f), offset(0.0f) {
+	Setup(l_model, l_shader, l_material);
 }
 Drawable::~Drawable() {}
 
+void Drawable::Setup(Model* l_model, Shader* l_shader, Material& l_material) {
+	model = l_model;
+	if(model != nullptr)
+		obb.Setup(model->GetAABBMinMax(), & transform);
+	shader = l_shader;
+	material = l_material;
+}
+
 void Drawable::SetMaterial(const Material& l_materiel) {
 	material = l_materiel;
+}
+void Drawable::SetModel(Model* l_model) {
+	model = l_model;
+	if (model != nullptr)
+		obb.Setup(model->GetAABBMinMax(), &transform);
+}
+void Drawable::SetShader(Shader* l_shader) {
+	shader = l_shader;
 }
 
 bool Drawable::TestRayIntersection(
@@ -199,6 +242,9 @@ void Drawable::Move(glm::vec3 move) {
 	transform.Move(move);
 }
 
+void Drawable::Scale(float uniScale) {
+	Scale(glm::vec3(uniScale, uniScale, uniScale));
+}
 void Drawable::Scale(glm::vec3 scale) {
 	transform.Scale(scale);
 	transform.SetPosition(GetRealPosition());

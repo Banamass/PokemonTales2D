@@ -55,6 +55,7 @@ private:
 AABBMin and AABBMax correspond to min and max coords value in the tree dimensions of the OBB */
 class OBB {
 public:
+	OBB();
 	OBB(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform);
 	~OBB() {}
 
@@ -70,6 +71,8 @@ public:
 		glm::vec3 ray_direction,
 		float& interstion_distance);
 
+	void Setup(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform);
+
 private:
 	Transform* modelTransform;
 
@@ -80,19 +83,25 @@ private:
 /* Class representing a 3D objet that can be drawn on the window */
 class Drawable {
 public:
-	/* Structure storing the behavior of an 3D object in the face of light */
+	/* Structure storing the behavior of an 3D object in the face of light 
+	The default material is a white object with no light effect and shininess at 32.0*/
 	struct Material {
 		Material()
-			: ambient(1.0f), diffuse(1.0f), specular(1.0f), shininess(32.0f)
+			: ambient(1.0f), diffuse(1.0f), specular(1.0f), shininess(32.0f), alpha(1.0f)
 		{}
+
+		void SetPlainColor(glm::vec3 color);
+		void SetLightningColor(glm::vec3 color, float ambientFact = 0.0f, float specularFact = 0.0f);
 
 		glm::vec3 ambient;
 		glm::vec3 diffuse;
 		glm::vec3 specular;
 
 		float shininess;
+		float alpha;
 	};
 
+	Drawable();
 	Drawable(Model* model, Shader* shader);
 	Drawable(Model* model, Shader* shader, Material l_material);
 	~Drawable();
@@ -109,6 +118,7 @@ public:
 		float& interstion_distance);
 
 	void Move(glm::vec3 move);
+	void Scale(float uniScale);
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 
@@ -116,6 +126,8 @@ public:
 	void SetOffset(glm::vec3 l_offset);
 	void SetOrigin(glm::vec3 l_origin);
 
+	void SetModel(Model* l_model);
+	void SetShader(Shader* l_shader);
 	void SetMaterial(const Material& l_material);
 
 	glm::vec3 GetPosition();
@@ -126,6 +138,8 @@ public:
 	Transform* GetTransform() { return &transform; }
 
 private:
+	void Setup(Model* l_model, Shader* l_shader, Material& l_material);
+
 	Material material;
 
 	Model* model;

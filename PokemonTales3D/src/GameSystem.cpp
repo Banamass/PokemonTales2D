@@ -8,6 +8,9 @@ GameSystem::GameSystem(SharedContext* l_context)
 	player(context), opponent(context), hoverPoke(nullptr){
 	l_context->gameSystem = this;
 	playingPlayer = nullptr;
+	
+	player.SetPlayerColor(glm::vec3(0.0f, 0.0f, 1.0f));
+	opponent.SetPlayerColor(glm::vec3(1.0f, 0.0f, 0.0f));
 }
 GameSystem::~GameSystem(){
 	

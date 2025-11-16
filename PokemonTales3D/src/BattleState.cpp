@@ -6,6 +6,7 @@
 PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	: Panel(l_context->shaderManager), poke(l_poke), context(l_context)
 {
+	selectedMove = -1;
 	nbStepLeft = 0;
 	ShaderManager* shadeMgr = context->shaderManager;
 	statsBar = (PokemonStatsBar*)AddElement(new PokemonStatsBar(poke, l_font, shaderMgr));
@@ -55,6 +56,19 @@ PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	nbStepText->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
 	nbStepText->SetCharacterSize(charSize);
 	nbStepText->SetPos(glm::vec2(boxSize.x + moveBarPadding.x, boxSize.y - nbStepBarSize.y) + glm::vec2(5.0f, 10.0f));
+
+	glm::vec2 stepButtonPadding(10.0f);
+	glm::vec2 stepButtonSize(120.0f, nbStepBarSize.y - stepButtonPadding.y);
+	stepButton = (Button*)AddElement(
+		new Button(l_font, shadeMgr, glm::vec2(0.0f)));
+	stepButton->SetText("Step");
+	stepButton->SetCharacterSize(20.0f);
+	stepButton->SetSize(stepButtonSize);
+	stepButton->SetFrameColor(glm::vec4(glm::vec3(1.0f), 0.5f));
+	stepButton->SetTextColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	stepButton->SetOrigin(Location::BottomLeft);
+	stepButton->SetPos(glm::vec2(boxSize.x + moveBarPadding.x, boxSize.y - nbStepBarSize.y)
+		+ glm::vec2(stepButtonPadding.x + 5.0f + nbStepBarSize.x, -stepButtonPadding.y + 10.0f));
 }
 PokemonGUI::~PokemonGUI() {
 
@@ -65,9 +79,12 @@ void PokemonGUI::Update(double dt) {
 	for (int i = 0; i < MAX_AIMED_POKE; i++) {
 		aimedPokeStatsBar[i]->Update(dt);
 	}
-	for (int i = 0; i < 4; i++) {
-		moveBars[i]->Update(context->win);
+	if (selectedMove == -1) {
+		for (int i = 0; i < 4; i++) {
+			moveBars[i]->Update(context->win);
+		}
 	}
+	stepButton->Update(context->win);
 }
 
 void PokemonGUI::Draw(glm::mat4& cameraMatrix) {
@@ -99,6 +116,7 @@ void PokemonGUI::Reset() {
 }
 
 void PokemonGUI::SetSelectedMove(int i) {
+	selectedMove = i;
 	for (int j = 0; j < 4; j++)
 		moveBars[j]->SetSelect(j == i);
 	if (i < 0 || i > 3) {
@@ -131,6 +149,10 @@ int PokemonGUI::GetMoveClicked() {
 			return i;
 	}
 	return -1;
+}
+
+bool PokemonGUI::GetStepClicked() {
+	return stepButton->GetClick();
 }
 
 /*---------------GUI---------------*/

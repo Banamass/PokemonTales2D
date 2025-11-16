@@ -23,7 +23,7 @@ public:
 	bool GetPress();
 	//Get if the object is hovered
 	bool GetHover();
-	
+
 	//Set the activation of the clickable object
 	void SetActivated(bool b);
 	//Get if the clickable object is activated
@@ -49,6 +49,9 @@ protected:
 	bool click;
 	bool press;
 	bool hover;
+
+	glm::vec4 hoverColor;
+	glm::vec4 pressColor;
 
 	bool activated;
 };
@@ -125,12 +128,8 @@ public:
 	void SetCharacterSize(float l_charSize);
 	void SetText(std::string text);
 	void SetTextColor(glm::vec4 color);
-	//Set the color of the frame by default
+	//Set the color of the frame
 	void SetFrameColor(glm::vec4 color);
-	//Set the color of the frame when it's hovered
-	void SetFrameHoverColor(glm::vec4 color);
-	//Set the color of the frame when it's pressed
-	void SetFramePressColor(glm::vec4 color);
 
 	std::string GetText();
 
@@ -151,8 +150,40 @@ protected:
 	Location origin;
 
 	glm::vec4 color;
-	glm::vec4 hoverColor;
-	glm::vec4 pressColor;
+};
+
+class EmptyButton : public Clickable, public  {
+	Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
+	virtual ~Button();
+
+	virtual void SetPos(glm::vec2 l_pos);
+	void SetOrigin(Location l_origin);
+	void SetSize(glm::vec2 l_size);
+	void SetCharacterSize(float l_charSize);
+	void SetText(std::string text);
+	void SetTextColor(glm::vec4 color);
+	//Set the color of the frame
+	void SetFrameColor(glm::vec4 color);
+
+	std::string GetText();
+
+	virtual void Hover();
+	virtual void UnHover();
+
+	virtual void Press();
+	virtual void UnPress();
+
+	virtual bool In(glm::vec2 mousePos);
+
+protected:
+	RectangleShape* frame;
+	Text* text;
+
+	float characterSize;
+	glm::vec2 size;
+	Location origin;
+
+	glm::vec4 color;
 };
 
 class TextField : public Panel {
@@ -259,6 +290,31 @@ protected:
 	RectangleShape* panelFrame;
 };
 
+class ColorSelection : public Panel {
+public:
+	ColorSelection(ShaderManager* l_shaderMgr, Orientation l_orientation);
+	virtual ~ColorSelection();
+
+	void Update(Window* win);
+	void Draw(glm::mat4& cameraMatrix);
+
+private:
+	struct ColorButton {
+		ColorButton(ShaderManager* l_shaderMgr, glm::vec4 l_color, glm::vec2 size, Panel* l_panel);
+		virtual ~ColorButton();
+
+		void SetSize(glm::vec2 size);
+
+		glm::vec4 color;
+		EmptyButton* button;
+		RectangleShape* colorRect;
+	};
+
+	Orientation orientation;
+
+	std::vector<ColorButton> buttons;
+};
+
 class PokemonMoveBar : public Panel, public Clickable {
 public:
 	PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
@@ -266,6 +322,9 @@ public:
 
 	//Draw the move bar
 	virtual void Draw(glm::mat4& cameraMatrix);
+
+	void Hover();
+	void UnHover();
 
 	virtual bool In(glm::vec2 mousePos);
 

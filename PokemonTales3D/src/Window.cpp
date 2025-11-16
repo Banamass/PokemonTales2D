@@ -74,6 +74,7 @@ void Window::Draw(Drawable* drawable) {
 	shader->SetUniform("material.diffuse", drawable->material.diffuse);
 	shader->SetUniform("material.specular", drawable->material.specular);
 	shader->SetUniform("material.shininess", drawable->material.shininess);
+	shader->SetUniform("material.alpha", drawable->material.alpha);
 	drawable->model->Draw(shader, context->camera->GetTransformMatrix(), drawable->transform.GetTransform());
 }
 
@@ -91,6 +92,7 @@ void Window::DrawStatic(Drawable* drawable) {
 	shader->SetUniform("material.diffuse", drawable->material.diffuse);
 	shader->SetUniform("material.specular", drawable->material.specular);
 	shader->SetUniform("material.shininess", drawable->material.shininess);
+	shader->SetUniform("material.alpha", drawable->material.alpha);
 	drawable->model->Draw(shader, glm::mat4(1.0f), drawable->transform.GetTransform());
 }
 
@@ -114,6 +116,7 @@ void Window::DrawInstanced(DrawableInstanced* drawableInstanced) {
 	shader->SetUniform("material.diffuse", drawable->material.diffuse);
 	shader->SetUniform("material.specular", drawable->material.specular);
 	shader->SetUniform("material.shininess", drawable->material.shininess);
+	shader->SetUniform("material.alpha", drawable->material.alpha);
 	drawable->model->DrawInstanced(shader, context->camera->GetTransformMatrix(),
 		drawableInstanced);
 }

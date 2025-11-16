@@ -24,9 +24,8 @@ void Mesh::Draw(Shader* shader, glm::mat4& cameraMatrix, glm::mat4& modelMatrix)
 		glActiveTexture(GL_TEXTURE0 + i);
 		std::string number;
 		std::string name = textures[i].type;
-		if (name == "texture_diffuse") {
+		if (name == "texture_diffuse")
 			number = std::to_string(diffuseNr++);
-		}
 		else if(name == "texture_specular")
 			number = std::to_string(specularNr++);
 

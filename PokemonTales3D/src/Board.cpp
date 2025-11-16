@@ -54,10 +54,7 @@ Board::Board(glm::vec2 l_size, SharedContext* l_context)
 	}
 
 	Drawable::Material mat;
-	mat.ambient = 0.3f * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat.specular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat.shininess = 32.0f;
+	mat.SetLightningColor(glm::vec3(1.0f), 0.3f, 1.0f);
 
 	boxDrawable = new Drawable(boxModel, instancedModelShader);
 	boxDrawable->SetMaterial(mat);

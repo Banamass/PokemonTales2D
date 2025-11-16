@@ -5,6 +5,7 @@ struct Material{
     vec3 specular;
 
     float shininess;
+    float alpha;
 };
 
 out vec4 FragColor;
@@ -37,5 +38,5 @@ void main()
     vec3 specular = lightColor * (spec * material.specular);
 
     vec3 results = ambient + diffuse + specular;
-    FragColor = vec4(results, 1.0f);
+    FragColor = vec4(results, material.alpha);
 }

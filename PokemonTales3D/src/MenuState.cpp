@@ -40,8 +40,6 @@ MenuState::MenuState(SharedContext* l_context)
 	playButton->SetSize(bSize);
 	playButton->SetText("Play");
 	playButton->SetFrameColor(bColor);
-	playButton->SetFrameHoverColor(bhColor);
-	playButton->SetFramePressColor(bpColor);
 	playButton->SetTextColor(tbColor);
 	playButton->SetCharacterSize(charSize);
 	playButton->SetOrigin(Location::Middle);
@@ -53,8 +51,6 @@ MenuState::MenuState(SharedContext* l_context)
 	optionsButton->SetSize(bSize);
 	optionsButton->SetText("Options");
 	optionsButton->SetFrameColor(bColor);
-	optionsButton->SetFrameHoverColor(bhColor);
-	optionsButton->SetFramePressColor(bpColor);
 	optionsButton->SetTextColor(tbColor);
 	optionsButton->SetCharacterSize(charSize);
 	optionsButton->SetOrigin(Location::Middle);
@@ -66,8 +62,6 @@ MenuState::MenuState(SharedContext* l_context)
 	quitButton->SetSize(bSize);
 	quitButton->SetText("Quit");
 	quitButton->SetFrameColor(bColor);
-	quitButton->SetFrameHoverColor(bhColor);
-	quitButton->SetFramePressColor(bpColor);
 	quitButton->SetTextColor(tbColor);
 	quitButton->SetCharacterSize(charSize);
 	quitButton->SetOrigin(Location::Middle);

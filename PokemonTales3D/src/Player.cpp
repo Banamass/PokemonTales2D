@@ -202,14 +202,21 @@ Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_select
 
 void Player::PokeSelectedState::Update(double dt) {
 	State::Update(dt);
+
+	BattleGUI* gui = player->context->gui;
+
 	if (selectedPokemon->IsKO()) {
-		player->context->gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
+		gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
 		player->EndTurn();
 		return;
 	}
-	int moveId = player->context->gui->GetSelectedPokemonGUI()->GetMoveClicked();
-	if (moveId != -1)
-		Attack(moveId);
+	if(gui->GetSelectedPokemonGUI()->GetStepClicked()){
+		Move();
+	}else {
+		int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();
+		if (moveId != -1)
+			Attack(moveId);
+	}
 }
 
 void Player::PokeSelectedState::KeyCallback(Key_Data& data) {

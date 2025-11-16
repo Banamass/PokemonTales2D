@@ -4,7 +4,8 @@
 /*---------------Clickable---------------*/
 
 Clickable::Clickable()
-	: press(false), click(false), hover(false), activated(true)
+	: press(false), click(false), hover(false), activated(true),
+	pressColor(0.0f), hoverColor(0.0f)
 {}
 
 void Clickable::Update(Window* win) {
@@ -206,6 +207,7 @@ Button::Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
 
 	SetCharacterSize(characterSize);
 	SetPos(l_pos);
+	SetFrameColor(glm::vec4(1.0f));
 }
 Button::~Button() {
 
@@ -254,14 +256,11 @@ void Button::SetText(std::string l_text) {
 void Button::SetTextColor(glm::vec4 color) {
 	text->SetColor(color);
 }
-void Button::SetFrameColor(glm::vec4 color) {
+void Button::SetFrameColor(glm::vec4 l_color) {
+	color = l_color;
+	pressColor = color * glm::vec4(glm::vec3(0.8f), 1.0f);
+	hoverColor = color * glm::vec4(glm::vec3(0.5f), 1.0f);
 	frame->SetColor(color);
-}
-void Button::SetFrameHoverColor(glm::vec4 color) {
-	hoverColor = color;
-}
-void Button::SetFramePressColor(glm::vec4 color) {
-	pressColor = color;
 }
 
 std::string Button::GetText() { return text->GetText(); }
@@ -557,6 +556,38 @@ std::string SelectBox::GetSelectedField() {
 }
 bool SelectBox::GetIsInSelection() { return isInSelection; }
 
+/*---------------ColorSelection---------------*/
+
+ColorSelection::ColorButton::ColorButton(ShaderManager* l_shaderMgr, glm::vec4 l_color, glm::vec2 size, Panel* panel)
+	: color(l_color) {
+	button = (EmptyButton*)panel->AddElement(new EmptyButton());
+	colorRect = (RectangleShape*)panel->AddElement(new RectangleShape(l_shaderMgr->GetShader("SimpleShader")));
+	SetSize(size);
+}
+ColorSelection::ColorButton::~ColorButton() {}
+
+void ColorSelection::ColorButton::SetSize(glm::vec2 size) {
+	
+}
+
+ColorSelection::ColorSelection(ShaderManager* l_shaderMgr, Orientation l_orientation)
+	: Panel(l_shaderMgr), orientation(l_orientation)
+{
+
+}
+ColorSelection::~ColorSelection() {
+
+}
+
+void ColorSelection::Update(Window* win) {
+	for (auto& b : buttons)
+		b.button->Update(win);
+}
+void ColorSelection::Draw(glm::mat4& cameraMatrix) {
+	Panel::Draw(cameraMatrix);
+}
+
+
 /*---------------PokemonMoveBar---------------*/
 
 PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
@@ -568,7 +599,8 @@ PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::iv
 
 	isSelected = false;
 	unselectedColor = glm::vec4(1.0f);
-	selectedColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	selectedColor = glm::vec4(glm::vec3(0.6f), 1.0f);
+	hoverColor = glm::vec4(glm::vec3(0.8f), 1.0f);
 
 	ppText = (Text*)AddElement( new Text(l_font, "10/10", l_shaderMgr->GetShader("FontShader")));
 	ppText->SetColor(glm::vec3(0.0f));
@@ -607,11 +639,20 @@ void PokemonMoveBar::Draw(glm::mat4& cameraMatrix){
 		Panel::Draw(cameraMatrix);
 }
 
- bool PokemonMoveBar::In(glm::vec2 mousePos) {
+bool PokemonMoveBar::In(glm::vec2 mousePos) {
 	 if (move == nullptr)
 		 return false;
 	 FloatRect hitBox(GetRealPos(), size);
 	 return hitBox.Contains(mousePos);
+}
+
+void PokemonMoveBar::Hover() {
+	if (!isSelected)
+		frame->SetColor(hoverColor);
+}
+
+void PokemonMoveBar::UnHover() {
+	frame->SetColor(isSelected ? selectedColor : unselectedColor);
 }
 
 void PokemonMoveBar::SetSelect(bool b) {

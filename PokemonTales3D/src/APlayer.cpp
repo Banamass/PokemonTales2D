@@ -4,10 +4,16 @@
 /*------------------------APlayer------------------------*/
 
 APlayer::APlayer(SharedContext* l_context)
-	: context(l_context), isPlaying(false) {
+	: context(l_context), isPlaying(false)
+{
+	SetPlayerColor(glm::vec3(1.0f));
 
+	pokemonsMark.SetModel(l_context->modelManager->RequireGetResource("Mark"));
+	pokemonsMark.SetShader(l_context->shaderManager->GetShader("ModelShader"));
+	pokemonsMark.Scale(0.4f);
 }
 APlayer::~APlayer() {
+	context->modelManager->ReleaseResource("Mark");
 	for (Pokemon* poke : pokemons) {
 		delete poke;
 	}
@@ -28,7 +34,11 @@ bool APlayer::AddPokemon(Pokemon* poke, glm::ivec2 initialPos) {
 
 void APlayer::Render() {
 	for (Pokemon*& poke : pokemons) {
-		poke->Render(context->win, context->board->GetPokemonPosition(poke));
+		glm::ivec2 pos = context->board->GetPokemonPosition(poke);
+		poke->Render(context->win, pos);
+		pokemonsMark.SetPosition(
+			glm::vec3(pos.x * Constants::BOX_SIZE, 2.0f, pos.y * Constants::BOX_SIZE));
+		context->win->Draw(pokemonsMark);
 	}
 }
 
@@ -64,5 +74,11 @@ void APlayer::PokemonKO(Pokemon* poke) {
 	}
 }
 
+void APlayer::SetPlayerColor(glm::vec3 color) {
+	playerColor = color;
+	Drawable::Material mat;
+	mat.SetLightningColor(playerColor, 0.5f);
+	pokemonsMark.SetMaterial(mat);
+}
 bool APlayer::Playing() { return isPlaying; }
 std::vector<Pokemon*>& APlayer::GetPokemons() { return pokemons; }

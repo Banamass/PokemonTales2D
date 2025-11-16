@@ -21,6 +21,8 @@ public:
 	void SetNbStepsLeft(int l_nbStep);
 	//Return the id of the clicked move, -1 if no move is clicked
 	int GetMoveClicked();
+	//Get if the step button has been clicked
+	bool GetStepClicked();
 
 private:
 	void Reset();
@@ -31,10 +33,12 @@ private:
 	PokemonStatsBar* statsBar;
 	Panel* movesBar;
 	PokemonMoveBar* moveBars[4];
+	int selectedMove; //-1 if no move is selected
 	static const int MAX_AIMED_POKE = 10;
 	PokemonStatsBar* aimedPokeStatsBar[MAX_AIMED_POKE];
 	Panel* nbStepBar;
 	Text* nbStepText;
+	Button* stepButton;
 	int nbStepLeft;
 };
 

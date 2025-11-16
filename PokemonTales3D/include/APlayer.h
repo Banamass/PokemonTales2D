@@ -31,6 +31,7 @@ public:
 	
 	bool Playing();
 	std::vector<Pokemon*>& GetPokemons();
+	void SetPlayerColor(glm::vec3 color);
 
 protected:
 	SharedContext* context;
@@ -44,4 +45,7 @@ protected:
 		bool lock;
 	};
 	std::unordered_map<Pokemon*, PokemonState> pokemonState;
+
+	glm::vec3 playerColor;
+	Drawable pokemonsMark;
 };

@@ -8,4 +8,5 @@ A faire:
 - Enable depth test, trouver une couche où l'enlever pour le gui
 - Rajouter une origine pour tous les drawables statics (Ok)
 - Utiliser unique_ptr
-- 
+- Rajouter des contructeurs par défault aux objets qui en ont besoin + revoir ShaderManagement pour supprimer GetShader
+- Transformer l'axe z en l'axe y et inversement
