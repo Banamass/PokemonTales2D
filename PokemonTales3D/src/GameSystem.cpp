@@ -8,9 +8,6 @@ GameSystem::GameSystem(SharedContext* l_context)
 	player(context), opponent(context), hoverPoke(nullptr){
 	l_context->gameSystem = this;
 	playingPlayer = nullptr;
-	
-	player.SetPlayerColor(glm::vec3(0.0f, 0.0f, 1.0f));
-	opponent.SetPlayerColor(glm::vec3(1.0f, 0.0f, 0.0f));
 }
 GameSystem::~GameSystem(){
 	
@@ -46,6 +43,9 @@ void GameSystem::StartBattle() {
 			pos = glm::ivec2(rand() % (board.GetSize().x / 2), rand() % (board.GetSize().y / 2));
 		}
 	}
+
+	player.SetPlayerColor(optData.player1Color);
+	opponent.SetPlayerColor(optData.player2Color);
 
 	playingPlayer = &player;
 	player.PlayTurn();

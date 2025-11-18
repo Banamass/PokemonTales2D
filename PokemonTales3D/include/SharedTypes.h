@@ -40,7 +40,8 @@ struct SharedContext {
 };
 
 // Enumeration of all supported location
-enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft };
+enum Location { Middle, TopLeft, TopRight, BottomRight, BottomLeft,
+				MiddleLeft, MiddleRight, MiddleTop, MiddleBottom};
 
 // Enumeration of Direction
 enum Direction { Up, Down, Left, Right };

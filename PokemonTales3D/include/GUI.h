@@ -7,6 +7,7 @@
 #include "Font.h"
 #include "Shape.h"
 #include "Pokemon.h"
+#include "Notifier.h"
 
 //Pure virtual class representing an objet that can be clickable
 class Clickable {
@@ -62,16 +63,16 @@ public:
 	virtual ~Scrollable();
 
 	//Scroll the object
-	virtual void Scroll(int xoffset, int yoffset) = 0;
+	virtual void Scroll(double xoffset, double yoffset) = 0;
 
 protected:
-	void UpdateScrollPos(int xoffset, int yoffset);
+	void UpdateScrollPos(double xoffset, double yoffset);
 
-	int prevScrollXPos;
-	int scrollXPos;
+	double prevScrollXPos;
+	double scrollXPos;
 
-	int prevScrollYPos;
-	int scrollYPos;
+	double prevScrollYPos;
+	double scrollYPos;
 };
 
 /* Warning : memory usage of objects contained in the panel is managed by the panel
@@ -152,20 +153,16 @@ protected:
 	glm::vec4 color;
 };
 
-class EmptyButton : public Clickable, public  {
-	Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
-	virtual ~Button();
+class EmptyButton : public Clickable, public Panel {
+public:
+	EmptyButton(ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
+	virtual ~EmptyButton();
 
 	virtual void SetPos(glm::vec2 l_pos);
 	void SetOrigin(Location l_origin);
 	void SetSize(glm::vec2 l_size);
-	void SetCharacterSize(float l_charSize);
-	void SetText(std::string text);
-	void SetTextColor(glm::vec4 color);
-	//Set the color of the frame
-	void SetFrameColor(glm::vec4 color);
-
-	std::string GetText();
+	//Set the color of the button
+	void SetColor(glm::vec4 color);
 
 	virtual void Hover();
 	virtual void UnHover();
@@ -177,9 +174,7 @@ class EmptyButton : public Clickable, public  {
 
 protected:
 	RectangleShape* frame;
-	Text* text;
 
-	float characterSize;
 	glm::vec2 size;
 	Location origin;
 
@@ -228,7 +223,7 @@ public:
 	virtual void Update(Window* win);
 	virtual void Draw(glm::mat4& cameraMatrix);
 	
-	virtual void Scroll(int xoffset, int yoffset);
+	virtual void Scroll(double xoffset, double yoffset);
 
 	//Add a new field to the select box
 	virtual void AddField(const std::string& field);
@@ -290,7 +285,7 @@ protected:
 	RectangleShape* panelFrame;
 };
 
-class ColorSelection : public Panel {
+class ColorSelection : public Panel, public Notifier {
 public:
 	ColorSelection(ShaderManager* l_shaderMgr, Orientation l_orientation);
 	virtual ~ColorSelection();
@@ -298,21 +293,48 @@ public:
 	void Update(Window* win);
 	void Draw(glm::mat4& cameraMatrix);
 
+	/*Add a new color to the color section, if set is true then put the selected color
+	this one*/
+	void AddColor(glm::vec3 color, bool set = false);
+	void AddColor(glm::vec4 color, bool set = false);
+
+	void SetDesactivatedColors(std::vector<glm::vec4>& colors);
+
+	void SetSelectedColor(glm::vec4 color);
+	glm::vec4 GetSelectedColor();
+	void SetSize(glm::vec2 l_size);
+
 private:
-	struct ColorButton {
-		ColorButton(ShaderManager* l_shaderMgr, glm::vec4 l_color, glm::vec2 size, Panel* l_panel);
+	class ColorButton : public Panel {
+	public:
+		ColorButton(ShaderManager* l_shaderMgr, glm::vec4 l_color, glm::vec2 size);
 		virtual ~ColorButton();
 
-		void SetSize(glm::vec2 size);
+		void Update(Window* win);
+		bool GetClick();
+		glm::vec4 GetColor();
 
+		void SetSize(glm::vec2 size);
+		void Activate();
+		void Desactivate(glm::vec4 desColor);
+
+	private:
 		glm::vec4 color;
 		EmptyButton* button;
 		RectangleShape* colorRect;
 	};
 
-	Orientation orientation;
+	void SwitchSelectedColor(int newSelectIndex);
 
-	std::vector<ColorButton> buttons;
+	ColorButton* GetColorButton(glm::vec4 color);
+
+	ShaderManager* shaderMgr;
+	Orientation orientation;
+	glm::vec2 size;
+
+	std::vector<ColorButton*> buttons;
+	std::vector<ColorButton*> desactivatedButtons;
+	int selectIndex;
 };
 
 class PokemonMoveBar : public Panel, public Clickable {

@@ -35,6 +35,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuState.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\OptionsState.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
@@ -83,6 +84,7 @@
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\MenuState.h" />
     <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\OptionsState.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Pokemon.h" />

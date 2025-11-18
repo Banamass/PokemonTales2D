@@ -120,6 +120,9 @@
     <ClCompile Include="src\Areas.cpp">
       <Filter>Fichiers sources\Game\Battle</Filter>
     </ClCompile>
+    <ClCompile Include="src\Notifier.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
@@ -255,6 +258,9 @@
     </ClInclude>
     <ClInclude Include="include\Areas.h">
       <Filter>Fichiers d%27en-tête\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Notifier.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

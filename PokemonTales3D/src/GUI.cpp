@@ -80,7 +80,7 @@ Scrollable::Scrollable()
 	: scrollXPos(0), scrollYPos(0), prevScrollXPos(0), prevScrollYPos(0) {}
 Scrollable::~Scrollable(){}
 
-void Scrollable::UpdateScrollPos(int xoffset, int yoffset) {
+void Scrollable::UpdateScrollPos(double xoffset, double yoffset) {
 	prevScrollXPos = scrollXPos;
 	prevScrollYPos = scrollYPos;
 
@@ -265,6 +265,57 @@ void Button::SetFrameColor(glm::vec4 l_color) {
 
 std::string Button::GetText() { return text->GetText(); }
 
+/*---------------EmptyButton---------------*/
+
+EmptyButton::EmptyButton(ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
+	: Panel(l_shaderMgr, l_pos), Clickable(), origin(Location::BottomLeft), size(0, 0)
+{
+	frame = (RectangleShape*)AddElement(new RectangleShape(shaderMgr->GetShader("SimpleShader")), -1);
+	frame->SetOrigin(Location::Middle);
+
+	SetColor(glm::vec4(1.0f));
+
+	SetPos(l_pos);
+}
+EmptyButton::~EmptyButton() {}
+
+bool EmptyButton::In(glm::vec2 mousePos) {
+	FloatRect hitbox(frame->GetRealPos(), frame->GetSize());
+	return hitbox.Contains(mousePos);
+}
+
+void EmptyButton::Hover() {
+	frame->SetColor(hoverColor);
+}
+void EmptyButton::UnHover() {
+	frame->SetColor(color);
+}
+
+void EmptyButton::Press() {
+	frame->SetColor(pressColor);
+}
+void EmptyButton::UnPress() {
+	frame->SetColor(color);
+}
+
+void EmptyButton::SetPos(glm::vec2 l_pos) {
+	Panel::SetPos(l_pos - LocationToPosition(size, origin));
+}
+void EmptyButton::SetOrigin(Location l_origin) {
+	origin = l_origin;
+	SetPos(pos);
+}
+void EmptyButton::SetSize(glm::vec2 l_size) {
+	size = l_size;
+	frame->SetSize(l_size);
+}
+void EmptyButton::SetColor(glm::vec4 l_color) {
+	color = l_color;
+	pressColor = color * glm::vec4(glm::vec3(0.8f), 1.0f);
+	hoverColor = color * glm::vec4(glm::vec3(0.5f), 1.0f);
+	frame->SetColor(color);
+}
+
 /*---------------TextField---------------*/
 
 TextField::TextField(glm::vec2 l_backSize, unsigned int l_fontSize, glm::vec2 l_pos, ShaderManager* l_shaderMgr)
@@ -430,7 +481,7 @@ void SelectBox::Update(Window* win) {
 void SelectBox::Draw(glm::mat4& cameraMatrix) {
 	Panel::Draw(cameraMatrix);
 }
-void SelectBox::Scroll(int xoffset, int yoffset) {
+void SelectBox::Scroll(double xoffset, double yoffset) {
 	UpdateScrollPos(xoffset, yoffset);
 	
 	ShiftActButtonsInt(yoffset > 0 ? Direction::Up : Direction::Down);
@@ -519,9 +570,6 @@ bool SelectBox::SetActButtonsInt(int first, int last) {
 	UpdateButtonsScroll();
 	return true;
 }
-/*bool SelectBox::ShiftActButtonsInt(int shift) {
-	return false;
-}*/
 bool SelectBox::ShiftActButtonsInt(Direction dir) {
 	if (dir == Direction::Up) {
 		if (activButtonsInt.second == boxes.end())
@@ -558,35 +606,128 @@ bool SelectBox::GetIsInSelection() { return isInSelection; }
 
 /*---------------ColorSelection---------------*/
 
-ColorSelection::ColorButton::ColorButton(ShaderManager* l_shaderMgr, glm::vec4 l_color, glm::vec2 size, Panel* panel)
-	: color(l_color) {
-	button = (EmptyButton*)panel->AddElement(new EmptyButton());
-	colorRect = (RectangleShape*)panel->AddElement(new RectangleShape(l_shaderMgr->GetShader("SimpleShader")));
+ColorSelection::ColorButton::ColorButton(ShaderManager* l_shaderMgr, glm::vec4 l_color, glm::vec2 size)
+	: Panel(l_shaderMgr), color(l_color) {
+	button = (EmptyButton*)AddElement(new EmptyButton(l_shaderMgr, glm::ivec2(0, 0)));
+	button->SetColor(glm::vec4(1.0f));
+	colorRect = (RectangleShape*)AddElement(new RectangleShape(l_shaderMgr->GetShader("SimpleShader")));
+	colorRect->SetColor(l_color);
 	SetSize(size);
 }
 ColorSelection::ColorButton::~ColorButton() {}
 
+bool ColorSelection::ColorButton::GetClick() {
+	return button->GetClick();
+}
+glm::vec4 ColorSelection::ColorButton::GetColor() {
+	return color;
+}
+
+void ColorSelection::ColorButton::Update(Window* win) {
+	button->Update(win);
+}
+
 void ColorSelection::ColorButton::SetSize(glm::vec2 size) {
-	
+	button->SetSize(size);
+	colorRect->SetSize(size * 0.6f);
+	colorRect->SetPos(size * 0.2f);
+}
+
+void ColorSelection::ColorButton::Desactivate(glm::vec4 desColor) {
+	button->SetActivated(false);
+	button->SetColor(desColor);
+}
+void ColorSelection::ColorButton::Activate() {
+	button->SetActivated(true);
+	button->SetColor(glm::vec4(1.0f));
 }
 
 ColorSelection::ColorSelection(ShaderManager* l_shaderMgr, Orientation l_orientation)
-	: Panel(l_shaderMgr), orientation(l_orientation)
-{
-
+	: Panel(l_shaderMgr), Notifier(),
+	orientation(l_orientation), shaderMgr(l_shaderMgr), selectIndex(-1) {
+	SetSize(glm::vec2(20.0f, 20.0f));
 }
-ColorSelection::~ColorSelection() {
+ColorSelection::~ColorSelection() {}
 
+void ColorSelection::SwitchSelectedColor(int newSelectIndex) {
+	if (selectIndex != -1)
+		buttons[selectIndex]->Activate();
+	selectIndex = newSelectIndex;
+	buttons[selectIndex]->Desactivate(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+	NotifyAll("Color");
 }
 
 void ColorSelection::Update(Window* win) {
-	for (auto& b : buttons)
-		b.button->Update(win);
+	int i = 0;
+	for (auto& b : buttons) {
+		b->Update(win);
+		if (b->GetClick()) {
+			SwitchSelectedColor(i);
+			break;
+		}
+		i++;
+	}
 }
 void ColorSelection::Draw(glm::mat4& cameraMatrix) {
 	Panel::Draw(cameraMatrix);
 }
 
+void ColorSelection::AddColor(glm::vec3 color, bool set) {
+	AddColor(glm::vec4(color, 1.0f), set);
+}
+void ColorSelection::AddColor(glm::vec4 color, bool set) {
+	glm::vec2 bpos = glm::vec2(buttons.size() * size.x, 0.0f);
+	ColorButton* newB = (ColorButton*)AddElement(new ColorButton(shaderMgr, color, size));
+	buttons.push_back(newB);
+	newB->SetPos(bpos);
+	if (set)
+		SwitchSelectedColor(buttons.size()-1);
+}
+
+void ColorSelection::SetDesactivatedColors(std::vector<glm::vec4>& colors) {
+	for (auto& b : desactivatedButtons)
+		b->Activate();
+	desactivatedButtons.clear();
+	for (auto& c : colors) {
+		ColorButton* b = GetColorButton(c);
+		b->Desactivate(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+		desactivatedButtons.push_back(b);
+	}
+}
+
+ColorSelection::ColorButton* ColorSelection::GetColorButton(glm::vec4 color) {
+	for (auto& b : buttons) {
+		if (b->GetColor() == color)
+			return b;
+	}
+}
+
+void ColorSelection::SetSelectedColor(glm::vec4 color) {
+	int i = 0;
+	for (auto& b : buttons) {
+		if (b->GetColor() == color)
+			SwitchSelectedColor(i);
+		i++;
+	}
+}
+
+void ColorSelection::SetSize(glm::vec2 l_size) {
+	size = l_size;
+
+	glm::vec2 bpos = glm::vec2(0.0f, 0.0f);
+	glm::vec2 padd = glm::vec2(size.x, 0.0f);
+	for (auto& b : buttons) {
+		b->SetSize(size);
+		b->SetPos(bpos);
+		bpos += padd;
+	}
+}
+
+glm::vec4 ColorSelection::GetSelectedColor() {
+	if (selectIndex == -1)
+		return glm::vec4(0.0f);
+	return buttons[selectIndex]->GetColor();
+}
 
 /*---------------PokemonMoveBar---------------*/
 

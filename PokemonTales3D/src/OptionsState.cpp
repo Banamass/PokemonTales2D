@@ -4,7 +4,7 @@
 /*--------------PlayerOptionsGUI--------------*/
 
 PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context, std::string l_playerTag)
-	: Panel(shaderMgr), activated(true), playerTag(l_playerTag)
+	: Panel(shaderMgr), activated(true), playerTag(l_playerTag), otherPlayerOpt(nullptr)
 {
 	defaultSelection = "Select a Pokemon";
 	noneField = "No Pokemon";
@@ -13,8 +13,23 @@ PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context, std::string l_playe
 
 	playerTagText = (Text*)AddElement(
 		new Text(font, playerTag + " :", l_context->shaderManager->GetShader("FontShader")));
-	playerTagText->SetCharacterSize(20.0f);
+	playerTagText->SetCharacterSize(30.0f);
 	playerTagText->SetColor(glm::vec3(1.0f));
+	playerTagText->SetOrigin(Location::MiddleLeft);
+
+	playerColorSelection = (ColorSelection*)AddElement(
+		new ColorSelection(l_context->shaderManager, Orientation::Hozirontal));
+	playerColorSelection->Subscribe("Color", &PlayerOptionsGUI::ColorSelectionNotify, this);
+	playerColorSelection->SetSize(glm::vec2(60.0f, 60.0f));
+	playerColorSelection->SetPos(glm::vec2(500.0f, 0.0f));
+	playerColorSelection->SetOrigin(Location::MiddleLeft);
+
+	textSelectColor = (Text*)AddElement(
+		new Text(font, "Select a color : ", l_context->shaderManager->GetShader("FontShader")));
+	textSelectColor->SetCharacterSize(20.0f);
+	textSelectColor->SetColor(glm::vec3(1.0f));
+	textSelectColor->SetPos(glm::vec2(330.0f, 0.0f));
+	textSelectColor->SetOrigin(Location::MiddleLeft);
 
 	glm::vec2 selectSize(200.0f, 50.0f);
 	float space = 40.0f;
@@ -39,14 +54,20 @@ PlayerOptionsGUI::~PlayerOptionsGUI() {
 
 }
 
+void PlayerOptionsGUI::SetOtherPlayerOption(PlayerOptionsGUI* l_otherPlayerOpt) {
+	otherPlayerOpt = l_otherPlayerOpt;
+	playerColorSelection->Subscribe("Color", &PlayerOptionsGUI::ColorOtherPlayerNotify, otherPlayerOpt);
+}
+
 void PlayerOptionsGUI::Update(Window* win) {
 	if (!activated)
 		return;
 	for (auto& s : pokeSelection)
 		s->Update(win);
+	playerColorSelection->Update(win);
 }
 
-void PlayerOptionsGUI::Scroll(int xoffset, int yoffset) {
+void PlayerOptionsGUI::Scroll(double xoffset, double yoffset) {
 	for (auto& box : pokeSelection) {
 		if(box->GetIsInSelection())
 			box->Scroll(xoffset, yoffset);
@@ -55,6 +76,14 @@ void PlayerOptionsGUI::Scroll(int xoffset, int yoffset) {
 
 void PlayerOptionsGUI::SetActivated(bool b) {
 	activated = b;
+}
+
+void PlayerOptionsGUI::AddPlayerColor(glm::vec4 color) {
+	playerColorSelection->AddColor(color);
+	playerColorSelection->SetOrigin(Location::MiddleLeft);
+}
+void PlayerOptionsGUI::SetSelectedPlayerColor(glm::vec4 color) {
+	playerColorSelection->SetSelectedColor(color);
 }
 
 void PlayerOptionsGUI::Reset() {
@@ -73,16 +102,47 @@ std::vector<std::string> PlayerOptionsGUI::GetSelectedPokemon() {
 	return res;
 }
 
+glm::vec4 PlayerOptionsGUI::GetPlayerColor() {
+	return playerColorSelection->GetSelectedColor();
+}
+
+void PlayerOptionsGUI::ColorSelectionNotify() {
+	playerTagText->SetColor(playerColorSelection->GetSelectedColor());
+}
+void PlayerOptionsGUI::ColorOtherPlayerNotify() {
+	std::vector<glm::vec4> colors;
+	colors.push_back(otherPlayerOpt->GetPlayerColor());
+	playerColorSelection->SetDesactivatedColors(colors);
+}
+
 /*--------------OptionsState--------------*/
 
 OptionsState::OptionsState(SharedContext* l_context)
-	: State(l_context), player1Options(l_context, "Player1"), player2Options(l_context, "Player2"),
+	: State(l_context), player1Options(l_context, "Player1")
+	, player2Options(l_context, "Player2"),
 	generalButtons(l_context->shaderManager)
 {
 	type = StateType::Options;
 
 	context->eventManager->AddCallback("OptionsKey", EventType::Key, &OptionsState::KeyCallback, this, StateType::Options);
 	context->eventManager->AddCallback("OptionsScroll", EventType::Scroll, &OptionsState::ScrollCallback, this, StateType::Options);
+	
+	//Setup color selection
+	{
+		player1Options.SetOtherPlayerOption(&player2Options);
+		player2Options.SetOtherPlayerOption(&player1Options);
+
+		player1Options.AddPlayerColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		player1Options.AddPlayerColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		player1Options.AddPlayerColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+		player2Options.AddPlayerColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		player2Options.AddPlayerColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		player2Options.AddPlayerColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+		player1Options.SetSelectedPlayerColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		player2Options.SetSelectedPlayerColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	}
 
 	glm::vec2 select1Pos(10.0f, 400.0f);
 	glm::vec2 select2Pos(10.0f, 100.0f);
@@ -226,6 +286,9 @@ const OptionsData& OptionsState::GetOptionsData() {
 		if (pokeData)
 			data.pokeNamePlayer2.push_back(pokeData);
 	}
+
+	data.player1Color = player1Options.GetPlayerColor();
+	data.player2Color = player2Options.GetPlayerColor();
 
 	return data;
 }

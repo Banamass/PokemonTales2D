@@ -9,6 +9,14 @@ glm::vec2 LocationToPosition(glm::vec2 size, Location loc) {
 		 return glm::vec2(size.x, size.y);
 	 if (loc == Location::BottomRight)
 		 return glm::vec2(size.x, 0);
+	 if (loc == Location::MiddleTop)
+		 return glm::vec2(size.x / 2, size.y);
+	 if (loc == Location::MiddleLeft)
+		 return glm::vec2(0.0f, size.y / 2);
+	 if (loc == Location::MiddleBottom)
+		 return glm::vec2(size.x / 2, 0.0f);
+	 if (loc == Location::MiddleRight)
+		 return glm::vec2(size.x, size.y / 2);
 	 if (loc == Location::Middle)
 		 return glm::vec2(size.x / 2, size.y / 2);
 }
