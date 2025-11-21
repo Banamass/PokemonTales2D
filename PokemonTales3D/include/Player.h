@@ -129,6 +129,8 @@ private:
 	private:
 		void SetMove(int id);
 
+		SquareArea rangeArea;
+		Drawable rangeBox;
 		Pokemon* selectedPokemon;
 		PokemonMove* move;
 	};

@@ -93,8 +93,8 @@ Player::State::State(Player* l_player) :
 	player(l_player), type(PType::None),
 	cursorDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
 	selectedPokeAreaDrawable(player->boxModel, player->context->shaderManager->GetShader("ModelShader")),
-	cursor(glm::ivec2(1, 1)),
-	selectedPokeArea(glm::ivec2(0,0))
+	cursor(player->context->board, glm::ivec2(1, 1)),
+	selectedPokeArea(player->context->board, glm::ivec2(0,0))
 {
 	Drawable::Material mat;
 
@@ -110,7 +110,7 @@ void Player::State::Render() {
 
 void Player::State::UpdateCursor() {
 	Board* board = player->context->board;
-	cursor.Update(board, board->GetMousePos());
+	cursor.Update(board->GetMousePos());
 }
 void Player::State::RenderCursor() {
 	for (Box* box : cursor.GetBoxes()) {
@@ -130,7 +130,7 @@ void Player::State::UpdateSelectedPokeArea(Pokemon* poke) {
 	}
 	selectedPokeArea.SetSize(poke->GetSize());
 	Board* board = player->context->board;
-	selectedPokeArea.Update(board, board->GetPokemonPosition(poke));
+	selectedPokeArea.Update(board->GetPokemonPosition(poke));
 }
 void Player::State::RenderSelectedPokeArea() {
 	for (Box* box : selectedPokeArea.GetBoxes()) {
@@ -272,27 +272,28 @@ void Player::PokeSelectedState::Attack(int moveId) {
 
 Player::PokeMoveState::PokeMoveState(Player* l_player, Pokemon* l_selectedPokemon)
 	: State(l_player), selectedPokemon(l_selectedPokemon)
-	, moveArea(l_selectedPokemon, player->pokemonState[l_selectedPokemon].nbStepLeft),
+	, moveArea(player->context->board, l_selectedPokemon, player->pokemonState[l_selectedPokemon].nbStepLeft),
 	moveBox(player->boxModel, player->context->shaderManager->GetShader("ModelShader"))
 {
 	type = PType::PokeMove;
 
 	Drawable::Material mat;
-	glm::vec4 color(0.0f, 1.0f, 0.0f, 1.0f);
+	glm::vec3 color(0.0f, 0.0f, 0.7f);
 	mat.ambient = 0.3f * color;
 	mat.diffuse = color;
 	mat.specular = glm::vec4(1.0);
 	mat.shininess = 32.0f;
 	cursorDrawable.SetMaterial(mat);
 
-	color = glm::vec4(0.5f, 0.0f, 1.0f, 1.0f);
+	color = glm::vec3(0.0f, 0.0f, 1.0f);
 	mat.ambient = 0.3f * color;
 	mat.diffuse = color;
+	mat.alpha = 0.2f;
 	moveBox.SetMaterial(mat);
 	float scale = 0.95f;
 	moveBox.Scale(glm::vec3(scale, scale, scale));
 
-	moveArea.Update(player->context->board, player->context->board->GetPokemonPosition(selectedPokemon));
+	moveArea.Update(player->context->board->GetPokemonPosition(selectedPokemon));
 	
 	UpdateSelectedPokeArea(selectedPokemon);
 }
@@ -338,9 +339,8 @@ void Player::PokeMoveState::Unmove() {
 }
 
 void Player::PokeMoveState::Move() {
-	
 	glm::ivec2 movePos = cursor.GetIntRect().pos;
-	int dist = moveArea.Distance(player->context->board, movePos);
+	int dist = moveArea.Distance(movePos);
 	if (dist <= 0)
 		return;
 	bool hasMoved = player->context->board->SetPokemonPos(selectedPokemon, movePos);
@@ -354,18 +354,27 @@ void Player::PokeMoveState::Move() {
 
 /*-----------------------------PokeAttackState-----------------------------*/
 Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPokemon, int moveId)
-	: State(l_player), selectedPokemon(l_selectedPokemon) 
+	: State(l_player), selectedPokemon(l_selectedPokemon),
+	rangeArea(player->context->board, glm::ivec2(0,0)), rangeBox(player->boxModel, player->context->shaderManager->GetShader("ModelShader"))
 {
 	type = PType::PokeAttack;
 
 	Drawable::Material mat;
-	glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);
+	glm::vec3 color(0.8f, 0.0f, 0.0f);
 	mat.ambient = 0.3f * color;
 	mat.diffuse = color;
 	mat.specular = glm::vec4(1.0);
 	mat.shininess = 32.0f;
 	cursorDrawable.SetMaterial(mat);
 	
+	color = glm::vec3(1.0f, 0.0f, 0.0f);
+	mat.ambient = 0.3f * color;
+	mat.diffuse = color;
+	mat.alpha = 0.2f;
+	rangeBox.SetMaterial(mat);
+	float scale = 0.95f;
+	rangeBox.Scale(glm::vec3(scale, scale, scale));
+
 	SetMove(moveId);
 
 	UpdateSelectedPokeArea(selectedPokemon);
@@ -377,12 +386,14 @@ void Player::PokeAttackState::SetMove(int id) {
 	move = selectedPokemon->GetMove(id);
 	player->context->gui->GetSelectedPokemonGUI()->SetSelectedMove(id);
 	cursor.SetSize(move->data->hitZone);
+	rangeArea.SetSize(glm::ivec2(move->data->range*2) + selectedPokemon->GetSize());
+	Board* board = player->context->board;
+	rangeArea.Update(board->GetPokemonPosition(selectedPokemon));
 }
 
 void Player::PokeAttackState::KeyCallback(Key_Data& data) {
-	if (data.key == GLFW_KEY_2 && data.action == GLFW_RELEASE) {
+	if (data.key == GLFW_KEY_2 && data.action == GLFW_RELEASE)
 		Unattack();
-	}
 	else if (data.key == GLFW_KEY_KP_1 && data.action == GLFW_RELEASE)
 		SetMove(0);
 	else if (data.key == GLFW_KEY_KP_2 && data.action == GLFW_RELEASE)
@@ -391,6 +402,8 @@ void Player::PokeAttackState::KeyCallback(Key_Data& data) {
 		SetMove(2);
 	else if (data.key == GLFW_KEY_KP_4 && data.action == GLFW_RELEASE)
 		SetMove(3);
+	else if (data.key == GLFW_KEY_R && data.action == GLFW_RELEASE)
+		cursor.Rotate();
 }
 
 void Player::PokeAttackState::MouseButtonCallback(MouseButton_Data& data) {
@@ -414,23 +427,36 @@ void Player::PokeAttackState::Update(double dt) {
 	SharedContext* context = player->context;
 	std::vector<Pokemon*> attackedPokemon = context->board->GetPokemonCollision(cursor.GetIntRect());
 	context->gui->GetSelectedPokemonGUI()->SetAimedPoke(attackedPokemon, move);
-
+	
 	UpdateCursor();
 }
 
 void Player::PokeAttackState::Render(){
 	State::Render();
+	for (Box*& box : rangeArea.GetBoxes()) {
+		glm::ivec2 pos = box->GetPos();
+		rangeBox.SetPosition(glm::ivec3(
+			pos.x * Constants::BOX_SIZE,
+			0.0f,
+			pos.y * Constants::BOX_SIZE
+		));
+		player->context->win->Draw(rangeBox);
+	}
 	RenderCursor();
 }
 
 void Player::PokeAttackState::Attack() {
 	Board* board = player->context->board;
 	std::vector<Pokemon*> attackedPokemon = board->GetPokemonCollision(cursor.GetIntRect());
-	if (attackedPokemon.size() == 0)
-		return;
+	bool touch = false;
 	for (Pokemon* poke : attackedPokemon) {
-		player->context->gameSystem->Attack(selectedPokemon, poke, move);
+		if (rangeArea.IsIn(board->GetPokemonPosition(poke))) {
+			player->context->gameSystem->Attack(selectedPokemon, poke, move);
+			touch = true;
+		}
 	}
+	if (!touch)
+		return;
 	player->pokemonState[selectedPokemon].nbMove++;
 	player->pokemonState[selectedPokemon].lock = true;
 	player->context->gui->GetSelectedPokemonGUI()->SetSelectedMove(-1);

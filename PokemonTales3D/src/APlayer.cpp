@@ -29,6 +29,7 @@ bool APlayer::AddPokemon(Pokemon* poke, glm::ivec2 initialPos) {
 	pokemonState.emplace(poke, PokemonState());
 	poke->SetMovePool(0, context->gameData->GetMoveData(1));
 	poke->SetMovePool(1, context->gameData->GetMoveData(2));
+	poke->SetMovePool(2, context->gameData->GetMoveData(3));
 	return true;
 }
 

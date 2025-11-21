@@ -8,8 +8,8 @@
 //This abstract class represents an area of the board
 class AbstractArea {
 public:
-	AbstractArea()
-		:pos({ -100, -100 }) {
+	AbstractArea(Board* l_board)
+		:pos({ -100, -100 }), board(l_board) {
 	};
 	virtual ~AbstractArea() { Clear(); };
 
@@ -21,12 +21,13 @@ public:
 	//Return if a position is in the area
 	virtual bool IsIn(glm::ivec2 pos) = 0;
 	//Update the area representation on the board, with a new pos
-	virtual void Update(Board* board, glm::ivec2 l_pos) = 0;
+	virtual void Update(glm::ivec2 l_pos) = 0;
 
 protected:
 	virtual void Clear();
 	void Add(Box* box);
 
+	Board* board;
 	std::vector<Box*> boxes;
 	glm::ivec2 pos;
 };
@@ -34,8 +35,8 @@ protected:
 //This class implements Abstract area for a square area
 class SquareArea : public AbstractArea {
 public:
-	SquareArea(glm::ivec2 l_size, Location l_origin = Location::Middle)
-		: AbstractArea(), size(l_size), origin(l_origin), originOffset({ 0, 0 })
+	SquareArea(Board* l_board, glm::ivec2 l_size, Location l_origin = Location::Middle)
+		: AbstractArea(l_board), size(l_size), origin(l_origin), originOffset({ 0, 0 })
 	{
 		compute = true;
 		SetRealPosOffset();
@@ -47,8 +48,9 @@ public:
 	//Get the int rect representing the area
 	IntRect GetIntRect();
 
+	void Rotate();
 	bool IsIn(glm::ivec2 pos);
-	void Update(Board* board, glm::ivec2 l_pos);
+	void Update(glm::ivec2 l_pos);
 
 protected:
 	void SetIntRect();
@@ -65,8 +67,8 @@ protected:
 //This class implements Abstract area for an area representing the moving zone of an entity on the board
 class MoveArea : public AbstractArea {
 public:
-	MoveArea(Pokemon* l_movingPokemon, int nbStep)
-		: AbstractArea(), pos(glm::ivec2(-100, -100)), movingPokemon(l_movingPokemon)
+	MoveArea(Board* l_board, Pokemon* l_movingPokemon, int nbStep)
+		: AbstractArea(l_board), pos(glm::ivec2(-100, -100)), movingPokemon(l_movingPokemon)
 	{
 		range = nbStep;
 	}
@@ -74,9 +76,9 @@ public:
 
 	// For this class use Distance to have a better complexity
 	bool IsIn(glm::ivec2 l_pos);
-	void Update(Board* board, glm::ivec2 l_pos);
+	void Update(glm::ivec2 l_pos);
 	// Return the distance of l_pos from the area origin, -1 if it's unreachable
-	int Distance(Board* board, glm::ivec2 l_pos);
+	int Distance(glm::ivec2 l_pos);
 
 protected:
 	void Clear();

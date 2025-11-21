@@ -1,7 +1,7 @@
 {
   "ID": 1,
   "Name": "Bulbasaur",
-  "Type": [ "Fire" ],
+  "Type": [ "Grass" ],
   "Stats": {
     "HP": 39,
     "Attack": 52,
@@ -13,5 +13,5 @@
   },
   "Sprite": "Salameche.obj",
   "Size": [1, 1],
-  "AttackPool": [ 1 ]
+  "AttackPool": [ 3 ]
 }

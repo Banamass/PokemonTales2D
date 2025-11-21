@@ -5,6 +5,8 @@ PokeType GetPokeTypeFromString(const std::string& type){
 		return PokeType::Fire;
 	if (type == "Water")
 		return PokeType::Water;
+	if (type == "Grass")
+		return PokeType::Grass;
 	else
 		return PokeType::NonePokeType;
 }
@@ -13,6 +15,8 @@ std::string GetStringFromPokeType(PokeType type) {
 		return "Fire";
 	if (type == PokeType::Water)
 		return "Water";
+	if (type == PokeType::Grass)
+		return "Grass";
 	else
 		return "None";
 }
@@ -22,6 +26,8 @@ glm::vec4 GetColorFromPokeType(PokeType type) {
 		return glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	if (type == PokeType::Water)
 		return glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	if (type == PokeType::Grass)
+		return glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	else
 		return glm::vec4(0.0f);
 }

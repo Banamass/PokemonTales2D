@@ -746,7 +746,8 @@ PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::iv
 	ppText = (Text*)AddElement( new Text(l_font, "10/10", l_shaderMgr->GetShader("FontShader")));
 	ppText->SetColor(glm::vec3(0.0f));
 	ppText->SetCharacterSize(charSize);
-	ppText->SetPos(glm::vec2(size.x - 50, margin));
+	ppText->SetPos(glm::vec2(size.x - margin, margin));
+	ppText->SetOrigin(Location::BottomRight);
 
 	moveName = (Text*)AddElement(new Text(l_font, "Move", l_shaderMgr->GetShader("FontShader")));
 	moveName->SetColor(glm::vec3(0.0f));
@@ -763,6 +764,12 @@ PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::iv
 	typeText->SetCharacterSize(charSize);
 	typeText->SetPos(glm::vec2(size.x - 50, size.y - charSize - margin));
 	
+	rangeText = (Text*)AddElement(new Text(l_font, "0", l_shaderMgr->GetShader("FontShader")));
+	rangeText->SetColor(glm::vec3(0.0f));
+	rangeText->SetCharacterSize(charSize);
+	rangeText->SetPos(glm::vec2(size.x / 2.0f, margin));
+	rangeText->SetOrigin(Location::MiddleBottom);
+
 	typeFramePadding = glm::vec2(2.0f, 2.0f);
 	typeFrame = (RectangleShape*)AddElement(new RectangleShape(l_shaderMgr->GetShader("SimpleShader")), -1);
 	typeFrame->SetColor(glm::vec4(0.0f));
@@ -811,6 +818,7 @@ void PokemonMoveBar::SetPokemonMove(PokemonMove* l_move) {
 	typeText->SetText(GetStringFromPokeType(move->data->type));
 	typeFrame->SetColor(GetColorFromPokeType(move->data->type));
 	typeFrame->SetSize(glm::vec2(typeText->GetFloatRect().size.x, charSize) + 2.0f * typeFramePadding);
+	rangeText->SetText(std::to_string(move->data->range));
 }
 
 glm::vec2 PokemonMoveBar::GetSize() {

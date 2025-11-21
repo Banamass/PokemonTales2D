@@ -1,0 +1,13 @@
+{
+  "ID": 3,
+  "Name": "Vine Whip",
+  "Type": "Grass",
+  "Cat": "Phy",
+  "Power": 45,
+  "Acc.": 100,
+  "PP": 25,
+  "Effect": "Vine Whip deals damage with no additional effect",
+  "Prob": 10,
+  "HitZone": [ 1, 2 ],
+  "Range": 2
+}

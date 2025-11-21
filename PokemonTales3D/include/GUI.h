@@ -364,6 +364,7 @@ private:
 	Text* ppText;
 	Text* powerText;
 	Text* typeText;
+	Text* rangeText;
 	RectangleShape* typeFrame;
 	RectangleShape* frame;
 

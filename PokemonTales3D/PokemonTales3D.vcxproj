@@ -51,6 +51,7 @@
     <None Include="Resources\GameData\Moves\Bubble.json" />
     <None Include="Resources\GameData\Moves\Ember.json" />
     <None Include="Resources\GameData\Moves\Moves.json" />
+    <None Include="Resources\GameData\Moves\VineWhip.json" />
     <None Include="Resources\GameData\Pokemons\Bulbasaur.json" />
     <None Include="Resources\GameData\Pokemons\Charmander.json" />
     <None Include="Resources\GameData\Pokemons\Pokemons.json" />

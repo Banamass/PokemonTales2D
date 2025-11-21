@@ -31,11 +31,20 @@ void SquareArea::SetIntRect() {
 	intRect = IntRect({ pos.x - originOffset.x, pos.y - originOffset.y }, size);
 }
 
-bool SquareArea::IsIn(glm::ivec2 pos) {
-	return false;
+void SquareArea::Rotate() {
+	int temp = size.x;
+	size.x = size.y;
+	size.y = temp;
+	compute = true;
+	SetRealPosOffset();
+	Update(pos);
 }
 
-void SquareArea::Update(Board* board, glm::ivec2 l_pos) {
+bool SquareArea::IsIn(glm::ivec2 pos) {
+	return GetIntRect().Contains(pos);
+}
+
+void SquareArea::Update(glm::ivec2 l_pos) {
 	if (pos == l_pos && !compute)
 		return;
 	Clear();
@@ -76,11 +85,11 @@ bool MoveArea::IsIn(glm::ivec2 l_pos) {
 	return false;
 }
 
-int MoveArea::Distance(Board* board, glm::ivec2 l_pos) {
+int MoveArea::Distance(glm::ivec2 l_pos) {
 	return boxDistance[board->GetBox(l_pos)];
 }
 
-void MoveArea::Update(Board* board, glm::ivec2 l_pos) {
+void MoveArea::Update(glm::ivec2 l_pos) {
 	Clear();
 	pos = l_pos;
 	glm::ivec2 boardSize = board->GetSize();

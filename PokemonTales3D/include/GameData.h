@@ -14,7 +14,7 @@ using json = nlohmann::json;
 
 //Enum representing all supported poke type
 enum PokeType {
-	Fire, Water, NonePokeType
+	Fire, Water, Grass, NonePokeType
 };
 //Convert a string into a PokeType, if the string is unknown, return PokeType::NonePokeType
 PokeType GetPokeTypeFromString(const std::string& type);
