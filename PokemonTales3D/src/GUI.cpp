@@ -637,9 +637,15 @@ void ColorSelection::ColorButton::Desactivate(glm::vec4 desColor) {
 	button->SetActivated(false);
 	button->SetColor(desColor);
 }
+void ColorSelection::ColorButton::Delete(glm::vec4 delColor) {
+	button->SetActivated(false);
+	button->SetColor(delColor);
+	colorRect->SetColor(delColor);
+}
 void ColorSelection::ColorButton::Activate() {
 	button->SetActivated(true);
 	button->SetColor(glm::vec4(1.0f));
+	colorRect->SetColor(color);
 }
 
 ColorSelection::ColorSelection(ShaderManager* l_shaderMgr, Orientation l_orientation)
@@ -690,7 +696,7 @@ void ColorSelection::SetDesactivatedColors(std::vector<glm::vec4>& colors) {
 	desactivatedButtons.clear();
 	for (auto& c : colors) {
 		ColorButton* b = GetColorButton(c);
-		b->Desactivate(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+		b->Delete(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 		desactivatedButtons.push_back(b);
 	}
 }

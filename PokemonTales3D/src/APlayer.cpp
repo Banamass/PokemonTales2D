@@ -79,6 +79,7 @@ void APlayer::SetPlayerColor(glm::vec3 color) {
 	playerColor = color;
 	Drawable::Material mat;
 	mat.SetLightningColor(playerColor, 0.5f);
+	mat.alpha = 0.5f;
 	pokemonsMark.SetMaterial(mat);
 }
 bool APlayer::Playing() { return isPlaying; }

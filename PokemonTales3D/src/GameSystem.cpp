@@ -131,5 +131,42 @@ void GameSystem::Attack(Pokemon* attacker, Pokemon* attacked, PokemonMove* move)
 }
 
 float GameSystem::ComputeDamages(Pokemon* attacker, Pokemon* attacked, PokemonMove* move) {
-	return move->pp;
+	int res;
+	
+	PokemonStatus& sa = attacker->GetStatus();
+	PokemonStatus& sd = attacked->GetStatus();
+
+	int Niv = sa.GetStat(Stat::Hp);
+	int Att = 0;
+	int Def = 0;
+	if (move->data->cat == CatType::Phy) {
+		Att = sa.GetStat(Stat::Atk);
+		Def = sd.GetStat(Stat::Def);
+	}
+	else {
+		Att = sa.GetStat(Stat::SpAtk);
+		Def = sd.GetStat(Stat::SpDef);
+	}
+	int Pui = move->data->power; //Other coefficient (burn, etc)
+
+	res = ((((Niv * 0.4f + 2) * Att * Pui) / Def) / 50) + 2;
+
+	float CM = 1.0f;
+
+	float STAB = 1.0f;
+	auto types = attacker->GetType();
+	if (move->data->type == types.first || move->data->type == types.second)
+		STAB = 1.5f;
+
+	float Eff = 1.0f;
+
+	float CC = 1.0f;
+
+	float Rand = 1.0f;
+
+	float Other = 1.0f;
+
+	CM *= STAB * CC * Rand * Eff * Other;
+
+	return res * CM;
 }

@@ -15,6 +15,27 @@ struct PokemonMove {
 
 class APlayer;
 
+/*This class stores the status of an instance of a particular pokemon*/
+class PokemonStatus {
+public:
+	PokemonStatus(const PokemonData* l_data);
+	~PokemonStatus();
+
+	int GetStat(Stat stat);
+	int GetHealth();
+	void TakeDamages(int damages);
+
+	PokemonMove* movePool[4];
+	const PokemonData* data;
+
+private:
+	int level;
+	int EV[Constants::NB_STATS];
+	int IV[Constants::NB_STATS];
+
+	int damages;
+};
+
 class Pokemon {
 public:
 	Pokemon(const PokemonData* data, APlayer* l_trainer,
@@ -36,19 +57,22 @@ public:
 
 	//Getters and setters
 
-	float GetHealth();
-	float GetMaxHealth();
+	int GetHealth();
+	int GetMaxHealth();
 	glm::ivec2 GetSize();
 	int GetMoveRange();
 	APlayer* GetTrainer();
 	std::string GetName();
 	bool IsKO();
+	/*Return a pointer to the i-th move of this pokemon(0 <= i <= 3) 
+	If he has no such move return nullptr*/
 	PokemonMove* GetMove(int i);
 	std::pair<PokeType, PokeType> GetType();
 	void SetMovePool(int i, const MoveData* l_data);
+	PokemonStatus& GetStatus();
 
 	//Take l_damages damages
-	void TakeDamages(float l_damages);
+	void TakeDamages(int l_damages);
 
 private:
 	ModelManager* modelMgr;
@@ -60,10 +84,7 @@ private:
 
 	Drawable* OBB;
 
-	float health;
-	PokemonMove* movePool[4];
-
-	const PokemonData* data;
+	PokemonStatus status;
 
 	APlayer* trainer;
 };

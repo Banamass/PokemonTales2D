@@ -9,6 +9,7 @@
 
 #include "glm/glm.hpp"
 #include "json.hpp"
+#include "SharedTypes.h"
 
 using json = nlohmann::json;
 
@@ -28,16 +29,7 @@ enum CatType{Spe, Phy, NoneCatType};
 //Convert a string into a CatType, if the string is unknown, return CatType::NoneCatType
 CatType GetCatTypeFromString(const std::string& type);
 
-//Store the stats of a pokemon
-struct PokemonStats {
-	int hp;
-	int atk;
-	int def;
-	int spAtk;
-	int spDef;
-	int speed;
-	int move;
-};
+enum Stat {Hp = 0, Atk, Def, SpAtk, SpDef, Speed, Move};
 
 //Store the data relative to a move
 struct MoveData {
@@ -59,7 +51,7 @@ struct PokemonData {
 	int id;
 	std::string name;
 	std::pair<PokeType, PokeType> types;
-	PokemonStats stats;
+	int stats[Constants::NB_STATS];
 	std::string sprite;
 	glm::ivec2 size;
 	std::vector<const MoveData*> movePool;

@@ -1,7 +1,7 @@
 {
   "ID": 7,
   "Name": "Squirtle",
-  "Type": [ "Fire" ],
+  "Type": [ "Water" ],
   "Stats": {
     "HP": 39,
     "Attack": 52,

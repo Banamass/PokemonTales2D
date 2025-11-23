@@ -10,3 +10,19 @@ A faire:
 - Utiliser unique_ptr
 - Rajouter des contructeurs par défault aux objets qui en ont besoin + revoir ShaderManagement pour supprimer GetShader
 - Transformer l'axe z en l'axe y et inversement
+
+
+
+
+
+
+
+
+
+
+Formule pour le calcul des dégats d'attaques: 
+- https://www.pokepedia.fr/Calcul_des_d%C3%A9g%C3%A2ts
+
+Formule pour le calcul des statistiques :
+- https://www.pokepedia.fr/Calcul_des_statistiques (après la 3eme gen)
+- (Les natures des pokémons ne sont pas implémentées)

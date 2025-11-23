@@ -317,6 +317,7 @@ private:
 		void SetSize(glm::vec2 size);
 		void Activate();
 		void Desactivate(glm::vec4 desColor);
+		void Delete(glm::vec4 delColor);
 
 	private:
 		glm::vec4 color;

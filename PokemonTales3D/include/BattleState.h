@@ -100,6 +100,7 @@ private:
 	Light light;
 
 	Cubemap* skybox;
+	Drawable floor;
 
 	GameSystem* gameSystem;
 	BattleGUI gui;

@@ -271,9 +271,21 @@ BattleState::BattleState(SharedContext* l_context)
 	skybox = new Cubemap(context->shaderManager->GetShader("CubemapShader"), faces, dir);
 
 	context->eventManager->AddCallback("Battle", EventType::Key, &BattleState::KeyCallback, this, StateType::Battle);
+
+	context->modelManager->RequireGetResource("Box");
+	floor.SetModel(context->modelManager->GetResource("Box"));
+	floor.SetShader(context->shaderManager->GetShader("ModelShader"));
+	Drawable::Material m;
+	m.SetPlainColor(ColorFromRGB(18, 94, 29));
+	floor.SetMaterial(m);
+	floor.Scale(glm::vec3(30.0f, -0.2f, 30.0f));
+	floor.Move(glm::vec3(Constants::BOX_SIZE * context->board->GetSize().x / 2.0f
+		, -0.0f
+		, Constants::BOX_SIZE * context->board->GetSize().y / 2.0f));
 }
-BattleState:: ~BattleState(){
+BattleState::~BattleState(){
 	context->eventManager->RemoveCallbacks("Battle");
+	context->modelManager->ReleaseResource("Box");
 	delete skybox;
 	if (gameSystem)
 		delete gameSystem;
@@ -286,6 +298,8 @@ void BattleState::Update(double dt){
 }
 void BattleState::Render(){
 	context->win->Draw(skybox);
+
+	context->win->Draw(floor);
 
 	gameSystem->Render();
 	gui.Render();

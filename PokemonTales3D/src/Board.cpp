@@ -55,6 +55,7 @@ Board::Board(glm::vec2 l_size, SharedContext* l_context)
 
 	Drawable::Material mat;
 	mat.SetLightningColor(glm::vec3(1.0f), 0.3f, 1.0f);
+	mat.alpha = 0.4f;
 
 	boxDrawable = new Drawable(boxModel, instancedModelShader);
 	boxDrawable->SetMaterial(mat);
