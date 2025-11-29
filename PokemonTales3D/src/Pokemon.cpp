@@ -6,7 +6,7 @@
 PokemonStatus::PokemonStatus(const PokemonData* l_data) : data(l_data) {
 	damages = 0;
 	level = 10;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
 		movePool[i] = nullptr;
 	}
 	for (int i = 0; i < Constants::NB_STATS; i++) {
@@ -33,7 +33,7 @@ void PokemonStatus::TakeDamages(int l_damages) {
 }
 
 PokemonStatus::~PokemonStatus() {
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
 		if (movePool[i])
 			delete movePool[i];
 	}

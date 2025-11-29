@@ -17,10 +17,14 @@ using json = nlohmann::json;
 enum PokeType {
 	Fire, Water, Grass, NonePokeType
 };
+//Enum storing all the different stats of pokemons
+enum Stat { Hp = 0, Atk, Def, SpAtk, SpDef, Speed, Move };
 //Convert a string into a PokeType, if the string is unknown, return PokeType::NonePokeType
 PokeType GetPokeTypeFromString(const std::string& type);
 //Convert a PokeType into a string
 std::string GetStringFromPokeType(PokeType type);
+//Convert a Stat into a string
+std::string GetStringFromStat(Stat stat);
 //Getting the color associated to the poke type (hard coded)
 glm::vec4 GetColorFromPokeType(PokeType type);
 
@@ -28,8 +32,8 @@ glm::vec4 GetColorFromPokeType(PokeType type);
 enum CatType{Spe, Phy, NoneCatType};
 //Convert a string into a CatType, if the string is unknown, return CatType::NoneCatType
 CatType GetCatTypeFromString(const std::string& type);
-
-enum Stat {Hp = 0, Atk, Def, SpAtk, SpDef, Speed, Move};
+//Convert a CatType into a string
+std::string GetStringFromCatType(CatType type);
 
 //Store the data relative to a move
 struct MoveData {

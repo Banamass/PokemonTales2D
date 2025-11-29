@@ -7,7 +7,7 @@
   "Acc.": 100,
   "PP": 25,
   "Effect": "Vine Whip deals damage with no additional effect",
-  "Prob": 10,
+  "Prob": 0,
   "HitZone": [ 1, 2 ],
   "Range": 2
 }

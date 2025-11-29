@@ -25,7 +25,7 @@ public:
 	int GetHealth();
 	void TakeDamages(int damages);
 
-	PokemonMove* movePool[4];
+	PokemonMove* movePool[Constants::NB_MOVES_MAX_BY_POKE];
 	const PokemonData* data;
 
 private:

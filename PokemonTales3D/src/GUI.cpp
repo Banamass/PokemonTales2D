@@ -131,6 +131,7 @@ void Panel::DeleteElement(DrawableStatic* elem) {
 	for (auto& layer : elements) {
 		for (auto itr = layer.second.begin(); itr != layer.second.end(); itr++) {
 			if (elem == itr->drawable) {
+				delete itr->drawable;
 				layer.second.erase(itr);
 				return;
 			}
@@ -265,6 +266,99 @@ void Button::SetFrameColor(glm::vec4 l_color) {
 
 std::string Button::GetText() { return text->GetText(); }
 
+/*---------------WindowTabs---------------*/
+
+WindowTabs::WindowTabs(ShaderManager* l_shaderManager, Font* l_font)
+	: Panel(l_shaderManager), size(200.0f, 200.0f), shaderMgr(l_shaderManager), font(l_font),
+	charSize(20.0f), buttonColor(1.0f), frameColor(1.0f), selectedTab(nullptr)
+{
+	frame = (RectangleShape*)AddElement(new RectangleShape(size, shaderMgr->GetShader("SimpleShader")), -1);
+}
+WindowTabs::~WindowTabs() {}
+
+void WindowTabs::ArrangeTabButton() {
+	float y = charSize * 1.2f;
+	float x = size.x / tabs.size();
+
+	glm::vec2 pos(0.0f, size.y);
+	for (auto& itr : tabs) {
+		itr.second.tabButton->SetSize(glm::vec2(x, y));
+		itr.second.tabButton->SetPos(pos);
+		pos += glm::vec2(x, 0.0f);
+	}
+}
+
+void WindowTabs::SetSelectedTab(Tab* tab) {
+	if (selectedTab != nullptr) {
+		SetActivatedElement(selectedTab->tab, false);
+		selectedTab->tabButton->SetFrameColor(buttonColor);
+	}
+	selectedTab = tab;
+	SetActivatedElement(selectedTab->tab, true);
+	selectedTab->tabButton->SetFrameColor(frameColor);
+}
+
+void WindowTabs::Update(Window* win) {
+	for (auto& itr : tabs) {
+		itr.second.tabButton->Update(win);
+		if (itr.second.tabButton->GetClick()) {
+			SetSelectedTab(&itr.second);
+			break;
+		}
+	}
+}
+
+Panel* WindowTabs::AddTab(std::string name) {
+	auto itr = tabs.find(name);
+	if (itr != tabs.end())
+		return nullptr;
+	Tab newTab;
+	newTab.name = name;
+	newTab.tab = (Panel*)AddElement(new Panel(shaderMgr));
+	newTab.tabButton = (Button*)AddElement(new Button(font, shaderMgr));
+	newTab.tabButton->SetCharacterSize(charSize);
+	newTab.tabButton->SetTextColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	newTab.tabButton->SetFrameColor(buttonColor);
+	newTab.tabButton->SetText(name);
+	tabs.insert(std::make_pair(name, newTab));
+
+	ArrangeTabButton();
+	SetActivatedElement(newTab.tab, false);
+	if (tabs.size() == 1)
+		SetSelectedTab(&tabs.begin()->second);
+
+	return newTab.tab;
+}
+Panel* WindowTabs::GetTab(std::string name) {
+	auto itr = tabs.find(name);
+	if (itr == tabs.end())
+		return nullptr;
+	return itr->second.tab;
+}
+
+void WindowTabs::SetFrameColor(glm::vec4 color) {
+	frameColor = color;
+	frame->SetColor(frameColor);
+}
+void WindowTabs::SetButtonColor(glm::vec4 color) {
+	buttonColor = color;
+	for (auto& itr : tabs) {
+		itr.second.tabButton->SetFrameColor(buttonColor);
+	}
+}
+void WindowTabs::SetCharSize(float l_charSize) { charSize = l_charSize; }
+void WindowTabs::SetTextColor(glm::vec4 color) {
+	for (auto& itr : tabs) {
+		itr.second.tabButton->SetTextColor(color);
+	}
+}
+void WindowTabs::SetSize(glm::vec2 l_size) { 
+	size = l_size; 
+	frame->SetSize(size);
+	ArrangeTabButton();
+}
+glm::vec2 WindowTabs::GetSize() { return size; }
+
 /*---------------EmptyButton---------------*/
 
 EmptyButton::EmptyButton(ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
@@ -396,6 +490,123 @@ void TextField::SetLinesPosition(){
 void TextField::SetPadding(glm::vec2 l_padding) {
 	padding = l_padding;
 	SetLinesPosition();
+}
+
+/*---------------TextBlock---------------*/
+
+TextBlock::TextBlock(Font* l_font, ShaderManager* l_shaderManager) 
+	: Panel(l_shaderManager), font(l_font), shaderMgr(l_shaderManager)
+	, lineSpacing(5.0f), charSize(15.0f), color(0.0f)
+{}
+TextBlock::TextBlock(const std::string& str, Font* l_font, ShaderManager* l_shaderManager) 
+	: Panel(l_shaderManager), font(l_font), shaderMgr(l_shaderManager), lineSpacing(5.0f), charSize(15.0f)
+{
+	SetText(str);
+}
+TextBlock::~TextBlock() {}
+
+void TextBlock::SetCharacterSize(float l_charSize) {
+	charSize = l_charSize;
+	for (Text* t : lines) {
+		t->SetCharacterSize(l_charSize);
+	}
+	SetLinesPos();
+}
+
+void TextBlock::SetText(const std::string& str){
+	Erase();
+	std::string line = "";
+	line.reserve(str.size());
+	for (char c : str) {
+		if (c == '\n') {
+			lines.push_back((Text*)AddElement(new Text(font, line, shaderMgr->GetShader("FontShader"))));
+			Text* t = *(lines.end() - 1);
+			t->SetColor(color);
+			t->SetCharacterSize(charSize);
+			line.clear();
+			continue;
+		}
+		line.push_back(c);
+	}
+	if (line.size() > 0) {
+		lines.push_back((Text*)AddElement(new Text(font, line, shaderMgr->GetShader("FontShader"))));
+		Text* t = *(lines.end() - 1);
+		t->SetColor(color);
+		t->SetCharacterSize(charSize);
+	}
+	SetLinesPos();
+}
+void TextBlock::AddLine(const std::string& str) {
+	AddLine(str, lines.size());
+}
+void TextBlock::AddLine(const std::string& str, int i) {
+	Text* nt = *(lines.insert(lines.begin()+i,
+		(Text*)AddElement(new Text(font, str, shaderMgr->GetShader("FontShader")))));
+	nt->SetColor(color);
+	nt->SetCharacterSize(charSize);
+	SetLinesPos();
+}
+void TextBlock::RemoveLine() {
+	RemoveLine(lines.size() - 1);
+}
+void TextBlock::RemoveLine(int i) {
+	if (i < 0 || i >= lines.size())
+		return;
+	DeleteElement(lines[i]);
+	lines.erase(lines.begin() + i);
+	SetLinesPos();
+}
+
+void TextBlock::FitIn(float w) {
+	auto itr = lines.begin();
+	int i = 0;
+	for (; itr != lines.end(); itr++) {
+		if (i > 10000) {
+			std::cout << "Error : Try to fit a block in a a too small width" << std::endl;
+			break;
+		}
+		Text* t = *itr;
+		while (t->GetFloatRect().size.x > w) {
+			if (i > 100)
+				return;
+			t = *itr;
+			std::string str = t->GetText();
+			t->SetText("");
+			int spaceIndex = 0;
+			for (int k = 0; k < str.size(); k++) {
+				if (str[k] == ' ')
+					spaceIndex = k;
+				t->AddText(std::string(1, str[k]));
+				if (t->GetFloatRect().size.x > w) {
+					t->RemoveText(k - spaceIndex +1);
+					itr = lines.insert(itr+1, (Text*) AddElement(new Text(font, 
+						str.substr(spaceIndex+1, str.size() - (spaceIndex+1)), shaderMgr->GetShader("FontShader"))));
+					(*itr)->SetCharacterSize(charSize);
+					(*itr)->SetColor(color);
+					break;
+				}
+			}
+			
+		}
+		i++;
+	}
+
+	SetLinesPos();
+}
+
+void TextBlock::SetLinesPos() {
+	glm::vec2 p(0.0f, (lines.size() - 1) * (charSize + lineSpacing));
+	for (Text* t : lines) {
+		t->SetPos(p);
+		p.y -= charSize + lineSpacing;
+	}
+}
+
+void TextBlock::Erase() {
+	for (Text* t : lines) {
+		DeleteElement(t);
+	}
+	lines.clear();
 }
 
 /*---------------SelectBox---------------*/
@@ -735,6 +946,38 @@ glm::vec4 ColorSelection::GetSelectedColor() {
 	return buttons[selectIndex]->GetColor();
 }
 
+/*---------------PokemonTypeFrame---------------*/
+
+PokemonTypeFrame::PokemonTypeFrame(PokeType l_pokeType, Font* l_font, ShaderManager* l_shaderManager) 
+	: Panel(l_shaderManager), size(50.0f, 20.0f), pokeType(l_pokeType)
+{
+	text = (Text*)AddElement(new Text(l_font, GetStringFromPokeType(pokeType), l_shaderManager->GetShader("FontShader")));
+	frame = (RectangleShape*)AddElement(new RectangleShape(size, l_shaderManager->GetShader("SimpleShader")), -1);
+
+	frame->SetColor(GetColorFromPokeType(pokeType));
+	text->SetCharacterSize(14.0f);
+	text->SetOrigin(Location::Middle);
+	text->SetPos(size / 2.0f);
+	text->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
+}
+PokemonTypeFrame::~PokemonTypeFrame() {}
+
+void PokemonTypeFrame::SetSize(glm::vec2 l_size) {
+	size = l_size;
+	frame->SetSize(size);
+	text->SetPos(size / 2.0f);
+}
+void PokemonTypeFrame::SetCharacterSize(float charSize) {
+	text->SetCharacterSize(charSize);
+	text->SetOrigin(Location::Middle);
+}
+void PokemonTypeFrame::SetPokeType(PokeType l_pokeType) {
+	pokeType = l_pokeType;
+	frame->SetColor(GetColorFromPokeType(pokeType));
+	text->SetText(GetStringFromPokeType(pokeType));
+	text->SetOrigin(Location::Middle);
+}
+
 /*---------------PokemonMoveBar---------------*/
 
 PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos)
@@ -764,11 +1007,6 @@ PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::iv
 	powerText->SetColor(glm::vec3(0.0f));
 	powerText->SetCharacterSize(charSize);
 	powerText->SetPos(glm::vec2(margin, margin));
-
-	typeText = (Text*)AddElement(new Text(l_font, "Type1", l_shaderMgr->GetShader("FontShader")));
-	typeText->SetColor(glm::vec3(0.0f));
-	typeText->SetCharacterSize(charSize);
-	typeText->SetPos(glm::vec2(size.x - 50, size.y - charSize - margin));
 	
 	rangeText = (Text*)AddElement(new Text(l_font, "0", l_shaderMgr->GetShader("FontShader")));
 	rangeText->SetColor(glm::vec3(0.0f));
@@ -777,9 +1015,11 @@ PokemonMoveBar::PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::iv
 	rangeText->SetOrigin(Location::MiddleBottom);
 
 	typeFramePadding = glm::vec2(2.0f, 2.0f);
-	typeFrame = (RectangleShape*)AddElement(new RectangleShape(l_shaderMgr->GetShader("SimpleShader")), -1);
-	typeFrame->SetColor(glm::vec4(0.0f));
-	typeFrame->SetPos(glm::vec2(size.x - 50, size.y - charSize - margin) - typeFramePadding);
+	typeFrame = (PokemonTypeFrame*)AddElement(new PokemonTypeFrame(PokeType::NonePokeType, l_font, l_shaderMgr));
+	typeFrame->SetSize(glm::vec2(55.0f, 17.0f));
+	typeFrame->SetCharacterSize(13.0f);
+	typeFrame->SetOrigin(Location::TopRight);
+	typeFrame->SetPos(size - glm::vec2(margin));
 
 	frame = (RectangleShape*)AddElement(new RectangleShape(size, l_shaderMgr->GetShader("SimpleShader")), -2);
 	frame->SetColor(unselectedColor);
@@ -821,9 +1061,8 @@ void PokemonMoveBar::SetPokemonMove(PokemonMove* l_move) {
 	moveName->SetText(move->data->name);
 	ppText->SetText(std::to_string(move->pp) + "/" + std::to_string(move->data->pp));
 	powerText->SetText(std::to_string(move->data->power));
-	typeText->SetText(GetStringFromPokeType(move->data->type));
-	typeFrame->SetColor(GetColorFromPokeType(move->data->type));
-	typeFrame->SetSize(glm::vec2(typeText->GetFloatRect().size.x, charSize) + 2.0f * typeFramePadding);
+	typeFrame->SetPokeType(move->data->type);
+	typeFrame->SetOrigin(Location::TopRight);
 	rangeText->SetText(std::to_string(move->data->range));
 }
 
@@ -879,6 +1118,30 @@ PokemonStatsBar::PokemonStatsBar(Pokemon* l_poke, Font* l_font, ShaderManager* s
 		pokeName->SetText(poke->GetName());
 	else
 		pokeName->SetText("None");
+
+	//Type
+	std::pair<PokeType, PokeType> types;
+	if (poke != nullptr) {
+		types = poke->GetType();
+	}
+	else {
+		types.first = PokeType::NonePokeType;
+		types.second = PokeType::NonePokeType;
+	}
+
+	type1Frame = (PokemonTypeFrame*)AddElement(new PokemonTypeFrame(types.first, l_font, shaderMgr));
+	type1Frame->SetSize(glm::vec2(65.0f, 20.0f));
+	type1Frame->SetCharacterSize(15.0f);
+	type1Frame->SetOrigin(Location::TopRight);
+	type1Frame->SetPos(size - glm::vec2(10.0f, 10.0f));
+	this->SetActivatedElement(type1Frame, types.first != PokeType::NonePokeType);
+
+	type2Frame = (PokemonTypeFrame*)AddElement(new PokemonTypeFrame(types.second, l_font, shaderMgr));
+	type2Frame->SetSize(glm::vec2(65.0f, 20.0f));
+	type2Frame->SetCharacterSize(15.0f);
+	type2Frame->SetOrigin(Location::TopRight);
+	type2Frame->SetPos(size - glm::vec2(10.0f, 30.0f));
+	this->SetActivatedElement(type2Frame, types.second != PokeType::NonePokeType);
 }
 PokemonStatsBar::~PokemonStatsBar() {
 
@@ -908,7 +1171,162 @@ void PokemonStatsBar::SetPokemon(Pokemon* l_poke) {
 	if (poke == nullptr)
 		return;
 	pokeName->SetText(poke->GetName());
+	auto types = poke->GetType();
+	type1Frame->SetPokeType(types.first);
+	type2Frame->SetPokeType(types.second);
+	this->SetActivatedElement(type1Frame, types.first != PokeType::NonePokeType);
+	this->SetActivatedElement(type2Frame, types.second != PokeType::NonePokeType);
 }
 
 glm::vec2 PokemonStatsBar::GetSize() { return size; }
 Pokemon* PokemonStatsBar::GetPokemon() { return poke; }
+
+/*---------------PokemonStatsPanel---------------*/
+
+PokemonStatsPanel::PokemonStatsPanel(Pokemon* l_poke, Font* l_font, ShaderManager* l_shaderManager)
+	: WindowTabs(l_shaderManager, l_font), poke(l_poke), nbMoves(0)
+{
+	SetCharSize(12.0f);
+
+	statsPanel = AddTab("Stats");
+
+	padding = 10.0f;
+
+	glm::vec2 pos(0.0f);
+	for (int i = 0; i < Constants::NB_STATS; i++) {
+		statsName[i] = (Text*)statsPanel->AddElement(new Text(l_font, GetStringFromStat((Stat)i) + " : ", l_shaderManager->GetShader("FontShader")));
+		statsName[i]->SetCharacterSize(20.0f);
+		statsName[i]->SetColor(glm::vec3(0.0f));
+		statsName[i]->SetPos(pos);
+		stats[i] = (Text*)statsPanel->AddElement(new Text(l_font, "", l_shaderManager->GetShader("FontShader")));
+		stats[i]->SetCharacterSize(20.0f);
+		stats[i]->SetColor(glm::vec3(0.0f));
+		stats[i]->SetPos(pos + glm::vec2(90.0f, 0.0f));
+		pos.y -= 30.0f;
+	}
+	statsPanel->SetOrigin(Location::TopLeft);
+	statsPanel->SetPos(glm::vec2(padding, size.y - padding));
+
+	movesPanel = AddTab("Moves");
+	glm::vec2 bmSize;
+	bmSize.x = size.x / 2.0f - 2 * padding;
+	bmSize.y = 22.0f;
+	glm::vec2 bmPos;
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
+		bmPos.x = padding + (i % 2 == 0 ? 0 : size.x / 2.0f);
+		bmPos.y = size.y - (i / 2) * (padding + bmSize.y) - padding;
+		movesButton[i] = (Button*)movesPanel->AddElement(new Button(font, shaderMgr));
+		movesButton[i]->SetText("button");
+		movesButton[i]->SetCharacterSize(15.0f);
+		movesButton[i]->SetTextColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		movesButton[i]->SetSize(bmSize);
+		movesButton[i]->SetOrigin(Location::TopLeft);
+		movesButton[i]->SetPos(bmPos);
+	}
+	moveDetail = (TextBlock*)movesPanel->AddElement(new TextBlock(font, shaderMgr));
+
+	descPanel = AddTab("Desc.");
+	description = (TextBlock*)descPanel->AddElement(new TextBlock(font, shaderMgr));
+	description->SetCharacterSize(20.0f);
+	descPanel->SetPos(glm::vec2(padding, size.y - padding));
+
+	SetPokemon(l_poke);
+}
+PokemonStatsPanel::~PokemonStatsPanel() {}
+
+void PokemonStatsPanel::Draw(glm::mat4& cameraMat) {
+	if (poke == nullptr)
+		return;
+	Panel::Draw(cameraMat);
+}
+
+void PokemonStatsPanel::Update(Window* win){
+	WindowTabs::Update(win);
+	for (int i = 0; i < nbMoves; i++) {
+		movesButton[i]->Update(win);
+		if (movesButton[i]->GetClick()) {
+			SetSelectedMove(i);
+			break;
+		}
+	}
+}
+
+void PokemonStatsPanel::SetSelectedMove(int i) {
+	if (selectedMove != -1) {
+		movesButton[selectedMove]->SetActivated(true);
+		movesButton[selectedMove]->SetFrameColor(glm::vec4(1.0f));
+	}
+	selectedMove = i;
+	if (selectedMove != -1) {
+		movesButton[selectedMove]->SetActivated(false);
+		movesButton[selectedMove]->SetFrameColor(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+		std::stringstream ss;
+		if (poke != nullptr) {
+			PokemonStatus& status = poke->GetStatus();
+			PokemonMove* m = status.movePool[selectedMove];
+			ss << "Name  : " << m->data->name << "\n";
+			ss << "Type  : " << GetStringFromPokeType(m->data->type) << "       ";
+			ss << "Cat   : " << GetStringFromCatType(m->data->cat) << "\n";
+			ss << "Power : " << m->data->power << "       ";
+			ss << "Acc.  : " << m->data->acc << "\n";
+			ss << "PP    : " << m->data->pp << "       ";
+			ss << "Range : " << m->data->range << "\n";
+			ss << "Zone  : " << m->data->hitZone.x << ", " << m->data->hitZone.y << "\n";
+			ss << "Effect: " << m->data->effect << "\n";
+			ss << "Prob  : " << m->data->prob;
+		}
+		moveDetail->SetText(ss.str());
+		moveDetail->FitIn(size.x - 2*padding);
+		moveDetail->SetOrigin(Location::TopLeft);
+	}
+}
+
+void PokemonStatsPanel::SetPokemon(Pokemon* l_poke) {
+	poke = l_poke;
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++)
+		movesPanel->SetActivatedElement(movesButton[i], false);
+
+	if (poke == nullptr)
+		return;
+
+	PokemonStatus& status = poke->GetStatus();
+	for (int i = 0; i < Constants::NB_STATS; i++) {
+		stats[i]->SetText(std::to_string(status.GetStat((Stat)i)));
+	}
+	nbMoves = 0;
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
+		PokemonMove* m = status.movePool[i];
+		if (m == nullptr)
+			break;
+		movesPanel->SetActivatedElement(movesButton[i], true);
+		movesButton[i]->SetText(m->data->name);
+		nbMoves++;
+	}
+	if (nbMoves > 0) {
+		SetSelectedMove(0);
+	}
+
+	std::stringstream ss;
+	ss << "Size : " << status.data->size.x << ", " << status.data->size.y;
+	description->SetText(ss.str());
+	description->SetOrigin(Location::TopLeft);
+	statsPanel->SetOrigin(Location::TopLeft);
+}
+
+void PokemonStatsPanel::SetSize(glm::vec2 l_size) {
+	WindowTabs::SetSize(l_size);
+	statsPanel->SetPos(glm::vec2(padding, size.y - padding));
+	glm::vec2 bmSize;
+	bmSize.x = size.x / 2.0f - 2 * padding;
+	bmSize.y = 22.0f;
+	glm::vec2 bmPos;
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
+		bmPos.x = padding + (i % 2 == 0 ? 0 : size.x / 2.0f);
+		bmPos.y = size.y - (i / 2) * (padding + bmSize.y) - padding;
+		movesButton[i]->SetSize(bmSize);
+		movesButton[i]->SetOrigin(Location::TopLeft);
+		movesButton[i]->SetPos(bmPos);
+	}
+	moveDetail->SetPos(glm::vec2(padding, size.y - (Constants::NB_MOVES_MAX_BY_POKE) / 2 * (padding + bmSize.y) - 2 * padding));
+	descPanel->SetPos(glm::vec2(padding, size.y - padding));
+}

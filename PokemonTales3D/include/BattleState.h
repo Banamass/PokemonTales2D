@@ -32,7 +32,7 @@ private:
 
 	PokemonStatsBar* statsBar;
 	Panel* movesBar;
-	PokemonMoveBar* moveBars[4];
+	PokemonMoveBar* moveBars[Constants::NB_MOVES_MAX_BY_POKE];
 	int selectedMove; //-1 if no move is selected
 	static const int MAX_AIMED_POKE = 10;
 	PokemonStatsBar* aimedPokeStatsBar[MAX_AIMED_POKE];
@@ -40,12 +40,18 @@ private:
 	Text* nbStepText;
 	Button* stepButton;
 	int nbStepLeft;
+
+	PokemonStatsPanel* stats;
+	bool statsRender;
+	Button* statsButton;
 };
 
 class BattleGUI {
 public:
 	BattleGUI(SharedContext* l_context);
 	virtual ~BattleGUI();
+
+	void KeyCallback(CallbackData data);
 
 	void Update(double dt);
 	void Render();
@@ -67,6 +73,8 @@ private:
 	Panel gameName;
 
 	PokemonStatsBar hoverPokeBar;
+	bool hoverActivated;
+	PokemonStatsPanel hoverPokePanel;
 
 	PokemonGUI selectedPokeGUI;
 

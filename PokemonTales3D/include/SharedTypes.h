@@ -8,6 +8,7 @@ namespace Constants{
 	constexpr float WIN_WIDTH = 1200.0f;
 	constexpr float WIN_HEIGHT = 700.0f;
 	constexpr int NB_POKEMON_BY_PLAYER = 4;
+	constexpr int NB_MOVES_MAX_BY_POKE = 4;
 	constexpr int NB_STATS = 7;
 }
 

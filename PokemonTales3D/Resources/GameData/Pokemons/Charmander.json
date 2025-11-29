@@ -12,6 +12,6 @@
     "Move": 5
   },
   "Sprite": "Salameche.obj",
-  "Size": [1, 1],
+  "Size": [2, 1],
   "AttackPool": [ 1 ]
 }

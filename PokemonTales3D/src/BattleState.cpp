@@ -16,7 +16,7 @@ PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	glm::vec2 moveBarPadding(30.0f, 15.0f);
 	glm::vec2 moveBarFramePadding(20.0f, 20.0f);
 	glm::vec2 moveBarsPos(statsBar->GetSize().x + moveBarPadding.x + moveBarFramePadding.x, -100.0f);
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
 		moveBars[i] = (PokemonMoveBar*)movesBar->AddElement(new PokemonMoveBar(l_font, shaderMgr, glm::vec2(0, 0)));
 		glm::vec2 size = moveBars[i]->GetSize();
 		if (i == 2)
@@ -69,6 +69,23 @@ PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	stepButton->SetOrigin(Location::BottomLeft);
 	stepButton->SetPos(glm::vec2(boxSize.x + moveBarPadding.x, boxSize.y - nbStepBarSize.y)
 		+ glm::vec2(stepButtonPadding.x + 5.0f + nbStepBarSize.x, -stepButtonPadding.y + 10.0f));
+
+	stats = (PokemonStatsPanel*)AddElement(new PokemonStatsPanel(l_poke, l_font, shadeMgr));
+	stats->SetSize(glm::vec2(boxSize.x, 250.0f));
+	stats->SetCharSize(17.0f);
+	stats->SetFrameColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	stats->SetButtonColor(glm::vec4(1.0f));
+	stats->SetOrigin(Location::TopLeft);
+	statsRender = false;
+	SetActivatedElement(stats, statsRender);
+
+	statsButton = (Button*)AddElement(new Button(l_font, shadeMgr));
+	statsButton->SetCharacterSize(10.0f);
+	statsButton->SetSize(glm::vec2(50.0f, 15.0f));
+	statsButton->SetText("Infos");
+	statsButton->SetFrameColor(glm::vec4(0.8f));
+	statsButton->SetOrigin(Location::BottomRight);
+	statsButton->SetPos(glm::vec2(boxSize.x, 0.0f));
 }
 PokemonGUI::~PokemonGUI() {
 
@@ -80,11 +97,17 @@ void PokemonGUI::Update(double dt) {
 		aimedPokeStatsBar[i]->Update(dt);
 	}
 	if (selectedMove == -1) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
 			moveBars[i]->Update(context->win);
 		}
 	}
 	stepButton->Update(context->win);
+	stats->Update(context->win);
+	statsButton->Update(context->win);
+	if (statsButton->GetClick()) {
+		statsRender = !statsRender;
+		SetActivatedElement(stats, statsRender);
+	}
 }
 
 void PokemonGUI::Draw(glm::mat4& cameraMatrix) {
@@ -96,11 +119,12 @@ void PokemonGUI::Draw(glm::mat4& cameraMatrix) {
 void PokemonGUI::SetPokemon(Pokemon* l_poke) {
 	poke = l_poke;
 	statsBar->SetPokemon(l_poke);
+	stats->SetPokemon(l_poke);
 	if (poke == nullptr) {
 		Reset();
 		return;
 	}
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++)
 		moveBars[i]->SetPokemonMove(poke->GetMove(i));
 }
 
@@ -117,7 +141,7 @@ void PokemonGUI::Reset() {
 
 void PokemonGUI::SetSelectedMove(int i) {
 	selectedMove = i;
-	for (int j = 0; j < 4; j++)
+	for (int j = 0; j < Constants::NB_MOVES_MAX_BY_POKE; j++)
 		moveBars[j]->SetSelect(j == i);
 	if (i < 0 || i > 3) {
 		std::vector<Pokemon*> p;
@@ -144,7 +168,7 @@ void PokemonGUI::SetAimedPoke(std::vector<Pokemon*>& aimedPoke, PokemonMove* mov
 }
 
 int PokemonGUI::GetMoveClicked() {
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
 		if (moveBars[i]->GetClick())
 			return i;
 	}
@@ -160,13 +184,16 @@ bool PokemonGUI::GetStepClicked() {
 BattleGUI::BattleGUI(SharedContext* l_context)
 	: context(l_context),
 	font(context->fontManager->RequireGetResource("Arial")),
-	gameInfos(glm::vec2(175, 200), 14, glm::vec2(10, 350), l_context->shaderManager),
+	gameInfos(glm::vec2(175, 200), 14, glm::vec2(10, 450), l_context->shaderManager),
 	gameName(l_context->shaderManager),
 	cursor(glm::vec2(100.0f, 100.0f), l_context->shaderManager->GetShader("SimpleShader")),
 	hoverPokeBar(nullptr, font, context->shaderManager),
+	hoverPokePanel(nullptr, font, context->shaderManager), hoverActivated(true),
 	selectedPokeGUI(nullptr, font, context)
 {
 	context->gui = this;
+
+	context->eventManager->AddCallback("BattleGUIKC", EventType::Key, &BattleGUI::KeyCallback, this, StateType::Battle);
 
 	//GameInfos
 	gameInfos.SetPadding(glm::vec2(10.0f, 4.0f));
@@ -192,6 +219,10 @@ BattleGUI::BattleGUI(SharedContext* l_context)
 
 	//Hove pokemons stats bar
 	hoverPokeBar.SetPos(glm::vec2(0.0f, 0.0f));
+	hoverPokePanel.SetSize(glm::vec2(200.0f, 300.0f));
+	hoverPokePanel.SetPos(glm::vec2(0.0f, hoverPokeBar.GetSize().y));
+	hoverPokePanel.SetFrameColor(glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	hoverPokePanel.SetButtonColor(glm::vec4(1.0f));
 
 	//Selected pokemon GUI
 	selectedPokeGUI.SetPos(glm::vec2(225.0f, Constants::WIN_HEIGHT - hoverPokeBar.GetSize().y));
@@ -201,9 +232,19 @@ BattleGUI::~BattleGUI() {
 	context->fontManager->ReleaseResource("Arial");
 }
 
+void BattleGUI::KeyCallback(CallbackData data) {
+	Key_Data kdata = std::get<Key_Data>(data.data);
+	if (kdata.key == GLFW_KEY_TAB && kdata.action == GLFW_RELEASE) {
+		hoverActivated = !hoverActivated;
+		if (hoverActivated)
+			UnsetHoverPokemon();
+	}
+}
+
 void BattleGUI::Update(double dt) {
 	selectedPokeGUI.Update(dt);
 	hoverPokeBar.Update(dt);
+	hoverPokePanel.Update(context->win);
 }
 
 void BattleGUI::Render() {
@@ -214,6 +255,7 @@ void BattleGUI::Render() {
 	context->win->DrawStatic(&gameName);
 
 	context->win->DrawStatic(&hoverPokeBar);
+	context->win->DrawStatic(&hoverPokePanel);
 	context->win->DrawStatic(&selectedPokeGUI);
 
 	glEnable(GL_DEPTH_TEST);
@@ -226,10 +268,16 @@ void BattleGUI::Reset() {
 }
 
 void BattleGUI::SetHoverPokemon(Pokemon* poke) {
-	hoverPokeBar.SetPokemon(poke);
+	if (hoverActivated) {
+		hoverPokeBar.SetPokemon(poke);
+		hoverPokePanel.SetPokemon(poke);
+	}
 }
 void BattleGUI::UnsetHoverPokemon() {
-	hoverPokeBar.SetPokemon(nullptr);
+	if (hoverActivated) {
+		hoverPokeBar.SetPokemon(nullptr);
+		hoverPokePanel.SetPokemon(nullptr);
+	}
 }
 
 void BattleGUI::SetSelectedPokemon(Pokemon* poke) {

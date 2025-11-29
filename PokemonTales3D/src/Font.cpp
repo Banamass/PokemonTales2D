@@ -92,10 +92,12 @@ Text::Text(Font* l_font, std::string l_text, Shader* l_shader)
 Text::~Text() {}
 
 void Text::ComputeCharacterDatas(int l_offset) {
-	if (textData.size() == 0)
-		return;
-
 	glm::vec2 realPos = GetRealPos();
+	
+	if (textData.size() == 0) {
+		floatRect = FloatRect(realPos, glm::vec2(0.0f));
+		return;
+	}
 
 	float x = realPos.x;
 	float minypos = Constants::WIN_HEIGHT * 2;
@@ -171,7 +173,7 @@ void Text::SetText(std::string l_text) {
 	for (char c : l_text) {
 		const Character* cInfos = font->GetCharacter(c);
 		if (cInfos == nullptr)
-			std::cout << "error c isn't supported by the given font" << std::endl;
+			std::cout << "error c isn't supported by the font : " << std::endl;
 		textData.emplace_back(cInfos);
 		(textData.end() - 1)->cInfos = cInfos;
 	}

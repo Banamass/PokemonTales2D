@@ -21,6 +21,23 @@ std::string GetStringFromPokeType(PokeType type) {
 		return "None";
 }
 
+std::string GetStringFromStat(Stat stat) {
+	if (stat == Stat::Atk)
+		return "Atk";
+	if (stat == Stat::Def)
+		return "Def";
+	if (stat == Stat::SpAtk)
+		return "SpAtk";
+	if (stat == Stat::SpDef)
+		return "SpDef";
+	if (stat == Stat::Hp)
+		return "Hp";
+	if (stat == Stat::Speed)
+		return "Speed";
+	if (stat == Stat::Move)
+		return "Move";
+}
+
 glm::vec4 GetColorFromPokeType(PokeType type) {
 	if (type == PokeType::Fire)
 		return glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -39,6 +56,14 @@ CatType GetCatTypeFromString(const std::string& type) {
 		return CatType::Phy;
 	else
 		return CatType::NoneCatType;
+}
+std::string GetStringFromCatType(CatType type) {
+	if (type == CatType::Spe)
+		return "Spe";
+	else if (type == CatType::Phy)
+		return "Phy";
+	else
+		return "None";
 }
 
 DataManager::DataManager(){

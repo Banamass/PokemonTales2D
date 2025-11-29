@@ -120,7 +120,7 @@ protected:
 
 class Button : public Panel, public Clickable {
 public:
-	Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
+	Button(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos = glm::ivec2(0));
 	virtual ~Button();
 
 	virtual void SetPos(glm::vec2 l_pos);
@@ -153,6 +153,48 @@ protected:
 	glm::vec4 color;
 };
 
+class WindowTabs : public Panel {
+public :
+	WindowTabs(ShaderManager* l_shaderManager, Font* l_font);
+	~WindowTabs();
+
+	virtual void Update(Window* win);
+
+	void SetFrameColor(glm::vec4 color);
+	void SetButtonColor(glm::vec4 color);
+	void SetTextColor(glm::vec4 color);
+	void SetCharSize(float l_charSize);
+	virtual void SetSize(glm::vec2 l_size);
+	glm::vec2 GetSize();
+
+	//Add a new panel of a given name, and return it, if this tab already exits return nullptr
+	Panel* AddTab(std::string name);
+	//Return the panel associated to the name tab, nullptr if this tab doesn't exist
+	Panel* GetTab(std::string name);
+
+protected:
+	struct Tab {
+		std::string name;
+		Button* tabButton;
+		Panel* tab;
+	};
+
+	void ArrangeTabButton();
+	void SetSelectedTab(Tab* tab);
+
+	ShaderManager* shaderMgr;
+	Font* font;
+
+	glm::vec2 size;
+	float charSize;
+	glm::vec4 buttonColor;
+	glm::vec4 frameColor;
+
+	RectangleShape* frame;
+	std::unordered_map<std::string, Tab> tabs;
+	Tab* selectedTab;
+};
+
 class EmptyButton : public Clickable, public Panel {
 public:
 	EmptyButton(ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
@@ -179,6 +221,43 @@ protected:
 	Location origin;
 
 	glm::vec4 color;
+};
+
+class TextBlock : public Panel {
+public:
+	TextBlock(Font* l_font, ShaderManager* l_shaderManager);
+	TextBlock(const std::string& str, Font* l_font, ShaderManager* l_shaderManager);
+	virtual ~TextBlock();
+
+	//Set the size of characters
+	void SetCharacterSize(float l_charSize);
+
+	//Set the text for the text block, the char '\n' stands for an EOF
+	void SetText(const std::string& str);
+	//Add a new line at the end of the text block
+	void AddLine(const std::string& str);
+	//Add a new line before the line of index i
+	void AddLine(const std::string& str, int i);
+	//Remove the last line of the text block
+	void RemoveLine();
+	//Remove the line of index i of the text block
+	void RemoveLine(int i);
+
+	//Modify the current text block in order to fit it in a block with a width of w
+	void FitIn(float w);
+
+protected:
+	void Erase();
+	void SetLinesPos();
+
+	Font* font;
+	ShaderManager* shaderMgr;
+	glm::vec3 color;
+	float charSize;
+	float lineSpacing;
+
+	std::vector<Text*> lines;
+
 };
 
 class TextField : public Panel {
@@ -338,6 +417,23 @@ private:
 	int selectIndex;
 };
 
+class PokemonTypeFrame : public Panel {
+public:
+	PokemonTypeFrame(PokeType pokeType, Font* l_font, ShaderManager* l_shaderManager);
+	virtual ~PokemonTypeFrame();
+
+	void SetSize(glm::vec2 l_size);
+	void SetCharacterSize(float charSize);
+	void SetPokeType(PokeType l_pokeType);
+
+private:
+	glm::vec2 size;
+	PokeType pokeType;
+
+	Text* text;
+	RectangleShape* frame;
+};
+
 class PokemonMoveBar : public Panel, public Clickable {
 public:
 	PokemonMoveBar(Font* l_font, ShaderManager* l_shaderMgr, glm::ivec2 l_pos);
@@ -364,9 +460,8 @@ private:
 	Text* moveName;
 	Text* ppText;
 	Text* powerText;
-	Text* typeText;
 	Text* rangeText;
-	RectangleShape* typeFrame;
+	PokemonTypeFrame* typeFrame;
 	RectangleShape* frame;
 
 	bool isSelected;
@@ -403,5 +498,37 @@ protected:
 	RectangleShape* healthBarFrame;
 	RectangleShape* healthBarBack;
 	RectangleShape* healthBarBackground;
+	PokemonTypeFrame* type1Frame;
+	PokemonTypeFrame* type2Frame;
 	float simulatedDamages;
+};
+
+class PokemonStatsPanel : public WindowTabs {
+public:
+	PokemonStatsPanel(Pokemon* l_poke, Font* l_font, ShaderManager* l_shaderManager);
+	virtual ~PokemonStatsPanel();
+
+	void Draw(glm::mat4& cameraMat);
+	void Update(Window* win);
+
+	void SetPokemon(Pokemon* l_poke);
+	void SetSize(glm::vec2 l_size);
+
+private:
+	Pokemon* poke;
+	float padding;
+
+	Panel* statsPanel;
+	Text* statsName[Constants::NB_STATS];
+	Text* stats[Constants::NB_STATS];
+
+	void SetSelectedMove(int i);
+	Panel* movesPanel;
+	Button* movesButton[Constants::NB_MOVES_MAX_BY_POKE];
+	int nbMoves;
+	TextBlock* moveDetail;
+	int selectedMove;
+
+	Panel* descPanel;
+	TextBlock* description;
 };
