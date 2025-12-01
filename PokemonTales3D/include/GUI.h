@@ -9,8 +9,13 @@
 #include "Pokemon.h"
 #include "Notifier.h"
 
-//Pure virtual class representing an objet that can be clickable
-class Clickable {
+/*Pure virtual class representing an objet that can be clickable
+Implement Notifier, can subscribe to following notification :
+- "Click" : for click notification
+- "Press" : for press notification
+- "Hover" : for hover notification
+*/
+class Clickable : public Notifier{
 public:
 	Clickable();
 	virtual ~Clickable() {};

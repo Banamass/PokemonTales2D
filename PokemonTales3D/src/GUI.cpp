@@ -33,8 +33,10 @@ void Clickable::Update(Window* win) {
 void Clickable::SetPress(bool b) {
 	if (b == press)
 		return;
-	if (b && !press)
+	if (b && !press) {
+		NotifyAll("Press");
 		Press();
+	}
 	else if (!b && press)
 		UnPress();
 	press = b;
@@ -42,8 +44,10 @@ void Clickable::SetPress(bool b) {
 void Clickable::SetHover(bool b) {
 	if (b == hover)
 		return;
-	if (b && !hover)
+	if (b && !hover) {
+		NotifyAll("Hover");
 		Hover();
+	}
 	else if (!b && hover)
 		UnHover();
 	hover = b;
@@ -51,8 +55,10 @@ void Clickable::SetHover(bool b) {
 void Clickable::SetClick(bool b) {
 	if (b == click)
 		return;
-	if (b && !click)
+	if (b && !click) {
+		NotifyAll("Click");
 		Click();
+	}
 	else if (!b && click)
 		UnClick();
 	click = b;

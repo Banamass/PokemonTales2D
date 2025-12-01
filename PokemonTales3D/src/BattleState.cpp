@@ -70,6 +70,7 @@ PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	stepButton->SetOrigin(Location::BottomLeft);
 	stepButton->SetPos(glm::vec2(boxSize.x + moveBarPadding.x, boxSize.y - nbStepBarSize.y)
 		+ glm::vec2(stepButtonPadding.x + 5.0f + nbStepBarSize.x, -stepButtonPadding.y + 10.0f));
+	stepButton->Subscribe("Click", &PokemonGUI::StepButtonClick, this);
 
 	stats = (PokemonStatsPanel*)AddElement(new PokemonStatsPanel(l_poke, l_font, shadeMgr));
 	stats->SetSize(glm::vec2(boxSize.x, 250.0f));
@@ -177,6 +178,10 @@ int PokemonGUI::GetMoveClicked() {
 
 bool PokemonGUI::GetStepClicked() {
 	return stepButton->GetClick();
+}
+
+void PokemonGUI::StepButtonClick() {
+	NotifyAll("Step");
 }
 
 /*---------------GUI---------------*/

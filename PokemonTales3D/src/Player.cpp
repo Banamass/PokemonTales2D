@@ -198,6 +198,9 @@ Player::PokeSelectedState::PokeSelectedState(Player* l_player, Pokemon* l_select
 	player->context->gui->SetSelectedPokemon(selectedPokemon);
 	player->context->gui->GetSelectedPokemonGUI()->SetNbStepsLeft(player->pokemonState[l_selectedPokemon].nbStepLeft);
 	UpdateSelectedPokeArea(selectedPokemon);
+
+	PokemonGUI* gui = player->context->gui->GetSelectedPokemonGUI();
+	gui->Subscribe("Step", &Player::PokeSelectedState::Move, this);
 }
 
 void Player::PokeSelectedState::Update(double dt) {
@@ -208,10 +211,6 @@ void Player::PokeSelectedState::Update(double dt) {
 	if (selectedPokemon->IsKO()) {
 		gui->GetGameInfosField()->AddMessage("Selected Pokemon " + selectedPokemon->GetName() + " died.");
 		player->EndTurn();
-		return;
-	}
-	if (gui->GetSelectedPokemonGUI()->GetStepClicked()) {
-		Move();
 		return;
 	}
 	int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();

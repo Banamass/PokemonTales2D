@@ -5,7 +5,9 @@
 #include "Camera.h"
 #include "Light.h"
 
-class PokemonGUI : public Panel {
+/*This class implements notifier for the following notifications :
+- "Step" : for step button click */
+class PokemonGUI : public Panel, public Notifier {
 public:
 	PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context);
 	virtual ~PokemonGUI();
@@ -25,6 +27,9 @@ public:
 	bool GetStepClicked();
 
 private:
+	//Notifications methods
+	void StepButtonClick();
+
 	void Reset();
 
 	Pokemon* poke;
