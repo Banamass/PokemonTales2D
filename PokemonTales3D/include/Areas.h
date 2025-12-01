@@ -43,6 +43,8 @@ public:
 		SetIntRect();
 	}
 
+	//Set the origin of the square area
+	void SetOrigin(Location origin);
 	//Set the size of the area
 	void SetSize(glm::ivec2 size);
 	//Get the int rect representing the area

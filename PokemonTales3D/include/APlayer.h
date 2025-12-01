@@ -28,10 +28,12 @@ public:
 	void PokemonKO(Pokemon* poke);
 
 	//Getters
-	
 	bool Playing();
 	std::vector<Pokemon*>& GetPokemons();
 	void SetPlayerColor(glm::vec3 color);
+	/*Return the rotated size of the pokemon, depending on it state.
+	If this doesn't exist then return an empty size (0,0)*/
+	glm::ivec2 GetPokemonRotateSize(Pokemon* poke);
 
 protected:
 	SharedContext* context;
@@ -43,6 +45,7 @@ protected:
 		int nbStepLeft;
 		int nbMove;
 		bool lock;
+		bool rotate;
 	};
 	std::unordered_map<Pokemon*, PokemonState> pokemonState;
 

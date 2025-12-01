@@ -16,6 +16,13 @@ void AbstractArea::Add(Box* box) {
 
 /*------------------------SquareArea------------------------*/
 
+void SquareArea::SetOrigin(Location l_origin) {
+	origin = l_origin;
+	SetRealPosOffset();
+	compute = true;
+	Update(pos);
+}
+
 void SquareArea::SetSize(glm::ivec2 l_size) {
 	size = l_size;
 	SetIntRect();

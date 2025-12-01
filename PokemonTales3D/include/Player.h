@@ -90,6 +90,8 @@ private:
 		void Attack(int moveId);
 
 	private:
+		void RotatePokemon();
+
 		Pokemon* selectedPokemon;
 	};
 
@@ -103,6 +105,7 @@ private:
 		virtual void Render();
 		virtual void Update(double dt);
 
+		void Attack(int moveId);
 		void Unmove();
 		void Move();
 
@@ -123,6 +126,7 @@ private:
 		virtual void Render();
 		virtual void Update(double dt);
 
+		void Move();
 		void Unattack();
 		void Attack();
 

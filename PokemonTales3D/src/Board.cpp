@@ -153,7 +153,8 @@ IntRect Board::GetPokemonHitbox(Pokemon* poke) {
 	auto itr = pokemonsPos.find(poke);
 	if (itr == pokemonsPos.end())
 		return IntRect();
-	return IntRect(itr->second, itr->first->GetSize());
+	glm::ivec2 pokeSize = poke->GetTrainer()->GetPokemonRotateSize(poke);
+	return IntRect(itr->second - pokeSize / 2, pokeSize);
 }
 
 Pokemon* Board::GetPokemonFromPos(glm::ivec2 pos) {

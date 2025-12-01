@@ -84,3 +84,12 @@ void APlayer::SetPlayerColor(glm::vec3 color) {
 }
 bool APlayer::Playing() { return isPlaying; }
 std::vector<Pokemon*>& APlayer::GetPokemons() { return pokemons; }
+glm::ivec2 APlayer::GetPokemonRotateSize(Pokemon* poke) {
+	auto itr = pokemonState.find(poke);
+	if (itr == pokemonState.end())
+		return glm::ivec2(0, 0);
+	if (itr->second.rotate)
+		return glm::ivec2(poke->GetSize().y, poke->GetSize().x);
+	else
+		return poke->GetSize();
+}

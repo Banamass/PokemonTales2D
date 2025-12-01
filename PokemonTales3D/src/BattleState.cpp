@@ -55,7 +55,8 @@ PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	nbStepText = (Text*)AddElement(new Text(l_font, "Steps left", shadeMgr->GetShader("FontShader")));
 	nbStepText->SetColor(glm::vec4(glm::vec3(0.0f), 1.0f));
 	nbStepText->SetCharacterSize(charSize);
-	nbStepText->SetPos(glm::vec2(boxSize.x + moveBarPadding.x, boxSize.y - nbStepBarSize.y) + glm::vec2(5.0f, 10.0f));
+	nbStepText->SetPos(glm::vec2(boxSize.x + moveBarPadding.x, boxSize.y - nbStepBarSize.y) + nbStepBarSize / 2.0f);
+	nbStepText->SetOrigin(Location::Middle);
 
 	glm::vec2 stepButtonPadding(10.0f);
 	glm::vec2 stepButtonSize(120.0f, nbStepBarSize.y - stepButtonPadding.y);
@@ -96,10 +97,8 @@ void PokemonGUI::Update(double dt) {
 	for (int i = 0; i < MAX_AIMED_POKE; i++) {
 		aimedPokeStatsBar[i]->Update(dt);
 	}
-	if (selectedMove == -1) {
-		for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
-			moveBars[i]->Update(context->win);
-		}
+	for (int i = 0; i < Constants::NB_MOVES_MAX_BY_POKE; i++) {
+		moveBars[i]->Update(context->win);
 	}
 	stepButton->Update(context->win);
 	stats->Update(context->win);
@@ -143,7 +142,7 @@ void PokemonGUI::SetSelectedMove(int i) {
 	selectedMove = i;
 	for (int j = 0; j < Constants::NB_MOVES_MAX_BY_POKE; j++)
 		moveBars[j]->SetSelect(j == i);
-	if (i < 0 || i > 3) {
+	if (i < 0 || i >= Constants::NB_MOVES_MAX_BY_POKE) {
 		std::vector<Pokemon*> p;
 		SetAimedPoke(p, nullptr);
 	}
@@ -155,6 +154,7 @@ void PokemonGUI::SetNbStepsLeft(int l_nbStep) {
 	nbStepLeft = l_nbStep;
 	std::string s = nbStepLeft < 2 ? "" : "s";
 	nbStepText->SetText("Step" + s + " left : " + std::to_string(l_nbStep));
+	nbStepText->SetOrigin(Location::Middle);
 }
 
 void PokemonGUI::SetAimedPoke(std::vector<Pokemon*>& aimedPoke, PokemonMove* move) {

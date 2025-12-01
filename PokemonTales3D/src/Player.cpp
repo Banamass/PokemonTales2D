@@ -128,7 +128,7 @@ void Player::State::UpdateSelectedPokeArea(Pokemon* poke) {
 		selectedPokeArea.SetSize(glm::ivec2(0, 0));
 		return;
 	}
-	selectedPokeArea.SetSize(poke->GetSize());
+	selectedPokeArea.SetSize(player->GetPokemonRotateSize(poke));
 	Board* board = player->context->board;
 	selectedPokeArea.Update(board->GetPokemonPosition(poke));
 }
@@ -210,12 +210,14 @@ void Player::PokeSelectedState::Update(double dt) {
 		player->EndTurn();
 		return;
 	}
-	if(gui->GetSelectedPokemonGUI()->GetStepClicked()){
+	if (gui->GetSelectedPokemonGUI()->GetStepClicked()) {
 		Move();
-	}else {
-		int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();
-		if (moveId != -1)
-			Attack(moveId);
+		return;
+	}
+	int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();
+	if (moveId != -1){
+		Attack(moveId);
+		return;
 	}
 }
 
@@ -232,6 +234,13 @@ void Player::PokeSelectedState::KeyCallback(Key_Data& data) {
 		Attack(2);
 	else if (data.key == GLFW_KEY_KP_4 && data.action == GLFW_RELEASE)
 		Attack(3);
+	else if (data.key == GLFW_KEY_R && data.action == GLFW_RELEASE)
+		RotatePokemon();
+}
+
+void Player::PokeSelectedState::RotatePokemon() {
+	player->pokemonState[selectedPokemon].rotate = !player->pokemonState[selectedPokemon].rotate;
+	selectedPokeArea.Rotate();
 }
 
 void Player::PokeSelectedState::MouseButtonCallback(MouseButton_Data& data) {
@@ -330,7 +339,25 @@ void Player::PokeMoveState::Update(double dt) {
 		player->EndTurn();
 		return;
 	}
+
+	BattleGUI* gui = player->context->gui;
+	int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();
+	if (moveId != -1) {
+		Attack(moveId);
+		return;
+	}
+
 	UpdateCursor();
+}
+
+void Player::PokeMoveState::Attack(int moveId) {
+	if (player->pokemonState[selectedPokemon].nbMove > 0) {
+		player->context->gui->GetGameInfosField()->AddMessage("Max move in a turn reached");
+		return;
+	}
+	if (selectedPokemon->GetMove(moveId) == nullptr)
+		return;
+	player->SwitchState(new PokeAttackState(player, selectedPokemon, moveId));
 }
 
 void Player::PokeMoveState::Unmove() {
@@ -425,6 +452,17 @@ void Player::PokeAttackState::Update(double dt) {
 	}
 
 	SharedContext* context = player->context;
+	BattleGUI* gui = context->gui;
+	if (gui->GetSelectedPokemonGUI()->GetStepClicked()) {
+		Move();
+		return;
+	}
+	else{
+		int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();
+		if (moveId != -1)
+			SetMove(moveId);
+	}
+
 	std::vector<Pokemon*> attackedPokemon = context->board->GetPokemonCollision(cursor.GetIntRect());
 	context->gui->GetSelectedPokemonGUI()->SetAimedPoke(attackedPokemon, move);
 	
@@ -443,6 +481,15 @@ void Player::PokeAttackState::Render(){
 		player->context->win->Draw(rangeBox);
 	}
 	RenderCursor();
+}
+
+void Player::PokeAttackState::Move() {
+	if (player->pokemonState[selectedPokemon].nbStepLeft == 0) {
+		player->context->gui->GetGameInfosField()->AddMessage("No step left");
+		return;
+	}
+	player->context->gui->GetSelectedPokemonGUI()->SetSelectedMove(-1);
+	player->SwitchState(new PokeMoveState(player, selectedPokemon));
 }
 
 void Player::PokeAttackState::Attack() {
