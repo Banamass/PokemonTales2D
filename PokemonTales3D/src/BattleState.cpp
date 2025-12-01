@@ -311,15 +311,15 @@ BattleState::BattleState(SharedContext* l_context)
 	camera.SetPosition(glm::vec3(-3.0f, 5.0f, -3.0f));
 	camera.SetFront(glm::vec3(1.0f, -0.7f, 1.0f));
 
-	std::string dir = "Resources\\Skybox";
+	std::string dir = "Resources\\Skybox\\cloudy";
 	std::vector<std::string> faces
 	{
-			"right.jpg",
-			"left.jpg",
-			"top.jpg",
-			"bottom.jpg",
-			"front.jpg",
-			"back.jpg"
+			"right.png",
+			"left.png",
+			"up.png",
+			"down.png",
+			"front.png",
+			"back.png"
 	};
 	skybox = new Cubemap(context->shaderManager->GetShader("CubemapShader"), faces, dir);
 
