@@ -29,6 +29,7 @@
     <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameGUI.cpp" />
     <ClCompile Include="src\GameSystem.cpp" />
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Light.cpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="include\Font.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\GameGUI.h" />
     <ClInclude Include="include\GameSystem.h" />
     <ClInclude Include="include\GUI.h" />
     <ClInclude Include="include\json.hpp" />

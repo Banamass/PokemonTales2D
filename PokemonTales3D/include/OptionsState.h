@@ -2,7 +2,7 @@
 
 #include "StateManager.h"
 #include "EventManager.h"
-#include "GUI.h"
+#include "GameGUI.h"
 #include <vector>
 
 //Data from options state that can be retrieved from another state

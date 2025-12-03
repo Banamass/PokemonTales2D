@@ -31,7 +31,7 @@ private:
 	class State {
 	public:
 		State(Player* l_player);
-		virtual ~State() {};
+		virtual ~State();
 
 		virtual void KeyCallback(Key_Data& data) {};
 		virtual void MouseButtonCallback(MouseButton_Data& data) {};
@@ -58,6 +58,7 @@ private:
 	};
 
 	void SwitchState(State* newState);
+	State* nextState;
 	State* state;
 
 	class DefaultState : public State {

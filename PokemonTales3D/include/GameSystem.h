@@ -2,7 +2,7 @@
 
 #include "Board.h"
 #include "EventManager.h"
-#include "GUI.h"
+#include "GameGUI.h"
 #include "Player.h"
 #include "GameData.h"
 #include "OptionsState.h"

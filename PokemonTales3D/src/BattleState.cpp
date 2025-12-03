@@ -90,7 +90,7 @@ PokemonGUI::PokemonGUI(Pokemon* l_poke, Font* l_font, SharedContext* l_context)
 	statsButton->SetPos(glm::vec2(boxSize.x, 0.0f));
 }
 PokemonGUI::~PokemonGUI() {
-
+	stepButton->Unsubsribe(this);
 }
 
 void PokemonGUI::Update(double dt) {

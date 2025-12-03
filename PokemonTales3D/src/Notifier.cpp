@@ -5,6 +5,6 @@ void Notifier::NotifyAll(std::string tag) {
 	if (itr == callbacks.end())
 		return;
 	for (auto& f : itr->second) {
-		f();
+		f.first();
 	}
 }

@@ -51,7 +51,9 @@ PlayerOptionsGUI::PlayerOptionsGUI(SharedContext* l_context, std::string l_playe
 	}
 }
 PlayerOptionsGUI::~PlayerOptionsGUI() {
-
+	playerColorSelection->Unsubsribe(this);
+	if(playerColorSelection != nullptr)
+		playerColorSelection->Unsubsribe(playerColorSelection);
 }
 
 void PlayerOptionsGUI::SetOtherPlayerOption(PlayerOptionsGUI* l_otherPlayerOpt) {

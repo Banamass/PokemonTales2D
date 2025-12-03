@@ -6,7 +6,7 @@
 /*-----------------------------Player-----------------------------*/
 
 Player::Player(SharedContext* l_context) 
-	: APlayer(l_context), state(nullptr)
+	: APlayer(l_context), state(nullptr), nextState(nullptr)
 {
 	if (!context->modelManager->RequireResource("Box")) {
 		std::cout << "Box model not found" << std::endl;
@@ -59,6 +59,16 @@ void Player::PlayTurn() {
 }
 
 void Player::Update(double dt) {
+	if (nextState != nullptr) {
+		PType type = nextState->GetType();
+		if (type != PType::None) {
+			if (state != nullptr) {
+				delete state;
+			}
+			state = nextState;
+			nextState = nullptr;
+		}
+	}
 	APlayer::Update(dt);
 	if(state != nullptr)
 		state->Update(dt);
@@ -76,15 +86,7 @@ void Player::EndTurn() {
 }
 
 void Player::SwitchState(State* newState) {
-	if (newState == nullptr)
-		return;
-	PType type = newState->GetType();
-	if (type == PType::None)
-		return;
-	if (state != nullptr) {
-		delete state;
-	}
-	state = newState;
+	nextState = newState;
 }
 
 /*-----------------------------State-----------------------------*/
@@ -102,6 +104,9 @@ Player::State::State(Player* l_player) :
 	mat.ambient = 0.3f * color;
 	mat.diffuse = color;
 	selectedPokeAreaDrawable.SetMaterial(mat);
+}
+Player::State::~State() {
+	player->context->gui->GetSelectedPokemonGUI()->Unsubsribe(this);
 }
 
 void Player::State::Render() {
@@ -404,6 +409,8 @@ Player::PokeAttackState::PokeAttackState(Player* l_player, Pokemon* l_selectedPo
 	SetMove(moveId);
 
 	UpdateSelectedPokeArea(selectedPokemon);
+
+	player->context->gui->GetSelectedPokemonGUI()->Subscribe("Step", &PokeAttackState::Move, this);
 }
 
 void Player::PokeAttackState::SetMove(int id) {
@@ -452,11 +459,11 @@ void Player::PokeAttackState::Update(double dt) {
 
 	SharedContext* context = player->context;
 	BattleGUI* gui = context->gui;
-	if (gui->GetSelectedPokemonGUI()->GetStepClicked()) {
+	/*if (gui->GetSelectedPokemonGUI()->GetStepClicked()) {
 		Move();
 		return;
-	}
-	else{
+	}*/
+	{
 		int moveId = gui->GetSelectedPokemonGUI()->GetMoveClicked();
 		if (moveId != -1)
 			SetMove(moveId);
