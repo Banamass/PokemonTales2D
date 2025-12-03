@@ -18,13 +18,147 @@
 #include "Window.h"
 #include "StateManager.h"
 
-//Struct for hashing enum object
-struct EnumHash {
-	template <typename T>
-    std::size_t operator()(T t) const
-    {
-        return static_cast<std::size_t>(t);
-    }
+enum AZERTY
+{
+    // -------------------------
+    // Alphabet keys
+    // -------------------------
+    A = GLFW_KEY_Q,
+    Z = GLFW_KEY_W,
+    E = GLFW_KEY_E,
+    R = GLFW_KEY_R,
+    T = GLFW_KEY_T,
+    Y = GLFW_KEY_Y,
+    U = GLFW_KEY_U,
+    I = GLFW_KEY_I,
+    O = GLFW_KEY_O,
+    P = GLFW_KEY_P,
+
+    Q = GLFW_KEY_A,
+    S = GLFW_KEY_S,
+    D = GLFW_KEY_D,
+    F = GLFW_KEY_F,
+    G = GLFW_KEY_G,
+    H = GLFW_KEY_H,
+    J = GLFW_KEY_J,
+    K = GLFW_KEY_K,
+    L = GLFW_KEY_L,
+    M = GLFW_KEY_SEMICOLON,  // 'M' in AZERTY where ';' is in QWERTY
+
+    W = GLFW_KEY_Z,
+    X = GLFW_KEY_X,
+    C = GLFW_KEY_C,
+    V = GLFW_KEY_V,
+    B = GLFW_KEY_B,
+    N = GLFW_KEY_N,
+
+    // -------------------------
+    // Number row (top)
+    // -------------------------
+    N1 = GLFW_KEY_1,
+    N2 = GLFW_KEY_2,
+    N3 = GLFW_KEY_3,
+    N4 = GLFW_KEY_4,
+    N5 = GLFW_KEY_5,
+    N6 = GLFW_KEY_6,
+    N7 = GLFW_KEY_7,
+    N8 = GLFW_KEY_8,
+    N9 = GLFW_KEY_9,
+    N0 = GLFW_KEY_0,
+
+    // -------------------------
+    // Punctuation (approx positions)
+    // -------------------------
+    MINUS = GLFW_KEY_RIGHT_BRACKET,   // )
+    EQUAL = GLFW_KEY_EQUAL,           // =
+    SLASH = GLFW_KEY_MINUS,           // -
+    BACKSLASH = GLFW_KEY_BACKSLASH,       // remains same
+    APOSTROPHE = GLFW_KEY_COMMA,           // ,
+    COMMA = GLFW_KEY_M,               // ,
+    PERIOD = GLFW_KEY_PERIOD,          // .
+    SEMICOLON = GLFW_KEY_SEMICOLON,
+    GRAVE_ACCENT = GLFW_KEY_GRAVE_ACCENT,
+
+    // -------------------------
+    // Modifier keys
+    // -------------------------
+    LEFT_SHIFT = GLFW_KEY_LEFT_SHIFT,
+    RIGHT_SHIFT = GLFW_KEY_RIGHT_SHIFT,
+    LEFT_CTRL = GLFW_KEY_LEFT_CONTROL,
+    RIGHT_CTRL = GLFW_KEY_RIGHT_CONTROL,
+    LEFT_ALT = GLFW_KEY_LEFT_ALT,
+    RIGHT_ALT = GLFW_KEY_RIGHT_ALT, // AltGr
+    LEFT_SUPER = GLFW_KEY_LEFT_SUPER,
+    RIGHT_SUPER = GLFW_KEY_RIGHT_SUPER,
+
+    // -------------------------
+    // System keys
+    // -------------------------
+    ESCAPE = GLFW_KEY_ESCAPE,
+    TAB = GLFW_KEY_TAB,
+    CAPS_LOCK = GLFW_KEY_CAPS_LOCK,
+    ENTER = GLFW_KEY_ENTER,
+    SPACE = GLFW_KEY_SPACE,
+    BACKSPACE = GLFW_KEY_BACKSPACE,
+
+    // -------------------------
+    // Function keys
+    // -------------------------
+    F1 = GLFW_KEY_F1,
+    F2 = GLFW_KEY_F2,
+    F3 = GLFW_KEY_F3,
+    F4 = GLFW_KEY_F4,
+    F5 = GLFW_KEY_F5,
+    F6 = GLFW_KEY_F6,
+    F7 = GLFW_KEY_F7,
+    F8 = GLFW_KEY_F8,
+    F9 = GLFW_KEY_F9,
+    F10 = GLFW_KEY_F10,
+    F11 = GLFW_KEY_F11,
+    F12 = GLFW_KEY_F12,
+
+    // -------------------------
+    // Navigation + Editing
+    // -------------------------
+    PRINT_SCREEN = GLFW_KEY_PRINT_SCREEN,
+    SCROLL_LOCK = GLFW_KEY_SCROLL_LOCK,
+    PAUSE = GLFW_KEY_PAUSE,
+
+    INSERT = GLFW_KEY_INSERT,
+    DELETE = GLFW_KEY_DELETE,
+    HOME = GLFW_KEY_HOME,
+    END = GLFW_KEY_END,
+    PAGE_UP = GLFW_KEY_PAGE_UP,
+    PAGE_DOWN = GLFW_KEY_PAGE_DOWN,
+
+    // -------------------------
+    // Arrow keys
+    // -------------------------
+    ARROW_UP = GLFW_KEY_UP,
+    ARROW_DOWN = GLFW_KEY_DOWN,
+    ARROW_LEFT = GLFW_KEY_LEFT,
+    ARROW_RIGHT = GLFW_KEY_RIGHT,
+
+    // -------------------------
+    // Numpad
+    // -------------------------
+    KP_0 = GLFW_KEY_KP_0,
+    KP_1 = GLFW_KEY_KP_1,
+    KP_2 = GLFW_KEY_KP_2,
+    KP_3 = GLFW_KEY_KP_3,
+    KP_4 = GLFW_KEY_KP_4,
+    KP_5 = GLFW_KEY_KP_5,
+    KP_6 = GLFW_KEY_KP_6,
+    KP_7 = GLFW_KEY_KP_7,
+    KP_8 = GLFW_KEY_KP_8,
+    KP_9 = GLFW_KEY_KP_9,
+    KP_DECIMAL = GLFW_KEY_KP_DECIMAL,
+    KP_DIVIDE = GLFW_KEY_KP_DIVIDE,
+    KP_MULTIPLY = GLFW_KEY_KP_MULTIPLY,
+    KP_SUBTRACT = GLFW_KEY_KP_SUBTRACT,
+    KP_ADD = GLFW_KEY_KP_ADD,
+    KP_ENTER = GLFW_KEY_KP_ENTER,
+    KP_EQUAL = GLFW_KEY_KP_EQUAL,
 };
 
 //Enumeration listing all the supported event type

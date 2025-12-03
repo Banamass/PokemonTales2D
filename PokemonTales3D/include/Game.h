@@ -10,6 +10,7 @@
 #include "BattleState.h"
 #include "MenuState.h"
 #include "OptionsState.h"
+#include "OpenWorldState.h"
 
 //The main class of the game
 class Game {

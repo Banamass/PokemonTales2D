@@ -46,6 +46,17 @@ MenuState::MenuState(SharedContext* l_context)
 
 	bPos += glm::vec2(0, -bSize.y - padding);
 
+	battleButton = (Button*)panel.AddElement(
+		new Button(context->fontManager->GetResource("Arial"), context->shaderManager, bPos));
+	battleButton->SetSize(bSize);
+	battleButton->SetText("Battle");
+	battleButton->SetFrameColor(bColor);
+	battleButton->SetTextColor(tbColor);
+	battleButton->SetCharacterSize(charSize);
+	battleButton->SetOrigin(Location::Middle);
+
+	bPos += glm::vec2(0, -bSize.y - padding);
+
 	optionsButton = (Button*)panel.AddElement(
 		new Button(context->fontManager->GetResource("Arial"), context->shaderManager, bPos));
 	optionsButton->SetSize(bSize);
@@ -77,11 +88,14 @@ void MenuState::Update(double dt) {
 	playButton->Update(context->win);
 	optionsButton->Update(context->win);
 	quitButton->Update(context->win);
+	battleButton->Update(context->win);
 
 	if (playButton->GetClick())
-		context->game->SwitchState(StateType::Battle);
+		context->game->SwitchState(StateType::OpenWorld);
 	else if (optionsButton->GetClick())
 		context->game->SwitchState(StateType::Options);
+	else if (battleButton->GetClick())
+		context->game->SwitchState(StateType::Battle);
 	else if (quitButton->GetClick())
 		context->win->Close();
 }

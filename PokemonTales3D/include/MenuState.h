@@ -24,4 +24,5 @@ private:
 	Button* playButton;
 	Button* optionsButton;
 	Button* quitButton;
+	Button* battleButton;
 };

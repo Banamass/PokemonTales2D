@@ -17,6 +17,7 @@ Game::Game()
 
 	stateManager.AddState(StateType::Battle, new BattleState(&context));
 	stateManager.AddState(StateType::Menu, new MenuState(&context));
+	stateManager.AddState(StateType::OpenWorld, new OpenWorldState(&context));
 	stateManager.AddState(StateType::Options, new OptionsState(&context));
 
 	SwitchState(StateType::Menu);

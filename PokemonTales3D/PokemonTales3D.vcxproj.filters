@@ -43,6 +43,12 @@
     <Filter Include="Fichiers sources\Game\Battle">
       <UniqueIdentifier>{ceef452e-6861-4112-a478-562f12fe3b6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Game\OpenWorld">
+      <UniqueIdentifier>{aab3512c-26f1-435d-9a6a-8a111038ad5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Game\OpenWorld">
+      <UniqueIdentifier>{02f17c5b-dfec-4dfc-aaa1-a47552e03fb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -125,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="src\GameGUI.cpp">
       <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="include\OpenWorldState.cpp">
+      <Filter>Fichiers sources\Game\OpenWorld</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +279,9 @@
     </ClInclude>
     <ClInclude Include="include\GameGUI.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenWorldState.h">
+      <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

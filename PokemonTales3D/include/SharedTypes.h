@@ -86,3 +86,12 @@ glm::vec2 LocationToPosition(glm::vec2 size, Location loc);
 glm::vec2 LocationToPosition(FloatRect rect, Location loc);
 
 glm::vec3 ColorFromRGB(uint8_t r, uint8_t g, uint8_t b);
+
+//Struct for hashing enum object
+struct EnumHash {
+	template <typename T>
+	std::size_t operator()(T t) const
+	{
+		return static_cast<std::size_t>(t);
+	}
+};

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\GameData.cpp" />
+    <ClCompile Include="include\OpenWorldState.cpp" />
     <ClCompile Include="src\APlayer.cpp" />
     <ClCompile Include="src\Areas.cpp" />
     <ClCompile Include="src\BattleState.cpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="include\MenuState.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Notifier.h" />
+    <ClInclude Include="include\OpenWorldState.h" />
     <ClInclude Include="include\OptionsState.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Pokemon.h" />

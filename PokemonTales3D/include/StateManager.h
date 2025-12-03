@@ -2,9 +2,10 @@
 
 #include "SharedTypes.h"
 #include <vector>
+#include <iostream>
 
 /*Enum for describing a state*/
-enum StateType { Menu, Battle, Options, NoneState };
+enum StateType { Menu, Battle, Options, OpenWorld, NoneState };
 
 /*Class describing a state in the game*/
 class State {
