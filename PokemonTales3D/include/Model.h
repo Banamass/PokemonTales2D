@@ -113,7 +113,11 @@ public:
 /* This class represent a cubemap 3D object */
 class Cubemap {
 public:
-	//faces contains for each face the name of the file representing that face, all these file are in dir
+	/*Faces contains for each face the name of the file representing that face, all these file are in dir
+	Face files are : "right.ext","left.ext","up.ext","down.ext","front.ext","back.ext"
+	*/
+	Cubemap(Shader* l_shader, std::string dir = "", std::string ext = "png");
+	//Faces contains for each face the name of the file representing that face, all these file are in dir
 	Cubemap(Shader* l_shader, std::vector<std::string>& faces, std::string dir = "");
 	~Cubemap();
 
@@ -121,6 +125,8 @@ public:
 	void Draw(glm::mat4 transform);
 
 private:
+	void Setup(std::vector<std::string>& faces, std::string dir);
+
 	Shader* shader;
 	unsigned int textures;
 	unsigned int VAO;

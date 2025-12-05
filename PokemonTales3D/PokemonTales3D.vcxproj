@@ -24,6 +24,7 @@
     <ClCompile Include="src\APlayer.cpp" />
     <ClCompile Include="src\Areas.cpp" />
     <ClCompile Include="src\BattleState.cpp" />
+    <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Drawable.cpp" />
@@ -35,11 +36,13 @@
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MenuState.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\OptionsState.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\PlayerBody.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shape.cpp" />
@@ -47,9 +50,13 @@
     <ClCompile Include="src\StateManager.cpp" />
     <ClCompile Include="src\std_image.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\fonts\fonts.cfg" />
+    <None Include="Resources\GameData\Map\blocks.json" />
+    <None Include="Resources\GameData\Map\grass.json" />
+    <None Include="Resources\GameData\Map\map.json" />
     <None Include="Resources\GameData\Moves\Bubble.json" />
     <None Include="Resources\GameData\Moves\Ember.json" />
     <None Include="Resources\GameData\Moves\Moves.json" />
@@ -74,6 +81,7 @@
     <ClInclude Include="include\APlayer.h" />
     <ClInclude Include="include\Areas.h" />
     <ClInclude Include="include\BattleState.h" />
+    <ClInclude Include="include\Block.h" />
     <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Drawable.h" />
@@ -86,12 +94,14 @@
     <ClInclude Include="include\GUI.h" />
     <ClInclude Include="include\json.hpp" />
     <ClInclude Include="include\Light.h" />
+    <ClInclude Include="include\Map.h" />
     <ClInclude Include="include\MenuState.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\OpenWorldState.h" />
     <ClInclude Include="include\OptionsState.h" />
     <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\PlayerBody.h" />
     <ClInclude Include="include\Pokemon.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Shader.h" />
@@ -99,6 +109,7 @@
     <ClInclude Include="include\SharedTypes.h" />
     <ClInclude Include="include\StateManager.h" />
     <ClInclude Include="include\Window.h" />
+    <ClInclude Include="include\World.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\GameData\ResourcesDescription.txt" />

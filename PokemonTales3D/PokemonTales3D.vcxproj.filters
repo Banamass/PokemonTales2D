@@ -49,6 +49,9 @@
     <Filter Include="Fichiers sources\Game\OpenWorld">
       <UniqueIdentifier>{02f17c5b-dfec-4dfc-aaa1-a47552e03fb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Blocks">
+      <UniqueIdentifier>{4a12db4a-541d-443c-b037-fa2d95527c1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -135,6 +138,18 @@
     <ClCompile Include="include\OpenWorldState.cpp">
       <Filter>Fichiers sources\Game\OpenWorld</Filter>
     </ClCompile>
+    <ClCompile Include="src\World.cpp">
+      <Filter>Fichiers sources\Game\OpenWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Block.cpp">
+      <Filter>Fichiers sources\Game\OpenWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Map.cpp">
+      <Filter>Fichiers sources\Game\OpenWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerBody.cpp">
+      <Filter>Fichiers sources\Game\OpenWorld</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
@@ -196,6 +211,15 @@
     </None>
     <None Include="Resources\GameData\Moves\VineWhip.json">
       <Filter>Resources\Moves</Filter>
+    </None>
+    <None Include="Resources\GameData\Map\blocks.json">
+      <Filter>Resources\Blocks</Filter>
+    </None>
+    <None Include="Resources\GameData\Map\grass.json">
+      <Filter>Resources\Blocks</Filter>
+    </None>
+    <None Include="Resources\GameData\Map\map.json">
+      <Filter>Resources\Blocks</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -281,6 +305,18 @@
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenWorldState.h">
+      <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="include\World.h">
+      <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Block.h">
+      <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Map.h">
+      <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerBody.h">
       <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
     </ClInclude>
   </ItemGroup>

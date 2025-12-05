@@ -1,7 +1,7 @@
 #include "Light.h"
 
-Light::Light(glm::vec3 pos, SharedContext* l_context)
-	: shader(l_context->shaderManager->GetShader("SimpleShader")), context(l_context)
+Light::Light(glm::vec3 l_pos, SharedContext* l_context)
+	: shader(l_context->shaderManager->GetShader("SimpleShader")), context(l_context), pos(l_pos)
 {
 	if (!l_context->modelManager->RequireResource("Cube")) {
 		std::cout << "Cube model not found" << std::endl;
@@ -10,15 +10,21 @@ Light::Light(glm::vec3 pos, SharedContext* l_context)
 
 	sprite = new Drawable(model, shader);
 	sprite->Move(pos);
-	l_context->shaderManager->SetLightPos(pos);
 }
 Light::~Light() {
 	delete sprite;
 	context->modelManager->ReleaseResource("Cube");
 }
 
-void Light::Draw(Window* win) {
+void Light::Draw() {
 	shader->use();
 	shader->SetUniform("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	win->Draw(sprite);
+	context->win->Draw(sprite);
+}
+
+void Light::Activate() {
+	context->shaderManager->SetLightPos(pos);
+}
+void Light::Desactivate() {
+
 }

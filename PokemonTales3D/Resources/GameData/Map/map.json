@@ -1,0 +1,18 @@
+[
+  {
+    "Block": "Grass",
+    "Pos": [ 0, 0, 0 ],
+    "Size": [ 10,1,10 ],
+    "Orientation": "Vertical"
+  },
+  {
+    "Block": "Rock",
+    "Pos": [ 5, 1, 5 ],
+    "Size": [ 5,1,5 ]
+  },
+  {
+    "Block": "Rock",
+    "Pos": [ 9,1,0 ],
+    "Size": [ 1,5,5 ]
+  }
+]

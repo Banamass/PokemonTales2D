@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(SharedContext* l_context)
+Camera::Camera(SharedContext* l_context, StateType state)
 	:window(context->win), context(l_context), isFollowingMouse(true) {
 	glm::vec2 l_windowSize = window->GetWindowSize();
 
@@ -22,8 +22,8 @@ Camera::Camera(SharedContext* l_context)
 
 	zoomSensitivity = 1.0f;
 
-	context->eventManager->AddCallback("CameraMove", EventType::MouseMove, &Camera::MouseMouseCallback, this, StateType::Battle);
-	context->eventManager->AddCallback("CameraScroll", EventType::Scroll, &Camera::ScrollCallback, this, StateType::Battle);
+	context->eventManager->AddCallback("CameraMove", EventType::MouseMove, &Camera::MouseMouseCallback, this, state);
+	context->eventManager->AddCallback("CameraScroll", EventType::Scroll, &Camera::ScrollCallback, this, state);
 
 	context->camera = this;
 }

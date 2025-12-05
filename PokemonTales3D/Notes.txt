@@ -10,7 +10,8 @@ A faire:
 - Utiliser unique_ptr
 - Rajouter des contructeurs par défault aux objets qui en ont besoin + revoir ShaderManagement pour supprimer GetShader
 - Transformer l'axe z en l'axe y et inversement
-
+- Revoir l'ajout de lights, potentiellemtn plusieurs et pouvoir les désactiver
+- Permettre à deux instanced drawable de partager le même modèle
 
 
 

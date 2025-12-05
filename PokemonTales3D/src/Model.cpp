@@ -275,8 +275,27 @@ std::pair<glm::vec3, glm::vec3> Model::GetAABBMinMax() {
 
 /*-------------------Cubemap-------------------*/
 
+Cubemap::Cubemap(Shader* l_shader, std::string dir, std::string ext) 
+	:shader(l_shader)
+{
+	std::vector<std::string> faces
+	{
+			"right." + ext,
+			"left." + ext,
+			"up." + ext,
+			"down." + ext,
+			"front." + ext,
+			"back." + ext
+	};
+	Setup(faces, dir);
+}
 Cubemap::Cubemap(Shader* l_shader, std::vector<std::string>& faces, std::string dir)
 	: shader(l_shader){	
+	Setup(faces, dir);
+}
+Cubemap::~Cubemap(){}
+
+void Cubemap::Setup(std::vector<std::string>& faces, std::string dir) {
 	float skyboxVertices[] = {
 		// positions          
 		-1.0f,  1.0f, -1.0f,
@@ -368,7 +387,6 @@ Cubemap::Cubemap(Shader* l_shader, std::vector<std::string>& faces, std::string 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
 		GL_CLAMP_TO_EDGE);
 }
-Cubemap::~Cubemap(){}
 
 void Cubemap::Draw(glm::mat4 transform) {
 	glDepthMask(GL_FALSE);

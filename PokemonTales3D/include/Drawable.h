@@ -155,7 +155,7 @@ private:
 };
 
 /* Class representing a set of 3D object with the same aspect representing with an unique Drawable.
-Each of these objects have their own Transform. Thus, the Transform of the unique Drawable isn't used */
+Each of these objects have their own Transform. Thus, the Transform of the unique Drawable isn't used*/
 class DrawableInstanced {
 public:
 	DrawableInstanced(Drawable* drawable, std::vector<Transform*>& instanceMatrix);
@@ -169,6 +169,9 @@ public:
 	bool IsVAOSetup();
 	//Indicate that the vao of the model is setup
 	void VAOSetup();
+
+	//Delete transforms object so erase also all instance drawable
+	void DeleteTransforms();
 
 private:
 	//Reference drawable for multiple drawing

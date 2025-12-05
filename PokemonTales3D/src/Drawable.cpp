@@ -307,6 +307,12 @@ void DrawableInstanced::VAOSetup() {
 	isVAOSetup = true;
 }
 
+void DrawableInstanced::DeleteTransforms() {
+	for (Transform*& t : instanceTransforms)
+		delete t;
+	instanceTransforms.clear();
+}
+
 /*------------------------DrawableStatic------------------------*/
 
 void DrawableStatic::SetPos(glm::vec2 l_pos) {

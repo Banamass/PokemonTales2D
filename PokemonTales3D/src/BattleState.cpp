@@ -299,7 +299,7 @@ PokemonGUI* BattleGUI::GetSelectedPokemonGUI() { return &selectedPokeGUI; }
 
 BattleState::BattleState(SharedContext* l_context)
 	: State(l_context),
-	camera(context),
+	camera(context, StateType::Battle),
 	light(glm::vec3(-70.0f, 50.0f, 10.0f), context),
 	gui(context),
 	inProgress(false)
@@ -356,7 +356,7 @@ void BattleState::Render(){
 
 	gameSystem->Render();
 	gui.Render();
-	light.Draw(context->win);
+	light.Draw();
 }
 
 void BattleState::Activate() {
@@ -366,6 +366,8 @@ void BattleState::Activate() {
 		gameSystem->StartBattle();
 		inProgress = true;
 	}
+	light.Activate();
+	context->camera = &camera;
 }
 
 void BattleState::Restart() {

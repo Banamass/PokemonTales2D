@@ -5,6 +5,7 @@
 //Constants of the game
 namespace Constants{
 	constexpr float BOX_SIZE = 2.0f;
+	constexpr float BLOCK_SIZE = 2.0f;
 	constexpr float WIN_WIDTH = 1200.0f;
 	constexpr float WIN_HEIGHT = 700.0f;
 	constexpr int NB_POKEMON_BY_PLAYER = 4;

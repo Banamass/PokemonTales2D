@@ -4,7 +4,7 @@
 
 class Camera {
 public:
-	Camera(SharedContext* l_context);
+	Camera(SharedContext* l_context, StateType state);
 	~Camera();
 
 	//Update the camera state
