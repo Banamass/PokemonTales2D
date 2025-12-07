@@ -3,11 +3,12 @@
 /*--------------Block--------------*/
 
 Block::Block(ModelManager* l_modelMgr, ShaderManager* l_shaderMgr, const json& data)
-	: modelMgr(l_modelMgr), shaderMgr(l_shaderMgr), modelName("")
+	: Drawable(), modelMgr(l_modelMgr), shaderMgr(l_shaderMgr), modelName(""), type(Type::Cube)
 {
 	LoadData(data);
 }
 Block::~Block(){
+	std::cout << "Destroy " << blockName << std::endl;
 	if(modelName != "")
 		modelMgr->ReleaseResource(modelName);
 }
@@ -30,12 +31,22 @@ void Block::LoadData(const json& data) {
 	mat.SetLightningColor(ColorFromRGB(matData["Color"][0], matData["Color"][1], matData["Color"][2])
 		, matData["AmbientFact"], matData["SpecularFact"]);
 	SetMaterial(mat);
+
+	std::string sType = data["Type"];
+	if (sType == "Cube")
+		type = Type::Cube;
+	if (sType == "Stair") 
+		type = Type::Stair;
+}
+
+Block::Type Block::GetType() {
+	return type;
 }
 
 /*--------------BlockInstance--------------*/
 
 BlockInstance::BlockInstance(Block* l_block, glm::ivec3 l_pos)
-: block(l_block), pos(l_pos){}
+: block(l_block), pos(l_pos), orientation(0,1){}
 
 /*--------------BlockStorage--------------*/
 

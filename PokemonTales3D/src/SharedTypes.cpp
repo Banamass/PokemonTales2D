@@ -52,3 +52,20 @@ bool FloatRect::Intersects(IntRect rect) const {
 glm::vec3 ColorFromRGB(uint8_t r, uint8_t g, uint8_t b) {
 	return glm::vec3(((float)r) / 255.0f, ((float)g) / 255.0f, ((float)b) / 255.0f);
 }
+
+std::ostream& operator<<(std::ostream& s, glm::vec3 vec) {
+	s << "x : " << vec.x << ", y : " << vec.y << ", z : " << vec.z;
+	return s;
+}
+std::ostream& operator<<(std::ostream& s, glm::ivec3 vec) {
+	s << "x : " << vec.x << ", y : " << vec.y << ", z : " << vec.z;
+	return s;
+}
+std::ostream& operator<<(std::ostream& s, glm::vec2 vec) {
+	s << "x : " << vec.x << ", y : " << vec.y;
+	return s;
+}
+std::ostream& operator<<(std::ostream& s, glm::ivec2 vec) {
+	s << "x : " << vec.x << ", y : " << vec.y;
+	return s;
+}

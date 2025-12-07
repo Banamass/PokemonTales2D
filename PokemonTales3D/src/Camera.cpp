@@ -37,13 +37,13 @@ void Camera::Update(const double& dt) {
 
 	float speed = 2.0f;
 
-	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(window->GetGLFWwindow(), config.forwardK) == GLFW_PRESS)
 		move -= (float)dt * (speed * frontMove);
-	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(window->GetGLFWwindow(), config.backwardK) == GLFW_PRESS)
 		move += (float)dt * (speed * frontMove);
-	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(window->GetGLFWwindow(), config.leftK) == GLFW_PRESS)
 		move += (float)dt * (speed * rightMove);
-	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(window->GetGLFWwindow(), config.rightK) == GLFW_PRESS)
 		move -= (float)dt * (speed * rightMove);
 
 	if (glfwGetKey(window->GetGLFWwindow(), GLFW_KEY_UP) == GLFW_PRESS)
@@ -94,6 +94,10 @@ void Camera::SetIsFollowingMouse(float b) {
 	isFollowingMouse = b;
 	context->win->SetCursorCapture(b);
 	firstMouse = true;
+}
+
+void Camera::SetKeyConfig(KeyConfig l_config) {
+	config = l_config;
 }
 
 void Camera::MouseMouseCallback(CallbackData data) {

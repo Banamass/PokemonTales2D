@@ -12,15 +12,19 @@ using json = nlohmann::json;
 
 class Block : public Drawable {
 public:
+	enum Type {Cube, Stair};
+
 	Block(ModelManager* l_modelMgr, ShaderManager* l_shaderMgr, const json& data);
-	~Block();
+	virtual ~Block();
 
 	std::string GetName();
+	Type GetType();
 
 protected:
 	void LoadData(const json& data);
 
 	std::string blockName;
+	Type type;
 
 	ModelManager* modelMgr;
 	std::string modelName;
@@ -32,6 +36,7 @@ struct BlockInstance {
 
 	Block* block;
 	glm::ivec3 pos;
+	glm::ivec2 orientation;
 };
 
 class BlockStorage {

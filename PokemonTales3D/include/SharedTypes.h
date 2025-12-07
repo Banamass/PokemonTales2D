@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <iostream>
 
 //Constants of the game
 namespace Constants{
@@ -23,6 +24,7 @@ class FontManager;
 class GameSystem;
 class BattleGUI;
 class Board;
+class Map;
 class DataManager;
 class StateManager;
 
@@ -40,6 +42,7 @@ struct SharedContext {
 	GameSystem* gameSystem;
 	BattleGUI* gui;
 	Board* board;
+	Map* map;
 };
 
 // Enumeration of all supported location
@@ -89,10 +92,15 @@ glm::vec2 LocationToPosition(FloatRect rect, Location loc);
 glm::vec3 ColorFromRGB(uint8_t r, uint8_t g, uint8_t b);
 
 //Struct for hashing enum object
-struct EnumHash {
+struct EnumHash{
 	template <typename T>
 	std::size_t operator()(T t) const
 	{
 		return static_cast<std::size_t>(t);
 	}
 };
+
+std::ostream& operator<<(std::ostream& s, glm::vec3 vec);
+std::ostream& operator<<(std::ostream& s, glm::ivec3 vec);
+std::ostream& operator<<(std::ostream& s, glm::vec2 vec);
+std::ostream& operator<<(std::ostream& s, glm::ivec2 vec);

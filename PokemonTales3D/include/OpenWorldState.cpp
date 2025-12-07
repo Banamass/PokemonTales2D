@@ -9,6 +9,18 @@ OpenWorldState::OpenWorldState(SharedContext* l_context)
 
 	context->eventManager->AddCallback("KeyboardOpenWorld", EventType::Key
 		, &OpenWorldState::KeyCallback, this, StateType::OpenWorld);
+
+	Camera::KeyConfig camConfig;
+	camConfig.forwardK = AZERTY::O;
+	camConfig.backwardK = AZERTY::L;
+	camConfig.rightK = AZERTY::M;
+	camConfig.leftK = AZERTY::K;
+
+	camera.SetKeyConfig(camConfig);
+
+	camera.SetPosition(glm::vec3(-5.0f, 5.0f, -5.0f));
+	camera.SetFront(glm::vec3(1.0f, -0.7f, 1.0f));
+	camera.SetIsFollowingMouse(false);
 }
 OpenWorldState::~OpenWorldState(){}
 
@@ -29,6 +41,11 @@ void OpenWorldState::KeyCallback(CallbackData data) {
 	
 	if (kdata.key == AZERTY::ESCAPE && kdata.action == GLFW_RELEASE)
 		context->game->SwitchState(StateType::Menu);
+
+	if (kdata.key == AZERTY::LEFT_CTRL && kdata.action == GLFW_RELEASE)
+		world.RotateCamera(true);
+	if (kdata.key == AZERTY::RIGHT_CTRL && kdata.action == GLFW_RELEASE)
+		world.RotateCamera(false);
 }
 
 void OpenWorldState::Activate() {
@@ -36,7 +53,7 @@ void OpenWorldState::Activate() {
 	
 	light.Activate();
 	context->camera = &camera;
-	camera.SetIsFollowingMouse(true);
+	
 }
 
 void OpenWorldState::Desactivate() {

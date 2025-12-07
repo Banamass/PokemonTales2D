@@ -6,7 +6,7 @@ int main() {
 	double lastTime = glfwGetTime();
 	while (!game.IsOver()) {
 		double currTime = glfwGetTime();
-		double dt = lastTime - currTime;
+		double dt = currTime - lastTime;
 		lastTime = currTime;
 		game.Update(dt);
 		game.Render();

@@ -1,18 +1,55 @@
 [
   {
     "Block": "Grass",
-    "Pos": [ 0, 0, 0 ],
-    "Size": [ 10,1,10 ],
-    "Orientation": "Vertical"
+    "Pos": [ 0, -1, 0 ],
+    "Size": [ 10, 1, 10 ]
   },
   {
     "Block": "Rock",
-    "Pos": [ 5, 1, 5 ],
-    "Size": [ 5,1,5 ]
+    "Pos": [ 5, 0, 5 ],
+    "Size": [ 5, 1, 5 ]
   },
   {
     "Block": "Rock",
-    "Pos": [ 9,1,0 ],
-    "Size": [ 1,5,5 ]
+    "Pos": [ 9, 0, 0 ],
+    "Size": [ 1, 5, 5 ]
+  },
+  {
+    "Block": "Grass",
+    "Pos": [ -5, -5, 0 ],
+    "Size": [ 5, 1, 5 ]
+  },
+  {
+    "Block": "Grass",
+    "Pos": [ -3, -3, 0 ],
+    "Size": [ 3, 1, 5 ]
+  },
+  {
+    "Block": "Rock",
+    "Pos": [ 0, -5, 0 ],
+    "Size": [ 1, 5, 5 ]
+  },
+  {
+    "Block": "Rock",
+    "Pos": [ -5, -5, 4 ],
+    "Size": [ 5, 5, 1 ]
+  },
+  {
+    "Block": "Slope",
+    "Pos": [ 6, 0, 4 ],
+    "Size": [ 1, 1, 1 ],
+    "Orientation": [ 0, -1 ]
+  },
+  {
+    "Block": "Slope",
+    "Pos": [ 4, 0, 6 ],
+    "Size": [ 1, 1, 4 ],
+    "Orientation": [ -1, 0 ]
+  },
+  {
+    "Block": "Slope",
+    "Pos": [ 5, 1, 6 ],
+    "Size": [ 1, 1, 4 ],
+    "Orientation": [ -1, 0 ]
   }
 ]

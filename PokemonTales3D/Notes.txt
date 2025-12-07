@@ -12,11 +12,12 @@ A faire:
 - Transformer l'axe z en l'axe y et inversement
 - Revoir l'ajout de lights, potentiellemtn plusieurs et pouvoir les désactiver
 - Permettre à deux instanced drawable de partager le même modèle
+- WARNING : faire attention au constructeur par copy et move
 
 
 
 
-
+Rq : NEVER Use the copy constructor with objects that use a resource manager
 
 
 

@@ -6,7 +6,8 @@
       "Color": [ 61, 100, 41 ],
       "AmbientFact": 0.5,
       "SpecularFact": 0.1
-    }
+    },
+    "Type" :  "Cube"
   },
   {
     "Name": "Rock",
@@ -15,6 +16,17 @@
       "Color": [ 68, 32, 32 ],
       "AmbientFact": 0.5,
       "SpecularFact": 0.1
-    }
+    },
+    "Type": "Cube"
+  },
+  {
+    "Name": "Slope",
+    "Model": "Slope",
+    "Material": {
+      "Color": [ 61, 100, 41 ],
+      "AmbientFact": 0.5,
+      "SpecularFact": 0.1
+    },
+    "Type": "Stair"
   }
 ]

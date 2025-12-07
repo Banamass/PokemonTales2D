@@ -104,7 +104,7 @@ public:
 	Drawable();
 	Drawable(Model* model, Shader* shader);
 	Drawable(Model* model, Shader* shader, Material l_material);
-	~Drawable();
+	virtual ~Drawable();
 
 	/* Test if a ray go through the 3D object
 	Params:

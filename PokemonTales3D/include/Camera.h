@@ -4,6 +4,21 @@
 
 class Camera {
 public:
+	struct KeyConfig {
+		KeyConfig()
+			: forwardK(AZERTY::Z), backwardK(AZERTY::S), leftK(AZERTY::Q), rightK(AZERTY::D),
+			upK(AZERTY::ARROW_UP), downK(AZERTY::ARROW_DOWN) {
+		}
+
+		int forwardK;
+		int backwardK;
+		int leftK;
+		int rightK;
+
+		int upK;
+		int downK;
+	};
+
 	Camera(SharedContext* l_context, StateType state);
 	~Camera();
 
@@ -26,11 +41,15 @@ public:
 	void SetFoV(float newFoV);
 	//Set if the camerais following the mouse pos
 	void SetIsFollowingMouse(float b);
+	//Set the key config of the camera
+	void SetKeyConfig(KeyConfig l_config);
 
 	//Getting the direction where the mouse is currently pointing to
 	glm::vec3 GetMouseDirection();
 	//Get the position of the camera
 	glm::vec3 GetPosition();
+
+	
 
 private:
 	SharedContext* context;
@@ -61,4 +80,6 @@ private:
 	float FovX;
 	float FovY;
 	float zoomSensitivity;
+
+	KeyConfig config;
 };
