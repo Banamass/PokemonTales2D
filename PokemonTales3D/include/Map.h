@@ -18,8 +18,12 @@ public:
 
 	/*Return if there is a collision between the pos and an element of the map*/
 	bool GetCollision(glm::vec3 pos);
+	/*Return if position pos has just below a cube or not*/
+	bool GetIsOnCube(glm::vec3 pos);
 	/*Return the block which has a collision with the given pos, or nullptr is there is none*/
 	const BlockInstance* GetBlockCollision(glm::vec3 pos);
+	/*Return the block of given type which has a collision with the given pos, or nullptr is there is none*/
+	const BlockInstance* GetBlockCollision(glm::vec3 pos, Block::Type type);
 	/*Return the position of an object who makes a movment from prevPos to newPos
 	Taking into account all map elements*/
 	glm::vec3 ReactMovment(glm::vec3 prevPos, glm::vec3 newPos);

@@ -42,10 +42,12 @@ void OpenWorldState::KeyCallback(CallbackData data) {
 	if (kdata.key == AZERTY::ESCAPE && kdata.action == GLFW_RELEASE)
 		context->game->SwitchState(StateType::Menu);
 
-	if (kdata.key == AZERTY::LEFT_CTRL && kdata.action == GLFW_RELEASE)
+	if (kdata.key == AZERTY::LEFT_CTRL && kdata.action == GLFW_RELEASE) {
 		world.RotateCamera(true);
-	if (kdata.key == AZERTY::RIGHT_CTRL && kdata.action == GLFW_RELEASE)
+	}
+	if (kdata.key == AZERTY::RIGHT_CTRL && kdata.action == GLFW_RELEASE) {
 		world.RotateCamera(false);
+	}
 }
 
 void OpenWorldState::Activate() {

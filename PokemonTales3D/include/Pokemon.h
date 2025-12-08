@@ -42,9 +42,10 @@ public:
 		ModelManager* modelMgr, ShaderManager* shaderMgr, glm::vec3 l_color);
 	virtual ~Pokemon();
 
-	//Render method for the Pokemon, draw it in win at position pos
+	//Render method for the Pokemon, draw it in win at grid position pos
 	void Render(Window* win, glm::ivec2 pos);
-
+	//Render method for the Pokemon, draw it in win at real position pos
+	void Render(Window* win, glm::vec3 pos);
 	
 	/*Perform an intersection test with a given ray, describes by ray_origin and ray_direction
 	Return if there is an intersection between the Pokemon drawable and the ray
@@ -61,7 +62,10 @@ public:
 	int GetMaxHealth();
 	glm::ivec2 GetSize();
 	int GetMoveRange();
+	/*Return the trainer of the pokemon, nullptr when the pokemon is wild*/
 	APlayer* GetTrainer();
+	/*Set the trainer of the pokemon*/
+	void SetTrainer(APlayer* l_trainer);
 	std::string GetName();
 	bool IsKO();
 	/*Return a pointer to the i-th move of this pokemon(0 <= i <= 3) 

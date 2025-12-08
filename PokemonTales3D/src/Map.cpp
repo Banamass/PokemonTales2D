@@ -139,9 +139,20 @@ bool Map::GetCollision(glm::vec3 pos) {
 	const BlockInstance* collision = GetBlockCollision(pos);
 	return collision != nullptr;
 }
+bool Map::GetIsOnCube(glm::vec3 pos) {
+	return GetBlockCollision(
+		pos - glm::vec3(0.0f, Constants::BLOCK_SIZE - 0.01f, 0.0f)
+		, Block::Type::Cube) != nullptr;
+}
 
 const BlockInstance* Map::GetBlockCollision(glm::vec3 pos) {
 	return instanceBlocks.GetBlock(Map::MapIndFromPos(pos));
+}
+const BlockInstance* Map::GetBlockCollision(glm::vec3 pos, Block::Type type) {
+	const BlockInstance* b = instanceBlocks.GetBlock(Map::MapIndFromPos(pos));
+	if (b == nullptr || b->block->GetType() != type)
+		return nullptr;
+	return b;
 }
 
 glm::vec3 Map::ReactMovment(glm::vec3 prevPos, glm::vec3 newPos) {

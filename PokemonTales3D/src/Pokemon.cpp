@@ -96,12 +96,19 @@ void Pokemon::Render(Window* win, glm::ivec2 pos){
 
 	win->Draw(sprite);
 }
+void Pokemon::Render(Window* win, glm::vec3 pos) {
+	sprite->SetPosition(pos);
+	OBB->SetPosition(pos);
+
+	win->Draw(sprite);
+}
 
 int Pokemon::GetHealth() { return status.GetHealth(); }
 int Pokemon::GetMaxHealth() { return status.GetStat(Stat::Hp); }
 glm::ivec2 Pokemon::GetSize() { return status.data->size; }
 int Pokemon::GetMoveRange() { return status.GetStat(Stat::Move); }
 APlayer* Pokemon::GetTrainer() { return trainer; }
+void Pokemon::SetTrainer(APlayer* l_trainer) { trainer = l_trainer; }
 std::string Pokemon::GetName() { return status.data->name; }
 bool Pokemon::IsKO() { return GetHealth() <= 0; }
 PokemonMove* Pokemon::GetMove(int i) { return status.movePool[i]; }

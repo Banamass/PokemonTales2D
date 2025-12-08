@@ -24,6 +24,7 @@ public:
 	void Render();
 
 	void Accelerate(glm::vec3 f);
+	void SetFrontMove(glm::vec3 v);
 	glm::vec3 GetPosition();
 
 private:
@@ -31,6 +32,8 @@ private:
 
 	Drawable sprite;
 
+	glm::vec3 frontMove;
+	glm::vec3 rightMove;
 	float walkSpeed;
 	float walkAccel;
 	glm::vec3 velocity;

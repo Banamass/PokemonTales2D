@@ -44,11 +44,13 @@
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\PlayerBody.cpp" />
     <ClCompile Include="src\Pokemon.cpp" />
+    <ClCompile Include="src\PokemonBody.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\SharedTypes.cpp" />
     <ClCompile Include="src\StateManager.cpp" />
     <ClCompile Include="src\std_image.cpp" />
+    <ClCompile Include="src\Transitor.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>
@@ -103,11 +105,13 @@
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\PlayerBody.h" />
     <ClInclude Include="include\Pokemon.h" />
+    <ClInclude Include="include\PokemonBody.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Shape.h" />
     <ClInclude Include="include\SharedTypes.h" />
     <ClInclude Include="include\StateManager.h" />
+    <ClInclude Include="include\Transitor.h" />
     <ClInclude Include="include\Window.h" />
     <ClInclude Include="include\World.h" />
   </ItemGroup>

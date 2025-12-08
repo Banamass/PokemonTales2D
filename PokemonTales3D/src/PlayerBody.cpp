@@ -36,6 +36,8 @@ PlayerBody::PlayerBody(SharedContext* l_context)
 	sprite.SetMaterial(mat);
 
 	sprite.Move(glm::vec3(2.0f, 0.0f, 0.0f));
+
+	SetFrontMove(glm::vec3(1, 0, 0));
 }
 PlayerBody::~PlayerBody(){
 	context->modelManager->ReleaseResource("Character");
@@ -45,16 +47,16 @@ void PlayerBody::Update(double dt){
 	GLFWwindow* gwin = context->win->GetGLFWwindow();
 
 	if (glfwGetKey(gwin, AZERTY::Z) == GLFW_PRESS) {
-		acceleration.x += walkAccel;
+		acceleration += frontMove;
 	}
 	if (glfwGetKey(gwin, AZERTY::S) == GLFW_PRESS) {
-		acceleration.x -= walkAccel;
+		acceleration -= frontMove;
 	}
 	if (glfwGetKey(gwin, AZERTY::Q) == GLFW_PRESS) {
-		acceleration.z -= walkAccel;
+		acceleration -= rightMove;
 	}
 	if (glfwGetKey(gwin, AZERTY::D) == GLFW_PRESS) {
-		acceleration.z += walkAccel;
+		acceleration += rightMove;
 	}
 
 	velocity += acceleration * (float)dt;
@@ -99,6 +101,13 @@ void PlayerBody::Update(double dt){
 }
 void PlayerBody::Render(){
 	context->win->Draw(sprite);
+}
+
+void PlayerBody::SetFrontMove(glm::vec3 v) {
+	frontMove = glm::normalize(v);
+	rightMove = glm::cross(frontMove, glm::vec3(0.0f, 1.0f, 0.0f));
+	frontMove *= walkAccel;
+	rightMove *= walkAccel;
 }
 
 void PlayerBody::Accelerate(glm::vec3 f) {
