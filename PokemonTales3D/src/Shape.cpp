@@ -95,3 +95,32 @@ glm::vec2 RectangleShape::GetSize() { return size; }
 FloatRect RectangleShape::GetFloatRect() { return FloatRect(GetRealPos(), size); }
 
 void RectangleShape::SetColor(glm::vec4 l_color) { color = l_color; }
+
+/*---------------CubeShape---------------*/
+
+CubeShape::CubeShape(ModelManager* l_modelMgr, ShaderManager* shaderMgr)
+	: Drawable(), modelMgr(l_modelMgr), size(1.0f)
+{
+	SetModel(modelMgr->RequireGetResource("1x1x1Cube"));
+	SetShader(shaderMgr->GetShader("ModelShader"));
+
+	Material mat;
+	mat.SetPlainColor(glm::vec3(1.0f));
+	SetMaterial(mat);
+}
+CubeShape::~CubeShape(){
+	modelMgr->ReleaseResource("1x1x1Cube");
+}
+
+void CubeShape::SetColor(glm::vec3 color) {
+	Material mat;
+	mat.SetPlainColor(color);
+	SetMaterial(mat);
+}
+void CubeShape::SetSize(glm::vec3 l_size) {
+	size = l_size;
+	SetScaling(size);
+}
+glm::vec3 CubeShape::GetSize() {
+	return size;
+}

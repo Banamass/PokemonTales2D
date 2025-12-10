@@ -23,11 +23,14 @@ private:
 	glm::ivec2 cameraRotation;
 	SmoothLinearTransition<glm::vec3> cameraTransition;
 
+	void CheckCollisions();
+
 	SharedContext* context;
 
 	Map map;
 	PlayerBody playerBody;
 	std::unordered_map<Pokemon*, PokemonBody> wildPokemons;
+	CubeShape bb;
 
 	float gravity;
 };

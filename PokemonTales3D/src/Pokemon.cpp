@@ -52,7 +52,6 @@ Pokemon::Pokemon(const PokemonData* l_data, APlayer* l_trainer,
 	}
 	model = modelMgr->GetResource("Charmander");
 	sprite = new Drawable(model, shaderMgr->GetShader("ModelShader"));
-	OBB = new Drawable(model, shaderMgr->GetShader("ModelShader"));
 
 	if (l_data->name == "Bulbasaur")
 		color = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -69,15 +68,9 @@ Pokemon::Pokemon(const PokemonData* l_data, APlayer* l_trainer,
 	
 	sprite->SetMaterial(mat);
 	sprite->Scale(glm::vec3(0.2f));
-
-	Drawable::Material matOBB;
-	matOBB.ambient = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	OBB->SetMaterial(matOBB);
-	OBB->Scale(glm::vec3(0.65f));
 }
 Pokemon::~Pokemon(){
 	delete sprite;
-	delete OBB;
 	modelMgr->ReleaseResource("Charmander");
 }
 
@@ -92,15 +85,24 @@ bool Pokemon::TestRayIntersection(
 void Pokemon::Render(Window* win, glm::ivec2 pos){
 	glm::vec3 realPos(pos.x * Constants::BOX_SIZE, 0.4f, pos.y * Constants::BOX_SIZE);
 	sprite->SetPosition(realPos);
-	OBB->SetPosition(realPos);
-
+	
 	win->Draw(sprite);
 }
 void Pokemon::Render(Window* win, glm::vec3 pos) {
 	sprite->SetPosition(pos);
-	OBB->SetPosition(pos);
 
 	win->Draw(sprite);
+}
+void Pokemon::RenderWithBB(Window* win, glm::vec3 pos, CubeShape* bbSprite) {
+	sprite->SetPosition(pos);
+
+	win->DrawWithBB(sprite, bbSprite);
+}
+void Pokemon::RenderWithBB(Window* win, glm::ivec2 pos, CubeShape* bbSprite) {
+	glm::vec3 realPos(pos.x * Constants::BOX_SIZE, 0.4f, pos.y * Constants::BOX_SIZE);
+	sprite->SetPosition(realPos);
+
+	win->DrawWithBB(sprite, bbSprite);
 }
 
 int Pokemon::GetHealth() { return status.GetHealth(); }
@@ -125,4 +127,8 @@ void Pokemon::TakeDamages(int l_damages) {
 	if (IsKO()) {
 		trainer->PokemonKO(this);
 	}
+}
+
+FloatCube Pokemon::GetFloatCube() {
+	return sprite->GetFloatCube();
 }

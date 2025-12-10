@@ -102,6 +102,9 @@ void PlayerBody::Update(double dt){
 void PlayerBody::Render(){
 	context->win->Draw(sprite);
 }
+void PlayerBody::RenderWithBB(CubeShape* bb) {
+	context->win->DrawWithBB(sprite, bb);
+}
 
 void PlayerBody::SetFrontMove(glm::vec3 v) {
 	frontMove = glm::normalize(v);
@@ -116,4 +119,7 @@ void PlayerBody::Accelerate(glm::vec3 f) {
 
 glm::vec3 PlayerBody::GetPosition() {
 	return sprite.GetPosition();
+}
+FloatCube PlayerBody::GetFloatCube() {
+	return sprite.GetFloatCube();
 }

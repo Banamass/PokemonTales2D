@@ -66,7 +66,6 @@ void Window::EndDraw() {
 void Window::Draw(Drawable& drawable) {
 	Draw(&drawable);
 }
-
 void Window::Draw(Drawable* drawable) {
 	Shader* shader = drawable->shader;
 	shader->use();
@@ -76,6 +75,26 @@ void Window::Draw(Drawable* drawable) {
 	shader->SetUniform("material.shininess", drawable->material.shininess);
 	shader->SetUniform("material.alpha", drawable->material.alpha);
 	drawable->model->Draw(shader, context->camera->GetTransformMatrix(), drawable->transform.GetTransform());
+}
+void Window::DrawLined(Drawable& drawable) {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	Draw(drawable);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+void Window::DrawLined(Drawable* drawable) {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	Draw(drawable);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+void Window::DrawWithBB(Drawable& drawable, CubeShape* obbSprite) {
+	DrawWithBB(&drawable, obbSprite);
+}
+void Window::DrawWithBB(Drawable* drawable, CubeShape* obbSprite) {
+	FloatCube boundingBox(drawable->obb.GetFloatCube());
+	obbSprite->SetSize(boundingBox.size);
+	obbSprite->SetPosition(boundingBox.pos);
+	DrawLined(obbSprite);
+	Draw(drawable);
 }
 
 void Window::Draw(Cubemap& cubemap) {

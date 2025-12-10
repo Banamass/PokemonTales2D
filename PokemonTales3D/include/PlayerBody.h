@@ -22,10 +22,12 @@ public:
 
 	void Update(double dt);
 	void Render();
+	void RenderWithBB(CubeShape* bb);
 
 	void Accelerate(glm::vec3 f);
 	void SetFrontMove(glm::vec3 v);
 	glm::vec3 GetPosition();
+	FloatCube GetFloatCube();
 
 private:
 	SharedContext* context;

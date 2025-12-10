@@ -77,10 +77,24 @@ struct FloatRect {
 	}
 
 	bool Contains(glm::vec2 v) const;
-	bool Intersects(IntRect rect) const;
+	bool Intersects(FloatRect rect) const;
 
 	glm::vec2 pos;
 	glm::vec2 size;
+};
+
+//Structure representing a cube with floating coords
+struct FloatCube {
+	FloatCube() : pos(0.0f), size(0.0f) {}
+	FloatCube(glm::vec3 l_pos, glm::vec3 l_size)
+		: pos(l_pos), size(l_size) {
+	}
+
+	bool Contains(glm::vec3 v) const;
+	bool Intersects(FloatCube rect) const;
+
+	glm::vec3 pos;
+	glm::vec3 size;
 };
 
 //For an object with a size 'size', compute the coords of the point at the location loc

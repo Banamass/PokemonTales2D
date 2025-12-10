@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Drawable.h"
 #include "Window.h"
 #include "Pokemon.h"
 #include "Map.h"
 #include "Transitor.h"
+#include "Shape.h"
 
 class PokemonBody {
 public:
@@ -13,6 +13,7 @@ public:
 
 	void Update(double dt);
 	void Render();
+	void RenderWithBB(CubeShape* bb);
 
 	Pokemon* GetPokemon();
 
@@ -26,6 +27,7 @@ public:
 	void SetPosition(glm::vec3 l_pos);
 
 	glm::vec3 GetPosition();
+	FloatCube GetFloatCube();
 
 private:
 	SharedContext* context;

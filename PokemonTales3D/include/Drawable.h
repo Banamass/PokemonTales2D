@@ -26,18 +26,23 @@ public:
 	
 	//Move the transform
 	void Move(glm::vec3 move);
-	//Scale the transform
-	void Scale(glm::vec3 scale);
-	//Rotate the transform
-	void Rotate(glm::vec3 rotation);
-
 	//Set the position of the transform
 	void SetPosition(glm::vec3 pos);
+	//Scale the transform
+	void Scale(glm::vec3 scale);
+	//Set the scaling of the transform
+	void SetScaling(glm::vec3 scale);
+	//Rotate the transform
+	void Rotate(glm::vec3 rotation);
 
 	//Get the matrix associated to the transformations applied to this object
 	glm::mat4 GetTransform();
 	//Get the scaling of this object
 	glm::vec3 GetScaling();
+	//Get the position of this object
+	glm::vec3 GetPosition();
+	//Get the rotation of this object
+	glm::vec3 GetRotation();
 
 private:
 	void ResetTransformations();
@@ -70,6 +75,9 @@ public:
 		glm::vec3 ray_origin,
 		glm::vec3 ray_direction,
 		float& interstion_distance);
+
+	//Get the float cube of the obb, without the rotation transform
+	FloatCube GetFloatCube();
 
 	void Setup(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform);
 
@@ -120,6 +128,8 @@ public:
 	void Move(glm::vec3 move);
 	void Scale(float uniScale);
 	void Scale(glm::vec3 scale);
+	void SetScaling(float uniScale);
+	void SetScaling(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 
 	void SetPosition(glm::vec3 l_pos);
@@ -136,6 +146,8 @@ public:
 	glm::vec3 GetRealPosition();
 	//Get the transform representing all the transformations applied to the original model
 	Transform* GetTransform() { return &transform; }
+	//Get the float cube of the drawable, without the rotation transform
+	FloatCube GetFloatCube();
 
 private:
 	void Setup(Model* l_model, Shader* l_shader, Material& l_material);

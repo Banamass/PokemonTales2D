@@ -127,7 +127,7 @@ std::pair<glm::vec3, glm::vec3> Mesh::GetAABBMinMax() {
 	for (; itr != vertices.end(); itr++) {
 		AABBMin.x = std::min(AABBMin.x, itr->Position.x);
 		AABBMin.y = std::min(AABBMin.y, itr->Position.y);
-		AABBMin.x = std::min(AABBMin.y, itr->Position.y);
+		AABBMin.z = std::min(AABBMin.z, itr->Position.z);
 		AABBMax.x = std::max(AABBMax.x, itr->Position.x);
 		AABBMax.y = std::max(AABBMax.y, itr->Position.y);
 		AABBMax.z = std::max(AABBMax.z, itr->Position.z);

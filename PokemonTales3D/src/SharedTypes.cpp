@@ -29,7 +29,6 @@ bool IntRect::Contains(glm::ivec2 v) const {
 	return (v.x >= pos.x && v.x < pos.x + size.x
 		&& v.y >= pos.y && v.y < pos.y + size.y);
 }
-
 bool IntRect::Intersects(IntRect rect) const {
 	return !(pos.x >= rect.pos.x + rect.size.x
 		|| rect.pos.x >= pos.x + size.x
@@ -41,12 +40,25 @@ bool FloatRect::Contains(glm::vec2 v) const {
 	return (v.x >= pos.x && v.x <= pos.x + size.x
 		&& v.y >= pos.y && v.y <= pos.y + size.y);
 }
-
-bool FloatRect::Intersects(IntRect rect) const {
+bool FloatRect::Intersects(FloatRect rect) const {
 	return !(pos.x > rect.pos.x + rect.size.x
 		|| rect.pos.x > pos.x + size.x
 		|| pos.y > rect.pos.y + rect.size.y
 		|| rect.pos.y > pos.y + size.y);
+}
+
+bool FloatCube::Contains(glm::vec3 v) const {
+	return (v.x >= pos.x && v.x <= pos.x + size.x
+		&& v.y >= pos.y && v.y <= pos.y + size.y
+		&& v.z >= pos.z && v.z <= pos.z + size.z);
+}
+bool FloatCube::Intersects(FloatCube rect) const {
+	return !(pos.x > rect.pos.x + rect.size.x
+		|| rect.pos.x > pos.x + size.x
+		|| pos.y > rect.pos.y + rect.size.y
+		|| rect.pos.y > pos.y + size.y
+		|| pos.z > rect.pos.z + rect.size.z
+		|| rect.pos.z > pos.z + size.z);
 }
 
 glm::vec3 ColorFromRGB(uint8_t r, uint8_t g, uint8_t b) {

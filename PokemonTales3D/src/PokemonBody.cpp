@@ -3,9 +3,7 @@
 PokemonBody::PokemonBody(SharedContext* l_context, Pokemon* l_pokemon)
 	: context(l_context), pokemon(l_pokemon), pos(0.0f), movmentZone(0.0f),
 	posTransition(glm::vec3(0.0f), glm::vec3(0.0f), 1.6f, 0.0f), waitTimer(1.0)
-{
-	
-}
+{}
 PokemonBody::~PokemonBody(){}
 
 void PokemonBody::Update(double dt){
@@ -29,6 +27,9 @@ void PokemonBody::Update(double dt){
 void PokemonBody::Render(){
 	pokemon->Render(context->win, posTransition.current);
 }
+void PokemonBody::RenderWithBB(CubeShape* bb) {
+	pokemon->RenderWithBB(context->win, posTransition.current, bb);
+}
 
 void PokemonBody::SetZonePosition(glm::vec3 l_pos) { pos = l_pos; }
 void PokemonBody::SetMovmentZone(glm::vec2 zone) { movmentZone = glm::vec3(zone.x, 0.0f, zone.y); }
@@ -41,3 +42,6 @@ void PokemonBody::SetPosition(glm::vec3 l_pos) {
 glm::vec3 PokemonBody::GetPosition() { return posTransition.current; }
 
 Pokemon* PokemonBody::GetPokemon() { return pokemon; }
+FloatCube PokemonBody::GetFloatCube() {
+	return pokemon->GetFloatCube();
+}

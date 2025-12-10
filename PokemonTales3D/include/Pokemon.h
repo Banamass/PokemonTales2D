@@ -46,6 +46,10 @@ public:
 	void Render(Window* win, glm::ivec2 pos);
 	//Render method for the Pokemon, draw it in win at real position pos
 	void Render(Window* win, glm::vec3 pos);
+	//Render method for the Pokemon and its bounding box, draw it in win at real position pos
+	void RenderWithBB(Window* win, glm::vec3 pos, CubeShape* bbSprite);
+	//Render method for the Pokemon and its bounding box, draw it in win at grid position pos
+	void RenderWithBB(Window* win, glm::ivec2 pos, CubeShape* bbSprite);
 	
 	/*Perform an intersection test with a given ray, describes by ray_origin and ray_direction
 	Return if there is an intersection between the Pokemon drawable and the ray
@@ -78,6 +82,8 @@ public:
 	//Take l_damages damages
 	void TakeDamages(int l_damages);
 
+	FloatCube GetFloatCube();
+
 private:
 	ModelManager* modelMgr;
 
@@ -85,8 +91,6 @@ private:
 
 	Model* model;
 	Drawable* sprite;
-
-	Drawable* OBB;
 
 	PokemonStatus status;
 

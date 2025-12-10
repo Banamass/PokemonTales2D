@@ -25,6 +25,11 @@ void Transform::Scale(glm::vec3 scale) {
 	ComputeTransform();
 }
 
+void Transform::SetScaling(glm::vec3 scale) {
+	scaling = scale;
+	ComputeTransform();
+}
+
 void Transform::Rotate(glm::vec3 l_rotation) {
 	rotation += l_rotation;
 	ComputeTransform();
@@ -50,6 +55,12 @@ glm::mat4 Transform::GetTransform() {
 
 glm::vec3 Transform::GetScaling() {
 	return scaling;
+}
+glm::vec3 Transform::GetPosition() {
+	return translation;
+}
+glm::vec3 Transform::GetRotation() {
+	return rotation;
 }
 
 /*------------------------OBB------------------------*/
@@ -164,6 +175,13 @@ bool OBB::TestRayOBBIntersection(
 	return true;
 }
 
+FloatCube OBB::GetFloatCube() {
+	glm::vec3 scaling = modelTransform->GetScaling();
+	glm::vec3 size = (AABBMax - AABBMin) * scaling;
+	glm::vec3 pos = AABBMin * scaling + modelTransform->GetPosition();
+	return FloatCube(pos, size);
+}
+
 void OBB::Setup(std::pair<glm::vec3, glm::vec3> l_AABBMinMax, Transform* l_modelTransform) {
 	modelTransform = l_modelTransform;
 	AABBMax = l_AABBMinMax.second;
@@ -249,6 +267,12 @@ void Drawable::Scale(glm::vec3 scale) {
 	transform.Scale(scale);
 	transform.SetPosition(GetRealPosition());
 }
+void Drawable::SetScaling(float uniScale) {
+	transform.SetScaling(glm::vec3(uniScale));
+}
+void Drawable::SetScaling(glm::vec3 scale) {
+	transform.SetScaling(scale);
+}
 
 void Drawable::Rotate(glm::vec3 l_rotation) {
 	transform.Rotate(l_rotation);
@@ -272,6 +296,7 @@ glm::vec3 Drawable::GetPosition() { return pos; }
 glm::vec3 Drawable::GetOffset() { return offset; }
 glm::vec3 Drawable::GetOrigin() { return origin; }
 glm::vec3 Drawable::GetRealPosition() { return pos + offset - origin*transform.GetScaling(); }
+FloatCube Drawable::GetFloatCube() { return obb.GetFloatCube(); }
 
 /*------------------------DrawableInstanced------------------------*/
 

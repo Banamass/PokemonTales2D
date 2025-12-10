@@ -2,7 +2,8 @@
 
 World::World(SharedContext* l_context)
 	: context(l_context), map(l_context, "Resources\\GameData\\Map\\map.json"), playerBody(l_context),
-	gravity(23.0f), cameraTransition(glm::vec3(0.0f), glm::vec3(0.0f), 5.0f, 6.0f)
+	gravity(23.0f), cameraTransition(glm::vec3(0.0f), glm::vec3(0.0f), 5.0f, 6.0f),
+	bb(context->modelManager, context->shaderManager)
 {
 	SetCameraRotation(glm::vec2(-1, -1));
 
@@ -41,13 +42,22 @@ void World::Update(double dt){
 	for (auto& e : wildPokemons) {
 		e.second.Update(dt);
 	}
+	CheckCollisions();
 	UpdateCamera(dt);
 }
 void World::Render(){
 	map.Render();
-	playerBody.Render();
+	playerBody.RenderWithBB(&bb);
 	for (auto& e : wildPokemons) {
-		e.second.Render();
+		e.second.RenderWithBB(&bb);
+	}
+}
+
+void World::CheckCollisions() {
+	for (auto& poke : wildPokemons) {
+		if (poke.second.GetFloatCube().Intersects(playerBody.GetFloatCube())) {
+			std::cout << "Intersect" << std::endl;
+		}
 	}
 }
 

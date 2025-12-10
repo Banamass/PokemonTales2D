@@ -20,6 +20,10 @@ public:
 
 	void Draw(Drawable& drawable);
 	void Draw(Drawable* drawable);
+	void DrawLined(Drawable& drawable);
+	void DrawLined(Drawable* drawable);
+	void DrawWithBB(Drawable& drawable, CubeShape* obbSprite);
+	void DrawWithBB(Drawable* drawable, CubeShape* obbSprite);
 	void Draw(Cubemap& cubemap);
 	void Draw(Cubemap* cubemap);
 

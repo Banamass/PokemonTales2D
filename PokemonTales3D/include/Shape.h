@@ -33,3 +33,18 @@ private:
 	float z;
 	glm::vec4 color;
 };
+
+class CubeShape : public Drawable{
+public:
+	CubeShape(ModelManager* modelMgr, ShaderManager* shaderMgr);
+	~CubeShape();
+
+	void SetColor(glm::vec3 color);
+	void SetSize(glm::vec3 l_size);
+	glm::vec3 GetSize();
+
+private:
+	ModelManager* modelMgr;
+
+	glm::vec3 size;
+};
