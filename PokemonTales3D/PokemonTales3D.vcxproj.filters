@@ -156,6 +156,9 @@
     <ClCompile Include="src\PokemonBody.cpp">
       <Filter>Fichiers sources\Game\OpenWorld</Filter>
     </ClCompile>
+    <ClCompile Include="src\OpenWorldGUI.cpp">
+      <Filter>Fichiers sources\Game\OpenWorld</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SimpleFragmentShader.glsl">
@@ -329,6 +332,9 @@
       <Filter>Fichiers d%27en-tête\Game</Filter>
     </ClInclude>
     <ClInclude Include="include\PokemonBody.h">
+      <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenWorldGUI.h">
       <Filter>Fichiers d%27en-tête\Game\OpenWorld</Filter>
     </ClInclude>
   </ItemGroup>

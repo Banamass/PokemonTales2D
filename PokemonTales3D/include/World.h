@@ -4,6 +4,7 @@
 #include "PlayerBody.h"
 #include "PokemonBody.h"
 #include "Transitor.h"
+#include "OpenWorldGUI.h"
 
 class World {
 public:

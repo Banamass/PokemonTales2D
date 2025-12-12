@@ -56,7 +56,11 @@ void World::Render(){
 void World::CheckCollisions() {
 	for (auto& poke : wildPokemons) {
 		if (poke.second.GetFloatCube().Intersects(playerBody.GetFloatCube())) {
-			std::cout << "Intersect" << std::endl;
+			std::string quest = "Fight against : " + poke.second.GetPokemon()->GetName();
+			std::vector<std::string> choices;
+			choices.push_back("Yes");
+			choices.push_back("No");
+			context->openWorldGui->AskQuestion(quest, choices);
 		}
 	}
 }

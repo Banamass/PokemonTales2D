@@ -34,34 +34,42 @@ void Clickable::SetPress(bool b) {
 	if (b == press)
 		return;
 	if (b && !press) {
+		press = b;
 		NotifyAll("Press");
 		Press();
 	}
-	else if (!b && press)
+	else if (!b && press) {
+		press = b;
 		UnPress();
-	press = b;
+	}
 }
 void Clickable::SetHover(bool b) {
 	if (b == hover)
 		return;
 	if (b && !hover) {
+		hover = b;
 		NotifyAll("Hover");
 		Hover();
 	}
-	else if (!b && hover)
+	else if (!b && hover){
+		hover = b;
 		UnHover();
-	hover = b;
+	}
+	
 }
 void Clickable::SetClick(bool b) {
 	if (b == click)
 		return;
 	if (b && !click) {
+		click = b;
 		NotifyAll("Click");
 		Click();
 	}
-	else if (!b && click)
+	else if (!b && click){
+		click = b;
 		UnClick();
-	click = b;
+	}
+	
 }
 
 bool Clickable::GetClick() { return click; }

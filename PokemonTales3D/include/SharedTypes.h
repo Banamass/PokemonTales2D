@@ -27,6 +27,7 @@ class Board;
 class Map;
 class DataManager;
 class StateManager;
+class OpenWorldGUI;
 
 //Structure containing all the main objects of the game, which are shared across the code
 struct SharedContext {
@@ -42,6 +43,7 @@ struct SharedContext {
 	GameSystem* gameSystem;
 	BattleGUI* gui;
 	Board* board;
+	OpenWorldGUI* openWorldGui;
 	Map* map;
 };
 
